@@ -1,0 +1,15 @@
+MANIFEST.in
+imalive/__init__.py
+imalive/imalive.py
+imalive/schema.sql
+imalive.egg-info/PKG-INFO
+imalive.egg-info/SOURCES.txt
+imalive.egg-info/dependency_links.txt
+imalive.egg-info/requires.txt
+imalive.egg-info/top_level.txt
+imalive/static/style.css
+imalive/static/style.css~
+imalive/templates/base.html
+imalive/templates/base.html~
+imalive/templates/home.html
+imalive/templates/home.html~

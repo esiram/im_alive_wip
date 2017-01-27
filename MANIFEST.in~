@@ -1,0 +1,5 @@
+
+
+graft imalive/templates
+graft imalive/static
+##include imalive/schema.sql
