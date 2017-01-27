@@ -7,7 +7,7 @@
 #ALL IMPORTS
 import os
 import sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, \ render_template, flash
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from .imalive import app
 
 
@@ -74,7 +74,7 @@ def initdb_command():
 ### Question: may I have two lines of @app.route on top of the same definition (i.e. '/' and '/home')? ###
 
 @app.route('/')
-def home()
+def home():
    """ Handles home screen (home.html). """
    ### needs future work here. ###
    return render_template('home.html')
