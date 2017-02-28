@@ -8,7 +8,7 @@
 import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
-from .imalive import app
+#from .imalive import app
 
 
 ### should I create a separate .py or .ini file for configuration code? (see step 2 of flaskr ap)
@@ -16,16 +16,18 @@ from .imalive import app
 #CONFIGURATION CODE
 """Loads default config and overrides config from environment variable."""
 app = Flask(__name__)     # create app instance & initialize it
-all.config.from_object(__name__)     # load config from this file, imalive.py
+app.config.from_object(__name__)     # load config from this file, imalive.py
 
+"""The below app.config.update(dict()) info needs better work... does it match up with imalive ap?"""
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'imalive.db'),
-    SECRET_KEY='development key', ### choose key well it keeps the client-side sessions secure ###
+    SECRET_KEY='development key',
     USERNAME='admin',
     PASSWORD='default'
     ))
 app.config.from_envvar('IMALIVE_SETTINGS', silent=True)
-   ### ^regarding DB path: should I make instance folders here (see Flaskr Step 2 sample) ###
+
+"""### Regarding DB path: should I make instance folders here (see Flaskr Step 2 sample) ALSO: see about the silent=TRUE/FALSE for the enviroment settings in step 2. ###"""
 
    
 #FUNCTIONS TO CONNECT DB
@@ -44,7 +46,7 @@ def get_db():
 
 
 @app.teardown_appcontext
-def close_db(error):
+def close_db(error): #note: if things go well the error parameter is None
     """Closes the database again at end of request."""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()

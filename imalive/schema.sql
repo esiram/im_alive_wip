@@ -9,6 +9,7 @@ create table table_survivors (
   originCountry text not null,
   originCity text not null,
   other text not null,
+  message text not null,
   todayDate timestamp,
   username text not null,
   password text not null
