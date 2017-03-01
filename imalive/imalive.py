@@ -81,4 +81,9 @@ def home():
    ### needs future work here. ###
    return render_template('home.html')
 
+@app.route('/signupSurvivor')
+def signupSurvivor():
+    """Handles survivor signup screen(signupSurvivor.html)."""
+    return render_template('signupSurvivor.html')
+
 #SURVIVOR VIEW FUNCTIONS
