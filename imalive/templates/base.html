@@ -1,11 +1,17 @@
-<!--
-
-<!doctype html>
-<title>ImAlive</title>
+<!--<!DOCTYPE html>
+<html>
+  <head>    
+    <title>ImAlive</title>
+  </head>
 
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-  <div class=page>
-    <h1>ImAlive<h2>
+
+  <h1>I'm Alive!<h2>
+      <div>
+      {% block body %}
+      {% endblock %}
+      </div> 
+
 
 	<div class=metanav>	
         {% if not session.logged_in %}
@@ -14,7 +20,7 @@
           <a href="{{ url_for('logout') }}">log out</a>
         {% endif %}
       </div>
-      
+  <div>    
       {% block body %}
       {% endblock %}
    </div>
