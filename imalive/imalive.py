@@ -79,7 +79,7 @@ def initdb_command():
 def home():
    """ Handles home screen (home.html). """
    ### needs future work here. ###
-   return render_template('home.html')
+   return render_template('home2.html')
 
 @app.route('/signupSurvivor')
 def signupSurvivor():

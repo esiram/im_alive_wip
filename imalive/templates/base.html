@@ -1,15 +1,21 @@
-<!--<!DOCTYPE html>
-<html>
-  <head>    
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <title>ImAlive</title>
-  </head>
+</head>
 
-  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-
-  <h1>I'm Alive!<h2>
-      <div>
-      {% block body %}
+<body>
+  <div id="content">
+      {% block content %}{% endblock %}
+  </div>
+  
+  <div id="footer">
+      {% block footer %}
+      &copy; Copyright 2017 by Esther Siram
       {% endblock %}
-      </div>
- 
--->  
+  </div>
+</body>
+
+</html>
