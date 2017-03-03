@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}LoginSurvivor{% endblock %}
+
+{% block content %}
+
+<form>
+  Family (Last) Name:
+  <input type="text" name="familyname"><br>
+  Personal (First) Name:
+  <input type="text" name="personalname"><br>
+  
+
+</form>

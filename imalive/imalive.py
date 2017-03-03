@@ -88,6 +88,11 @@ def celebrate():
     """Handles the celebrate/end screen (celebrate.html)."""
     return render_template('celebrate.html')
 
+@app.route('/loginSurvivor')
+def loginSurvivor():
+    """Handles survivor login to update information (loginSurvivor.html)."""
+    return render_template('loginSurvivor.html')
+
 
 #SEARCH VIEW FUNCTIONS
 @app.route('/search')
