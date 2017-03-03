@@ -1,15 +1,16 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>ImAlive</title>
-  </head>
+{% extends "base.html" %}
+{% block title %} ImAlive Home {% endblock %}
+{% block content %}
 
-  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-
-  <li><em>I'm Alive. Celebrate!</em></li>
-
-  <div> <img src="static/happydance.gif"></div>
-
+<li> <em>I'm Alive Home Page</em></li>
+<br>
+<br>
+<form>
+  <input type="radio" name="doWhat" value="search"> Look Up Someone<br>
+  <input type="radio" name="doWhat" value="signup"> Let Others Know You Live<br>
+  <input type="radio" name="doWhat" value="login"> Update Your Information<br>
+</form>  
   
-</html>
+  
+{% endblock %}
 

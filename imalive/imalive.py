@@ -69,21 +69,25 @@ def initdb_command():
 
 
 #VIEW FUNCTIONS
-### TBD: how to redirect screens ###
-
-### See step 6 in flaskr tutorial regarding hashing and salting passwords -- this still needs to happen. ###
 
 ### Question: may I have two lines of @app.route on top of the same definition (i.e. '/' and '/home')? ###
 
 @app.route('/')
+@app.route('/home')
 def home():
    """ Handles home screen (home.html). """
-   ### needs future work here. ###
-   return render_template('home2.html')
+   return render_template('home.html')
 
-@app.route('/signupSurvivor')
-def signupSurvivor():
-    """Handles survivor signup screen(signupSurvivor.html)."""
-    return render_template('signupSurvivor.html')
 
 #SURVIVOR VIEW FUNCTIONS
+@app.route('/signupSurvivor')
+def signupSurvivor():
+    """Handles survivor signup screen (signupSurvivor.html)."""
+    return render_template('signupSurvivor.html')
+
+@app.route('/celebrate')
+def celebrate():
+    """Handles the celebrate/end screen (celebrate.html)."""
+    return render_template('celebrate.html')
+
+

@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  
-<head>
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <title>ImAlive</title>
-</head>
 
-<body>
-  <div id="content">
-      {% block content %}{% endblock %}
-  </div>
-  
-  <div id="footer">
-      {% block footer %}
-      &copy; Copyright 2017 by Esther Siram
-      {% endblock %}
-  </div>
-</body>
+  <head>
+    {% block head %}
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+  </head>
+
+  <body>
+     <div id="content">
+       {% block content %}{% endblock %}
+     </div>
+     <br><br><br><br><br>
+     <div id="footer">
+        {% block footer %}
+         &copy; Copyright 2017 by Esther Siram
+        {% endblock %}
+     </div>
+   </body>
 
 </html>
