@@ -86,7 +86,7 @@ def signupSurvivor():
 @app.route('/celebrate')
 def celebrate():
     """Handles the celebrate/end screen (celebrate.html)."""
-    return render_template('celebrate.html')
+    return render_template('celebrate.html', name = "Esther" ) #personalname but hardcoding now
 
 @app.route('/loginSurvivor')
 def loginSurvivor():
