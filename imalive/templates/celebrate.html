@@ -1,10 +1,18 @@
 {% extends "base.html" %}
 {% block title %}ImAliveCelebrate{% endblock %}
-{% block content %}
-<li><em>I'm Alive. Celebrate!</em></li>
-<li><em>{{ name }} , celebrate, you're alive!</em><li>
 
-  <div> <img src="static/happydance.gif"></div>
+{% block content %}
+
+<li><em><b>{{ name }}, celebrate, you're alive!</b></em><li>
+<li><em><b>Celebrate!!!!  On {{ signupDate }} <b>{{ name }}</b> registered with I'mAlive!</em></li>
+<li><em>{{ name }}, you're information is updated!</em></li>
+
+    <br>
+    <br>
+    <br>
+
+   <div> <img src="static/happydance.gif"></div>
+   <em>I'm Alive. Celebrate!</em>
 {% endblock %}
 
 
