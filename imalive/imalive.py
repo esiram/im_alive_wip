@@ -70,8 +70,6 @@ def initdb_command():
 
 #VIEW FUNCTIONS
 
-### Question: may I have two lines of @app.route on top of the same definition (i.e. '/' and '/home')? ###
-
 @app.route('/')
 @app.route('/home')
 def home():
@@ -91,3 +89,8 @@ def celebrate():
     return render_template('celebrate.html')
 
 
+#SEARCH VIEW FUNCTIONS
+@app.route('/search')
+def search():
+    """Handles the search index screen (search.html)."""
+    return render_template('search.html')

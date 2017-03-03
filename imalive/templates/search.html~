@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>SurvivorSignup</title>
-  </head>
+{% extends "base.html" %}
+{% block title %} ImAlive Search {% endblock %}
+{% block content %}
 
 
   <form>
@@ -20,50 +18,47 @@
     <input type="radio" name="gender" value="other"> Other<br>
     <br>
     
-    Age:
-    <input type="text" name="age"><br>
-    Birth Year:
-    <input type="text" name="year"><br>
-    Birth Month:
-    <input type="text" name="month"><br>
-    Birthday:
-    <input type="text" name="day"><br>
+    Age:<br>
+    <input type="text" name="age"<br>
+    <br>
+    <br>
+    Birthday:<br>
+	   Year:
+	   <input type="text" name="year"><br>
+	   Month:
+	   <input type="text" name="month"><br>
+	   Day:
+	   <input type="text" name="day"><br>
 	   
     <br>	   
-    <br>
-    
-    Origin Country:
-    <input type="text" name="country"><br>	   
-    Origin City:
-    <input type="text" name="city"><br>
-    Origin County:
-    <input type="text" name="county"><br>
-    Origin Village/Neighborhood/Borough/Town:
-    <input type="text" name="village"><br>
-    Other Origin Information:
-    <input type="text" name="other"<br>
+    <br>	   
+    Origin Country:<br>
+    <input type="text" name="country"<br>
+    <br>	   
+    Origin City/County:<br>
+    <input type="text" name="city"<br>
 
     <br>	   
     <br>
-
-    Are You In Danger?<br>    
+    <br>
+    Are you in danger?<br>    
     <input type="radio" name="sos" value="yes"> Yes, please help.<br>
     <input type="radio" name="sos" value="no"> No, thank you.<br>
+
     <br>
-    Other Information About Your Danger:
-    <input type="text" name="otherSOS"<br>
+    <br>
+    Other information:<br>
+    <input type="text" name="other"<br>
 	   
     <br>
     <br>
     <br>
-    
-    Create a Password Please:
+    Create a password please:<br>
     <input type="password" name="password"<br>
     <br>
-    Please Retype Password for Verification:
+    Please retype password for verification:<br>
     <input type="password" name="password2"<br>
 
-    <br>	   
     <br>
     <br>
     <input type="submit" value="Submit">	   

@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>SurvivorSignup</title>
-  </head>
+{% extends "base.html" %}
+{% block title %} ImAlive Search {% endblock %}
+{% block content %}
 
 
   <form>
@@ -39,35 +37,14 @@
     Origin County:
     <input type="text" name="county"><br>
     Origin Village/Neighborhood/Borough/Town:
-    <input type="text" name="village"><br>
+    <input type="text" name="village"><br>   	       
     Other Origin Information:
     <input type="text" name="other"<br>
-
-    <br>	   
-    <br>
-
-    Are You In Danger?<br>    
-    <input type="radio" name="sos" value="yes"> Yes, please help.<br>
-    <input type="radio" name="sos" value="no"> No, thank you.<br>
-    <br>
-    Other Information About Your Danger:
-    <input type="text" name="otherSOS"<br>
 	   
     <br>
     <br>
     <br>
-    
-    Create a Password Please:
-    <input type="password" name="password"<br>
-    <br>
-    Please Retype Password for Verification:
-    <input type="password" name="password2"<br>
 
-    <br>	   
-    <br>
-    <br>
     <input type="submit" value="Submit">	   
-	   
-	   
-  </form>
-</html>
+
+ {% endblock %}   
