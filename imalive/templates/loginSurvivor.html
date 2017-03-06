@@ -4,16 +4,16 @@
 
 {% block content %}
 
-<form>
-  
-  Family (Last) Name:
-  <input type="text" name="familyname"><br>
-  Personal (First) Name:
-  <input type="text" name="personalname"><br>
-  Password:
-  <input type="password" name="password"><br>
-  <br>
-  <input type="submit" value="Submit">
+<form action="http://127.0.0.1:5000/loginSurvivor" method="post">
+
+    Family (Last) Name:
+    <input type="text" name="familyname"><br>
+    Personal (First) Name:
+    <input type="text" name="personalname"><br>
+    Password:
+    <input type="password" name="password"><br>
+    <br>
+    <input type="submit" value="Submit">
 
 </form>
 
