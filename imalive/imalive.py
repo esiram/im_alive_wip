@@ -78,9 +78,15 @@ def home():
 
 
 #SURVIVOR VIEW FUNCTIONS
-@app.route('/signupSurvivor')
+@app.route('/signupSurvivor', methods = ['POST', 'GET'])
 def signupSurvivor():
     """Handles survivor signup screen (signupSurvivor.html)."""
+  #  if request.method == 'POST':
+   #     user = request.form['personalname']
+    #    return redirect(url_for('celebrate', name = user))
+    #else:
+     #   user = request.args.get('personalname')
+      #  return redirect(url_for('celebrate', name = user))
     return render_template('signupSurvivor.html')
 
 @app.route('/celebrate')
@@ -88,7 +94,7 @@ def celebrate():
     """Handles the celebrate/end screen (celebrate.html)."""
     return render_template('celebrate.html', name = "Esther", signupDate = "03 March 2017" ) #personalname but hardcoding now
 
-@app.route('/loginSurvivor')
+@app.route('/loginSurvivor', methods = ['POST', 'GET'])
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""
     return render_template('loginSurvivor.html')
