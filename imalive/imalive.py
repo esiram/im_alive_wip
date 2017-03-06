@@ -70,23 +70,26 @@ def initdb_command():
 
 #VIEW FUNCTIONS
 
-@app.route('/')
-@app.route('/home')
+@app.route('/', methods = ['POST', 'GET'])
+@app.route('/home', methods = ['POST', 'GET'])
 def home():
    """ Handles home screen (home.html). """
-   return render_template('home.html')
-
+   render_template('home.html')
+   while request.method == 'POST':
+       doWhat = request.form['doWhat']
+       if doWhat == "search":
+           return redirect(url_for("search"))
+       elif doWhat == "signup":
+           return redirect(url_for("signupSurvivor"))
+       else:
+           return redirect(url_for("loginSurvivor"))
+   else:
+       return render_template('home.html')
 
 #SURVIVOR VIEW FUNCTIONS
 @app.route('/signupSurvivor', methods = ['POST', 'GET'])
 def signupSurvivor():
     """Handles survivor signup screen (signupSurvivor.html)."""
-  #  if request.method == 'POST':
-   #     user = request.form['personalname']
-    #    return redirect(url_for('celebrate', name = user))
-    #else:
-     #   user = request.args.get('personalname')
-      #  return redirect(url_for('celebrate', name = user))
     return render_template('signupSurvivor.html')
 
 @app.route('/celebrate')

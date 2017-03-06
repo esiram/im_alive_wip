@@ -1,14 +1,17 @@
 {% extends "base.html" %}
-{% block title %} ImAlive Home {% endblock %}
+{% block title %} I'mAlive Home {% endblock %}
 {% block content %}
 
-<li> <em>I'm Alive Home Page</em></li>
+<li> <em>I'mAlive Home Page</em></li>
 <br>
 <br>
-<form>
+<form action = "http://127.0.0.1:5000" method = "post">
+  
   <input type="radio" name="doWhat" value="search"> Look Up Someone<br>
   <input type="radio" name="doWhat" value="signup"> Let Others Know You Live<br>
   <input type="radio" name="doWhat" value="login"> Update Your Information<br>
+  <input type="submit" value="Submit">
+
 </form>  
   
   
