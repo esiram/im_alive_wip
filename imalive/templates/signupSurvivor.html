@@ -4,17 +4,23 @@
 
 {% block content %}
 
+   
+<form action="http://127.0.0.1:5000/signupSurvivor" method="post">
 
-  <form action="http://127.0.0.1:5000/signupSurvivor" method="post">
-    Family (Last) Name:
+    {% if error %}
+    <p><strong>Error:</strong> {{ error }}
+    <br>
+    {% endif %} 
+  
+    Family (Last) Name*:
     <input type="text" name="familyname"> <br>
-    Personal (First) Name:
+    Personal (First) Name*:
     <input type="text" name="personalname"> <br>
     Additional Name(s):
     <input type="text" name="additionalname"> <br>
     <br>
 
-    Gender:<br>
+    Gender*:<br>
     <input type="radio" name="gender" value="male"> Male<br>
     <input type="radio" name="gender" value="female"> Female<br>
     <input type="radio" name="gender" value="other"> Other<br>
@@ -32,13 +38,13 @@
     <br>	   
     <br>
     
-    Origin Country:
+    Origin Country*:
     <input type="text" name="country"><br>	   
     Origin City:
     <input type="text" name="city"><br>
     Origin County:
     <input type="text" name="county"><br>
-    Origin Village/Neighborhood/Borough/Town:
+    Origin Village/Neighborhood/Borough/Town*:
     <input type="text" name="village"><br>
     Other Origin Information:
     <input type="text" name="other"<br>
@@ -58,10 +64,10 @@
     <br>
     <br>
     
-    Create a Password Please:
+    Create a Password*:
     <input type="password" name="password"<br>
     <br>
-    Please Retype Password for Verification:
+    Retype Password for Verification*:
     <input type="password" name="password2"<br>
 
     <br>	   

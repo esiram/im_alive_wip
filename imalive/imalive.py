@@ -90,7 +90,19 @@ def home():
 @app.route('/signupSurvivor', methods = ['POST', 'GET'])
 def signupSurvivor():
     """Handles survivor signup screen (signupSurvivor.html)."""
-    return render_template('signupSurvivor.html')
+    render_template('signupSurvivor.html', error = None)
+    while request.method == 'POST':
+        familyname = request.form['familyname']
+        personalname = request.form['personalname']
+        error = None
+#        return redirect(url_for("celebrate", name = personalname))
+        if familyname and personalname: #for now to keep simple
+            return redirect(url_for("celebrate", name = personalname))
+        else:
+            error = "Not enough information to continue, please fill in asterisked/starred items."
+            return render_template('signupSurvivor.html', error = error)
+    else: #request.method == 'GET'
+        return render_template('signupSurvivor.html', error = None)
 
 @app.route('/celebrate')
 def celebrate():
