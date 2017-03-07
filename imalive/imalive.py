@@ -121,4 +121,15 @@ def loginSurvivor():
 @app.route('/search', methods = ['POST', 'GET'])
 def search():
     """Handles the search index screen (search.html)."""
-    return render_template('search.html')
+    render_template('search.html', error = None)
+    while request.method == 'POST':
+        familyname = request.form['familyname']
+        personalname = request.form['personalname']
+        error = None
+        if familyname and personalname: #for now to keep simple
+            return redirect(url_for("celebrate", personalname = personalname))
+        else:
+            error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
+            return render_template('search.html', error = error, personalname = personalname, familyname = familyname)
+    else: #request.method == 'GET'
+        return render_template('search.html', error = None)

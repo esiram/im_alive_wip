@@ -1,12 +1,21 @@
 {% extends "base.html" %}
+
 {% block title %} ImAlive Search {% endblock %}
+
 {% block content %}
 
 
-  <form>
-    Family (Last) Name:
+<form action="http://127.0.0.1:5000/search" method="post">
+  
+  {% if error %}
+  <p><strong> Error: {{ error }}</strong>
+  <br>
+  {% endif %}
+
+  
+    Family (Last) Name*:
     <input type="text" name="familyname"> <br>
-    Personal (First) Name:
+    Personal (First) Name*:
     <input type="text" name="personalname"> <br>
     Additional Name(s):
     <input type="text" name="additionalname"> <br>
@@ -45,6 +54,8 @@
     <br>
     <br>
 
-    <input type="submit" value="Submit">	   
+    <input type="submit" value="Submit">
+
+</form>    
 
  {% endblock %}   
