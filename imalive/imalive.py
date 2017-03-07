@@ -1,17 +1,10 @@
-
-""" Note: triple (###) stand for TBD info/updates; double (##) stand for this is code to use later probably; single (#) and triple quotes stand for normal notes. """
-
-### Correct later on as needed: in the schema.sql file I guessed on types, probably need to change many of the ones initially used
-
-
 #ALL IMPORTS
 import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
-#from .imalive import app
 
 
-### should I create a separate .py or .ini file for configuration code? (see step 2 of flaskr ap)
+### should I create a separate .py or .ini file for configuration code? (see step 2 of flaskr app model)
 
 #CONFIGURATION CODE
 """Loads default config and overrides config from environment variable."""
@@ -69,7 +62,6 @@ def initdb_command():
 
 
 #VIEW FUNCTIONS
-
 @app.route('/', methods = ['POST', 'GET'])
 @app.route('/home', methods = ['POST', 'GET'])
 def home():
@@ -86,6 +78,7 @@ def home():
    else:
        return render_template('home.html')
 
+   
 #SURVIVOR VIEW FUNCTIONS
 @app.route('/signupSurvivor', methods = ['POST', 'GET'])
 def signupSurvivor():
@@ -95,19 +88,27 @@ def signupSurvivor():
         familyname = request.form['familyname']
         personalname = request.form['personalname']
         error = None
-#        return redirect(url_for("celebrate", name = personalname))
         if familyname and personalname: #for now to keep simple
-            return redirect(url_for("celebrate", name = personalname))
+            return redirect(url_for("celebrate"))
         else:
             error = "Not enough information to continue, please fill in asterisked/starred items."
             return render_template('signupSurvivor.html', error = error)
     else: #request.method == 'GET'
         return render_template('signupSurvivor.html', error = None)
 
-@app.route('/celebrate')
+
+    
+@app.route('/celebrate', methods = ['POST', 'GET'])
 def celebrate():
     """Handles the celebrate/end screen (celebrate.html)."""
-    return render_template('celebrate.html', name = "Esther", signupDate = "03 March 2017" ) #personalname but hardcoding now
+    personalname = "Esther" #personalname hardcoded for now
+    if request.method == 'POST':
+        personalname = "POSTmethodTest" #personalname hardcoded for now
+    else:
+        personalname = "GETmethodTest"  #request.form[personalname] didn't work here
+    return render_template('celebrate.html', personalname = personalname)
+
+
 
 @app.route('/loginSurvivor', methods = ['POST', 'GET'])
 def loginSurvivor():
@@ -115,8 +116,9 @@ def loginSurvivor():
     return render_template('loginSurvivor.html')
 
 
+
 #SEARCH VIEW FUNCTIONS
-@app.route('/search')
+@app.route('/search', methods = ['POST', 'GET'])
 def search():
     """Handles the search index screen (search.html)."""
     return render_template('search.html')
