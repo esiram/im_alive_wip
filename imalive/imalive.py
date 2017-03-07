@@ -89,7 +89,7 @@ def signupSurvivor():
         personalname = request.form['personalname']
         error = None
         if familyname and personalname: #for now to keep simple
-            return redirect(url_for("celebrate"))
+            return redirect(url_for("celebrate", personalname = personalname))
         else:
             error = "Not enough information to continue, please fill in asterisked/starred items."
             return render_template('signupSurvivor.html', error = error)
