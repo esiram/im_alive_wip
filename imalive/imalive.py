@@ -98,14 +98,14 @@ def signupSurvivor():
 
 
     
-@app.route('/celebrate', methods = ['POST', 'GET'])
+@app.route('/celebrate', methods = ['GET']) # GET and POST method(s) needed or just GET?
 def celebrate():
     """Handles the celebrate/end screen (celebrate.html)."""
-    personalname = "Esther" #personalname hardcoded for now
-    if request.method == 'POST':
-        personalname = "POSTmethodTest" #personalname hardcoded for now
-    else:
-        personalname = "GETmethodTest"  #request.form[personalname] didn't work here
+    # personalname = "Esther" #personalname hardcoded for now
+    # if request.method == 'POST':
+    #     personalname = "POSTmethodTest" #personalname hardcoded for now
+    # else:
+    personalname = "Esther"  #request.form[personalname] didn't work here
     return render_template('celebrate.html', personalname = personalname)
 
 
