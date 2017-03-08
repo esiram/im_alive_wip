@@ -1,17 +1,18 @@
 #ALL IMPORTS
 import os
-import sqlite3
+#from app import models.py
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 
-### should I create a separate .py or .ini file for configuration code? (see step 2 of flaskr app model)
+
+### Should I create a separate .py or .ini file for configuration code? (see step 2 of flaskr app model)
 
 #CONFIGURATION CODE
 """Loads default config and overrides config from environment variable."""
 app = Flask(__name__)     # create app instance & initialize it
 app.config.from_object(__name__)     # load config from this file, imalive.py
 
-"""The below app.config.update(dict()) info needs better work... does it match up with imalive ap?"""
+### The below app.config.update(dict()) info needs better work... does it match up with imalive ap?
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'imalive.db'),
     SECRET_KEY='development key',
@@ -20,46 +21,11 @@ app.config.update(dict(
     ))
 app.config.from_envvar('IMALIVE_SETTINGS', silent=True)
 
-"""### Regarding DB path: should I make instance folders here (see Flaskr Step 2 sample) ALSO: see about the silent=TRUE/FALSE for the enviroment settings in step 2. ###"""
 
-   
-#FUNCTIONS TO CONNECT DB
-def connect_db():
-    """Connects to specific database."""
-    rv = sqlite3.connect(app.config['DATABASE'])
-    rv.row_factory = sqlite3.Row
-    return rv
+### Regarding DB path: should I make instance folders here (see Flaskr Step 2 sample) ALSO: see about the silent=TRUE/FALSE for the enviroment settings in step 2.
+  
 
-
-def get_db():
-    """Opens a new database connection if none yet for current application context."""
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
-
-
-@app.teardown_appcontext
-def close_db(error): #note: if things go well the error parameter is None
-    """Closes the database again at end of request."""
-    if hasattr(g, 'sqlite_db'):
-        g.sqlite_db.close()
-
-
-#FUNCTIONS TO INITIALIZE DB
-def init_db():
-    """Opens file from resource folder."""
-    db = get_db()
-    with app.open_resource('schema.sql', mode='r') as f:
-        db.cursor().executescript(f.read())
-    db.commit()
     
-@app.cli.command('initdb')  #flask creates an application context bound to correct application
-def initdb_command():
-    """Initializes the database."""
-    init_db()
-    print('Initialized the database.')
-
-
 
 #VIEW FUNCTIONS
 @app.route('/', methods = ['POST', 'GET'])
