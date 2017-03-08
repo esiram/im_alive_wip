@@ -1,6 +1,6 @@
 #ALL IMPORTS
 import os
-#from app import models.py
+import sqlite3 #I created a models.py file but need to think this through more 3-8-17es
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 
@@ -9,10 +9,10 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 
 #CONFIGURATION CODE
 """Loads default config and overrides config from environment variable."""
-app = Flask(__name__)     # create app instance & initialize it
+app = Flask(__name__) # create app instance & initialize it  ##original code
 app.config.from_object(__name__)     # load config from this file, imalive.py
 
-### The below app.config.update(dict()) info needs better work... does it match up with imalive ap?
+#verify that the below info works for imalive; basically copied from flaskr example
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'imalive.db'),
     SECRET_KEY='development key',
@@ -22,10 +22,67 @@ app.config.update(dict(
 app.config.from_envvar('IMALIVE_SETTINGS', silent=True)
 
 
-### Regarding DB path: should I make instance folders here (see Flaskr Step 2 sample) ALSO: see about the silent=TRUE/FALSE for the enviroment settings in step 2.
-  
+#FUNCTIONS TO CONNECT DB
+def connect_db():
+   """Connects to specific database."""
+   rv = sqlite3.connect(app.config['DATABASE']) 
+   rv.row_factory = sqlite3.Row #this allows rows to be treated like dictionaries vs tuples
+   return rv
+
+def get_db():
+    """Opens a new database connection if none yet for current application context."""
+    if not hasattr(g, 'sqlite_db'):
+        g.sqlite_db = connect_db()
+    return g.sqlite_db
+
+@app.teardown_appcontext
+def close_db(error):          #if things go well the error parameter is None
+    """Closes the database again at end of request."""
+    if hasattr(g, 'sqlite_db'):
+        g.sqlite_db.close()
+
+#FUNCTIONS TO UTILIZE DB
+def create_table():
+    """To create table_survivors if table doesn't exist."""
+    conn = connect_db() #connection
+    cur = conn.cursor() #cursor
+    cur.execute('CREATE TABLE IF NOT EXISTS table_survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')
+
+def insertSurvivor(familyname, personalname):
+    """For dynamic data entry."""
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO table_survivors(familyname, personalname) VALUES (?,?,)", (familyname, personalname))
+    conn.commit()
+    conn.close()
+
+def retrieveSurvivors():
+    """For retrieval of survivor info from table_survivors.""" 
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT familyname, personalname FROM table_survivors")
+    survivors = cur.fetchall()
+    conn.close()
+    return survivors
+       
+
+#FUNCTIONS TO INITIALIZE DB
+def init_db():
+    """Opens file from resource folder."""
+    db = get_db()
+    c = db.cursor()   #db.cursor() used in flaskr tutorial rather than c
+    with app.open_resource('schema.sql', mode='r') as f:
+       c.executescript(f.read())
+    db.commit()
+    
+@app.cli.command('initdb')  #flask creates an application context bound to correct application
+def initdb_command():
+    """Initializes the database."""
+    init_db()
+    print('Initialized the database.')
 
     
+
 
 #VIEW FUNCTIONS
 @app.route('/', methods = ['POST', 'GET'])

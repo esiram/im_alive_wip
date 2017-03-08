@@ -1,5 +1,6 @@
 import sqlite3
-
+import datetime #for datestamp
+import time #for populating unix (may not be necessary// delete later if not used)
 
 #FUNCTIONS TO CONNECT DB
 def connect_db():
