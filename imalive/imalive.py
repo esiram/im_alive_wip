@@ -1,18 +1,15 @@
 #ALL IMPORTS
 import os
-import sqlite3 #I created a models.py file but need to think this through more 3-8-17es
+import sqlite3 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 
-
-### Should I create a separate .py or .ini file for configuration code? (see step 2 of flaskr app model)
-
 #CONFIGURATION CODE
 """Loads default config and overrides config from environment variable."""
-app = Flask(__name__) # create app instance & initialize it  ##original code
+app = Flask(__name__)                # create app instance & initialize it
 app.config.from_object(__name__)     # load config from this file, imalive.py
 
-#verify that the below info works for imalive; basically copied from flaskr example
+
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'imalive.db'),
     SECRET_KEY='development key',
@@ -25,13 +22,13 @@ app.config.from_envvar('IMALIVE_SETTINGS', silent=True)
 #FUNCTIONS TO CONNECT DB
 def connect_db():
    """Connects to specific database."""
-   rv = sqlite3.connect(app.config['DATABASE']) 
+   rv = sqlite3.connect(app.config['DATABASE'])
    rv.row_factory = sqlite3.Row #this allows rows to be treated like dictionaries vs tuples
    return rv
 
 def get_db():
     """Opens a new database connection if none yet for current application context."""
-    if not hasattr(g, 'sqlite_db'):
+    if not hasattr(g, 'sqlite_db'):  #store db in a global variable 'g'
         g.sqlite_db = connect_db()
     return g.sqlite_db
 
@@ -48,24 +45,24 @@ def create_table():
     cur = conn.cursor() #cursor
     cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')
 
-def insertSurvivor():
-    """For dynamic data entry."""
-    familyname = familyname
-    personalname = personalname
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO survivors (familyname, personalname) VALUES (?, ?)",                   (familyname, personalname))
-    conn.commit()
-#    conn.close() #do you want to close this?
+#def insertSurvivor():
+#    """For dynamic data entry."""
+#    familyname = familyname
+#    personalname = personalname
+#    conn = connect_db()
+#    cur = conn.cursor()
+#    cur.execute("INSERT INTO survivors (familyname, personalname) VALUES (?, ?)",                   (familyname, personalname))
+#    conn.commit()
+##    conn.close() #do you want to close this?
 
-def retrieveSurvivors():
-    """For retrieval of survivor info from 'survivors' table.""" 
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("SELECT familyname, personalname FROM survivors")
-    survivorList = cur.fetchall()
-    conn.close()
-    return survivorList
+#def retrieveSurvivors():
+#    """For retrieval of survivor info from 'survivors' table.""" 
+#    conn = connect_db()
+#    cur = conn.cursor()
+#    cur.execute("SELECT familyname, personalname FROM survivors")
+#    survivorList = cur.fetchall()
+#    conn.close()
+#    return survivorList
        
 
 #FUNCTIONS TO INITIALIZE DB
@@ -82,8 +79,6 @@ def initdb_command():
     """Initializes the database."""
     init_db()
     print('Initialized the database.')
-
-    
 
 
 #VIEW FUNCTIONS
@@ -110,17 +105,19 @@ def signupSurvivor():
     """Handles survivor signup screen (signupSurvivor.html)."""
     render_template('signupSurvivor.html', error = None)
     while request.method == 'POST':
-        familyname = request.form['familyname']
-        personalname = request.form['personalname']
-        error = None
-        if familyname and personalname: #for now to keep simple
-            insertSurvivor()
-            return redirect(url_for("celebrate", personalname = personalname))
-        else:
-            error = "Not enough information to continue, please fill in asterisked/starred items."
-            return render_template('signupSurvivor.html', error = error)
+       error = None
+       familyname = request.form['familyname']
+       personalname = request.form['personalname']
+       if familyname and personalname: #for now to keep simple
+          db = get_db()
+          db.execute('INSERT INTO survivors (familyname, personalname) VALUES (?, ?)',                      [request.form['familyname'], request.form['personalname']])
+          db.commit()
+          return redirect(url_for("celebrate", personalname = personalname))
+       else:
+           error = "Not enough information to continue, please fill in asterisked/starred items."
+           return render_template('signupSurvivor.html', error = error)
     else: #request.method == 'GET'
-        return render_template('signupSurvivor.html', error = None)
+       return render_template('signupSurvivor.html', error = None)
 
 
     
