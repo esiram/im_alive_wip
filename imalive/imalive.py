@@ -43,27 +43,29 @@ def close_db(error):          #if things go well the error parameter is None
 
 #FUNCTIONS TO UTILIZE DB
 def create_table():
-    """To create table_survivors if table doesn't exist."""
+    """To create table 'survivors' if table doesn't exist."""
     conn = connect_db() #connection
     cur = conn.cursor() #cursor
-    cur.execute('CREATE TABLE IF NOT EXISTS table_survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')
+    cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')
 
-def insertSurvivor(familyname, personalname):
+def insertSurvivor():
     """For dynamic data entry."""
+    familyname = familyname
+    personalname = personalname
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute("INSERT INTO table_survivors(familyname, personalname) VALUES (?,?,)", (familyname, personalname))
+    cur.execute("INSERT INTO survivors (familyname, personalname) VALUES (?, ?)",                   (familyname, personalname))
     conn.commit()
-    conn.close()
+#    conn.close() #do you want to close this?
 
 def retrieveSurvivors():
-    """For retrieval of survivor info from table_survivors.""" 
+    """For retrieval of survivor info from 'survivors' table.""" 
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute("SELECT familyname, personalname FROM table_survivors")
-    survivors = cur.fetchall()
+    cur.execute("SELECT familyname, personalname FROM survivors")
+    survivorList = cur.fetchall()
     conn.close()
-    return survivors
+    return survivorList
        
 
 #FUNCTIONS TO INITIALIZE DB
@@ -112,6 +114,7 @@ def signupSurvivor():
         personalname = request.form['personalname']
         error = None
         if familyname and personalname: #for now to keep simple
+            insertSurvivor()
             return redirect(url_for("celebrate", personalname = personalname))
         else:
             error = "Not enough information to continue, please fill in asterisked/starred items."
