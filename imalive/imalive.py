@@ -1,14 +1,14 @@
-#ALL IMPORTS
+### ALL IMPORTS ###
 import os
 import sqlite3 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 
-#CONFIGURATION CODE
+### CONFIGURATION CODE ###
 """Loads default config and overrides config from environment variable."""
+
 app = Flask(__name__)                # create app instance & initialize it
 app.config.from_object(__name__)     # load config from this file, imalive.py
-
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'imalive.db'),
@@ -19,6 +19,8 @@ app.config.update(dict(
 app.config.from_envvar('IMALIVE_SETTINGS', silent=True)
 
 
+
+### DATABASE FUNCTIONS ###
 #FUNCTIONS TO CONNECT DB
 def connect_db():
    """Connects to specific database."""
@@ -38,31 +40,13 @@ def close_db(error):          #if things go well the error parameter is None
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
+        
 #FUNCTIONS TO UTILIZE DB
 def create_table():
     """To create table 'survivors' if table doesn't exist."""
     conn = connect_db() #connection
     cur = conn.cursor() #cursor
     cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')
-
-#def insertSurvivor():
-#    """For dynamic data entry."""
-#    familyname = familyname
-#    personalname = personalname
-#    conn = connect_db()
-#    cur = conn.cursor()
-#    cur.execute("INSERT INTO survivors (familyname, personalname) VALUES (?, ?)",                   (familyname, personalname))
-#    conn.commit()
-##    conn.close() #do you want to close this?
-
-#def retrieveSurvivors():
-#    """For retrieval of survivor info from 'survivors' table.""" 
-#    conn = connect_db()
-#    cur = conn.cursor()
-#    cur.execute("SELECT familyname, personalname FROM survivors")
-#    survivorList = cur.fetchall()
-#    conn.close()
-#    return survivorList
        
 
 #FUNCTIONS TO INITIALIZE DB
@@ -80,8 +64,10 @@ def initdb_command():
     init_db()
     print('Initialized the database.')
 
-
-#VIEW FUNCTIONS
+    
+    
+### VIEW FUNCTIONS ###
+#GENERAL VIEW FUNCTIONS
 @app.route('/', methods = ['POST', 'GET'])
 @app.route('/home', methods = ['POST', 'GET'])
 def home():
@@ -98,6 +84,14 @@ def home():
    else:
        return render_template('home.html')
 
+
+@app.route('/celebrate', methods = ['GET', 'POST'])
+def celebrate():
+    """Handles the celebrate screen (celebrate.html)."""
+#    personalname = request.form['personalname']###NOT WORKING
+    return render_template('celebrate.html', personalname = "Esther", signupDate = "3-7-17")
+
+    
    
 #SURVIVOR VIEW FUNCTIONS
 @app.route('/signupSurvivor', methods = ['POST', 'GET'])
@@ -110,7 +104,8 @@ def signupSurvivor():
        personalname = request.form['personalname']
        if familyname and personalname: #for now to keep simple
           db = get_db()
-          db.execute('INSERT INTO survivors (familyname, personalname) VALUES (?, ?)',                      [request.form['familyname'], request.form['personalname']])
+          db.execute('INSERT INTO survivors (familyname, personalname) VALUES (?, ?)',
+                     [request.form['familyname'], request.form['personalname']])
           db.commit()
           return redirect(url_for("celebrate", personalname = personalname))
        else:
@@ -118,19 +113,6 @@ def signupSurvivor():
            return render_template('signupSurvivor.html', error = error)
     else: #request.method == 'GET'
        return render_template('signupSurvivor.html', error = None)
-
-
-    
-@app.route('/celebrate', methods = ['GET']) # GET and POST method(s) needed or just GET?
-def celebrate():
-    """Handles the celebrate/end screen (celebrate.html)."""
-    # personalname = "Esther" #personalname hardcoded for now
-    # if request.method == 'POST':
-    #     personalname = "POSTmethodTest" #personalname hardcoded for now
-    # else:
-    personalname = "Esther"  #request.form[personalname] didn't work here
-    return render_template('celebrate.html', personalname = personalname)
-
 
 
 @app.route('/loginSurvivor', methods = ['POST', 'GET'])
@@ -150,7 +132,9 @@ def search():
         personalname = request.form['personalname']
         error = None
         if familyname and personalname: #for now to keep simple
-            return redirect(url_for("celebrate", personalname = personalname))
+           db = get_db()
+           db.execute('SELECT * FROM survivors WHERE familyname = ?', [request.form['familyname']])#, request.form['personalname']])
+           return redirect(url_for("celebrate", personalname = personalname))
         else:
             error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
             return render_template('search.html', error = error, personalname = personalname, familyname = familyname)
