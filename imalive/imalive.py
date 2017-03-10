@@ -102,10 +102,11 @@ def signupSurvivor():
        error = None
        familyname = request.form['familyname']
        personalname = request.form['personalname']
-       if familyname and personalname: #for now to keep simple
+       password = request.form['password']
+       if familyname and personalname and password: #for now to keep simple
           db = get_db()
-          db.execute('INSERT INTO survivors (familyname, personalname) VALUES (?, ?)',
-                     [request.form['familyname'], request.form['personalname']])
+          db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
+                     [request.form['familyname'], request.form['personalname'], request.form['password']])
           db.commit()
           return redirect(url_for("celebrate", personalname = personalname))
        else:
@@ -133,8 +134,12 @@ def search():
         error = None
         if familyname and personalname: #for now to keep simple
            db = get_db()
-           db.execute('SELECT * FROM survivors WHERE familyname = ?', [request.form['familyname']])#, request.form['personalname']])
-           return redirect(url_for("celebrate", personalname = personalname))
+           db.execute('SELECT * FROM survivors WHERE familyname = ?', [request.form['familyname']])#, request.form['personalname']]) ###this not working 3-9-17
+           if familyname is None:
+              error = "No such survivor with that name has enrolled with I'mAlive."
+              return render_template('search.html', error = error)
+           else:
+              return redirect(url_for("celebrate", personalname = personalname))
         else:
             error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
             return render_template('search.html', error = error, personalname = personalname, familyname = familyname)
