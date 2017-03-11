@@ -94,7 +94,7 @@ def celebrate():
     
    
 #SURVIVOR VIEW FUNCTIONS
-@app.route('/signupSurvivor', methods = ['POST', 'GET'])
+@app.route('/signupSurvivor', methods = ['GET', 'POST'])
 def signupSurvivor():
     """Handles survivor signup screen (signupSurvivor.html)."""
     render_template('signupSurvivor.html', error = None)
@@ -116,10 +116,23 @@ def signupSurvivor():
        return render_template('signupSurvivor.html', error = None)
 
 
-@app.route('/loginSurvivor', methods = ['POST', 'GET'])
+@app.route('/loginSurvivor', methods = ['GET', 'POST'])
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""
-    return render_template('loginSurvivor.html')
+    render_template('loginSurvivor.html')    
+    error = None
+    if request.method == 'POST':
+       if request.form['personalname'] != app.config['PERSONALNAME']: #see app.config info in flask docs
+          error = 'Invalid personal name.'
+          render_template('loginSurvivor.html', error = error)  
+       elif request.form['familyname'] != app.config['FAMILYNAME']:
+          error = 'Invalid family name.'
+          render_template('loginSurvivor.html', error = error)  
+       elif request.form['password'] != app.config['PASSWORD']:
+          error = 'Invalid password.'
+          render_template('loginSurvivor.html', error = error)  
+       else:
+          return render_template('signupSurvivor.html')  #this may need a different redirect
 
 
 
