@@ -85,11 +85,12 @@ def home():
        return render_template('home.html')
 
 
+#@app.route('/celebrate<personalname>', methods = ['GET', 'POST'])
 @app.route('/celebrate', methods = ['GET', 'POST'])
 def celebrate():
     """Handles the celebrate screen (celebrate.html)."""
-#    personalname = request.form['personalname']###NOT WORKING
-    return render_template('celebrate.html', personalname = "Esther", signupDate = "3-7-17")
+    return 'celebrate %s' % personalname
+#    return render_template('celebrate.html', personalname = "Esther", signupDate = "3-7-17")
 
     
    
@@ -108,7 +109,8 @@ def signupSurvivor():
           db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
                      [request.form['familyname'], request.form['personalname'], request.form['password']])
           db.commit()
-          return redirect(url_for("celebrate", personalname = personalname))
+          #return redirect(url_for("celebrate", personalname = personalname))
+          return render_template('celebrate.html', personalname = personalname)
        else:
            error = "Not enough information to continue, please fill in asterisked/starred items."
            return render_template('signupSurvivor.html', error = error)
@@ -121,19 +123,7 @@ def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""
     render_template('loginSurvivor.html')    
     error = None
-    if request.method == 'POST':
-       if request.form['personalname'] != app.config['PERSONALNAME']: #see app.config info in flask docs
-          error = 'Invalid personal name.'
-          render_template('loginSurvivor.html', error = error)  
-       elif request.form['familyname'] != app.config['FAMILYNAME']:
-          error = 'Invalid family name.'
-          render_template('loginSurvivor.html', error = error)  
-       elif request.form['password'] != app.config['PASSWORD']:
-          error = 'Invalid password.'
-          render_template('loginSurvivor.html', error = error)  
-       else:
-          return render_template('signupSurvivor.html')  #this may need a different redirect
-
+    return render_template('loginSurvivor.html', error = error)
 
 
 #SEARCH VIEW FUNCTIONS
