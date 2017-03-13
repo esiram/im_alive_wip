@@ -92,7 +92,7 @@ def celebrate():
     if 'personalname' in session:                                                        #this pulls name dynamically into template, URL not showing yet as of 3/13/17
        return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])  #this pulls name dynamically as of 3/13/17
     else:
-       return render_template('celebrate.html', personalname = "Esther", signupDate = "3-7-17")
+       return render_template('celebrate.html', personalname = "EstherTester", signupDate = "TesterDateToday")
 
     
    
@@ -112,11 +112,9 @@ def signupSurvivor():
           db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
                      [request.form['familyname'], request.form['personalname'], request.form['password']])
           db.commit()
-          #return redirect(url_for("celebrate"))
           session['personalname'] = request.form['personalname']   #added 3/13/17
           session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
           return redirect(url_for('celebrate'))                    #added 3/13/17
-          #return render_template('celebrate.html', personalname = personalname) #this render_template pulls the name, but the url stays with /signupSurvivor-ES 3/11/17
        else:
            error = "Not enough information to continue, please fill in asterisked/starred items."
            return render_template('signupSurvivor.html', error = error)
@@ -141,6 +139,7 @@ def search():
         familyname = request.form['familyname']
         personalname = request.form['personalname']
         error = None
+        message = ""
         if familyname and personalname: #for now to keep simple
            db = get_db()
            db.execute('SELECT * FROM survivors WHERE familyname = ?', [request.form['familyname']])#, request.form['personalname']]) ###this not working 3-9-17
@@ -148,8 +147,10 @@ def search():
               error = "No such survivor with that name has enrolled with I'mAlive."
               return render_template('search.html', error = error)
            else:  #would this be where we put the user in session?
-              #session['personalname'] = request.form['personalname']
-              return redirect(url_for("celebrate", personalname = personalname))
+              session['personalname'] = request.form['personalname']
+              session['familyname'] = request.form['familyname']
+              session['message'] = "Celebrate! On [X date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!" 
+              return redirect(url_for('celebrate'))
         else:
             error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
             return render_template('search.html', error = error, personalname = personalname, familyname = familyname)
