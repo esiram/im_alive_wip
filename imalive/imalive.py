@@ -89,8 +89,8 @@ def home():
 @app.route('/celebrate', methods = ['GET', 'POST'])
 def celebrate():
     """Handles the celebrate screen (celebrate.html)."""
-    if 'personalname' in session:                                                        #this pulls name dynamically as of 3/13/17
-       return render_template('celebrate.html', personalname = session['personalname'])  #this pulls name dynamically as of 3/13/17
+    if 'personalname' in session:                                                        #this pulls name dynamically into template, URL not showing yet as of 3/13/17
+       return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])  #this pulls name dynamically as of 3/13/17
     else:
        return render_template('celebrate.html', personalname = "Esther", signupDate = "3-7-17")
 
@@ -106,6 +106,7 @@ def signupSurvivor():
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        password = request.form['password']
+       message = ""
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
           db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
@@ -113,6 +114,7 @@ def signupSurvivor():
           db.commit()
           #return redirect(url_for("celebrate"))
           session['personalname'] = request.form['personalname']   #added 3/13/17
+          session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
           return redirect(url_for('celebrate'))                    #added 3/13/17
           #return render_template('celebrate.html', personalname = personalname) #this render_template pulls the name, but the url stays with /signupSurvivor-ES 3/11/17
        else:
