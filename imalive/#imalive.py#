@@ -89,7 +89,7 @@ def home():
 @app.route('/celebrate', methods = ['GET', 'POST'])
 def celebrate():
     """Handles the celebrate screen (celebrate.html)."""
-    if 'personalname' in session:                                                        #this pulls name dynamically as of 3/13/17
+    if 'personalname' in session:                                                        #this pulls name dynamically into template, URL not showing yet as of 3/13/17
        return render_template('celebrate.html', personalname = session['personalname'])  #this pulls name dynamically as of 3/13/17
     else:
        return render_template('celebrate.html', personalname = "Esther", signupDate = "3-7-17")
