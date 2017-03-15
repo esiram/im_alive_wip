@@ -111,7 +111,7 @@ def signupSurvivor():
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        #additionalname = request.form['additionalname']
-       #gender = request.form['gender']
+       gender = request.form['gender']
        #age = request.form['age']
        #year = request.form['year']
        #month = request.form['month']
@@ -128,8 +128,8 @@ def signupSurvivor():
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
-          db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
-                     [request.form['familyname'], request.form['personalname'], request.form['password']]) 
+          db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
+                     [request.form['familyname'], request.form['personalname'], request.form['gender'], request.form['password']]) 
          # db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
          #                                    other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
          #                                    [request.form['familyname'], request.form['personalname'], request.form['additionalname'], 
