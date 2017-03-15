@@ -73,19 +73,21 @@ def initdb_command():
 def home():
    """ Handles home screen (home.html). """
    render_template('home.html')
-   while request.method == 'POST':
+   error = None
+   while request.method == 'POST':     #should doWhat have a not null value????-ES 3/15/17
        doWhat = request.form['doWhat']
        if doWhat == "search":
            return redirect(url_for("search"))
        elif doWhat == "signup":
            return redirect(url_for("signupSurvivor"))
-       else:
+       else: # doWhat == "login":
            return redirect(url_for("loginSurvivor"))
-   else:
+      # else: #if nothing chosen but submit/enter button hit
+      #     return render_template('home.html', error = "Please select from one of the options.  Thank you.")
+   else:    #request.method == 'GET'
        return render_template('home.html')
 
-
-#@app.route('/celebrate<personalname>', methods = ['GET', 'POST']) #this hasn't worked yet. -Es 3/11/17
+#@app.route('/celebrate/<personalname>', methods = ['GET', 'POST']) #not pulling dynamic stuff into URL - Es 3/13/17
 @app.route('/celebrate', methods = ['GET', 'POST'])
 def celebrate():
     """Handles the celebrate screen (celebrate.html)."""
@@ -103,14 +105,38 @@ def signupSurvivor():
     render_template('signupSurvivor.html', error = None)
     while request.method == 'POST':
        error = None
+       message = ""
+       
+       #form inputs:
        familyname = request.form['familyname']
        personalname = request.form['personalname']
+       #additionalname = request.form['additionalname']
+       #gender = request.form['gender']
+       #age = request.form['age']
+       #year = request.form['year']
+       #month = request.form['month']
+       #day = request.form['day']
+       #country = request.form['country']
+       #city = request.form['city']
+       #county = request.form['county']
+       #village = request.form['village']
+       #other = request.form['other']
+       #sos = request.form['sos']
+       #otherSOS = request.form['otherSOS']
        password = request.form['password']
-       message = ""
+       #password2 = request.form['password2']
+       
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
           db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
-                     [request.form['familyname'], request.form['personalname'], request.form['password']])
+                     [request.form['familyname'], request.form['personalname'], request.form['password']]) 
+         # db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
+         #                                    other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+         #                                    [request.form['familyname'], request.form['personalname'], request.form['additionalname'], 
+         #                                    request.form['gender'], request.form['age'], request.form['year'], request.form['month'],
+         #                                    request.form['day'], request.form['country'], request.form['city'], request.form['county'], 
+         #                                    request.form['village'], request.form['other'], request.form['sos'], request.form['otherSOS'],
+         #                                    request.form['password']])
           db.commit()
           session['personalname'] = request.form['personalname']   #added 3/13/17
           session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"

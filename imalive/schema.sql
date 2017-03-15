@@ -3,7 +3,7 @@ create table survivors (
   id integer primary key autoincrement,
   familyName text,
   personalName text,
-  additionalname text,
+  additionalName text,
   gender text,
   age integer,
   year integer,
