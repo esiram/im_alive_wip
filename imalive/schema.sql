@@ -1,8 +1,8 @@
 drop table if exists survivors;
 create table survivors (
   id integer primary key autoincrement,
-  familyName text,
-  personalName text,
+  familyName text NOT NULL,
+  personalName text NOT NULL,
   additionalName text,
   gender text,
   age integer,
@@ -16,7 +16,7 @@ create table survivors (
   other text,
   sos text,
   otherSOS text,
-  password text,
+  password text NOT NULL,
   signupDate timestamp,
   updateDate timestamp
 );

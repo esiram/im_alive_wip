@@ -111,7 +111,7 @@ def signupSurvivor():
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        #additionalname = request.form['additionalname']
-       gender = request.form['gender']
+       gender = request.form['gender']  ##### as of 3/15/17: if this field empty, website has error msg not made by me.-ES
        #age = request.form['age']
        #year = request.form['year']
        #month = request.form['month']
@@ -123,13 +123,17 @@ def signupSurvivor():
        #other = request.form['other']
        #sos = request.form['sos']
        #otherSOS = request.form['otherSOS']
-       password = request.form['password']
+       password = request.form['password']   #####
        #password2 = request.form['password2']
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
-          db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
-                     [request.form['familyname'], request.form['personalname'], request.form['gender'], request.form['password']]) 
+          if gender: #until I figure out how to do this w/o multiple lines like this -ES3/15/17:
+              db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
+                         [request.form['familyname'], request.form['personalname'], request.form['gender'], request.form['password']])
+          else:   
+              db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
+                         [request.form['familyname'], request.form['personalname'], request.form['password']])
          # db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
          #                                    other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
          #                                    [request.form['familyname'], request.form['personalname'], request.form['additionalname'], 
@@ -168,14 +172,15 @@ def search():
         message = ""
         if familyname and personalname: #for now to keep simple
            db = get_db()
-           db.execute('SELECT * FROM survivors WHERE familyname = ?', [request.form['familyname']])#, request.form['personalname']]) ###this not working 3-9-17
+           cur = db.execute("SELECT familyName FROM survivors WHERE familyName = familyname")
+           all_options = cur.fetchall() 
            if familyname is None:
               error = "No such survivor with that name has enrolled with I'mAlive."
               return render_template('search.html', error = error)
-           else:  #would this be where we put the user in session?
+           else: 
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
-              session['message'] = "Celebrate! On [X date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!" 
+              session['message'] = "Celebrate! On [X date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!" + str(all_options)
               return redirect(url_for('celebrate'))
         else:
             error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
