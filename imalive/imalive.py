@@ -172,7 +172,7 @@ def search():
         message = ""
         if familyname and personalname: #for now to keep simple
            db = get_db()
-           cur = db.execute("SELECT familyName FROM survivors WHERE familyName = familyname")
+           cur = db.execute('SELECT familyName AND personalName FROM survivors WHERE familyName = familyname AND personalName = personalname')
            all_options = cur.fetchall() 
            if familyname is None:
               error = "No such survivor with that name has enrolled with I'mAlive."
