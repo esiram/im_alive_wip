@@ -172,23 +172,24 @@ def search():
         message = ""
         if familyname:# and personalname: #for now to keep simple
            db = get_db()
-           cur = db.execute('SELECT * FROM survivors WHERE familyName=familyname')# AND personalName = personalname')
-           #all_options = cur.fetchall()              
+           cur = db.execute('SELECT * FROM survivors WHERE familyName=familyname')# AND personalName = personalname')             
            #if all_options is None:
            #   error = "No such survivor with that name has enrolled with I'mAlive."
            #   return render_template('search.html', error = error)
            #else:
            msgDB = ""
            for row in cur.fetchall():
-              msgDB = msgDB + str(row)
-             # for row in all_options:             #TODO:some sort of iteration to pull the matching data
+              if request.form['familyname'] in row:
+                 msgDB = msgDB + str(row)
+              else:
+                 msgDB = msgDB
              #   pnCur = db.execute('SELECT * FROM all_options WHERE personalName = personalname') 
              #   while personalname == personalName:
-              session['personalname'] = request.form['personalname']
-              session['familyname'] = request.form['familyname']
-              session['message'] = "WIP Message: these names pulled from the DB: " + msgDB
-              #session['message'] = "Celebrate! On [X date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
-              return redirect(url_for('celebrate'))
+           session['personalname'] = request.form['personalname']
+           session['familyname'] = request.form['familyname']
+           session['message'] = "WIP Message: these names pulled from the DB: " + msgDB
+          #session['message'] = "Celebrate! On [X date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
+           return redirect(url_for('celebrate'))
                # else:
                #    error = "ERROR DURING DB ITERATION:No such survivor with that name has enrolled with I'mAlive."
                #    return render_template('search.html', error = error)
