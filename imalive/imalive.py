@@ -25,17 +25,17 @@ app.config.from_envvar('IMALIVE_SETTINGS', silent=True)
 def connect_db():
    """Connects to specific database."""
    rv = sqlite3.connect(app.config['DATABASE'])
-   rv.row_factory = sqlite3.Row #this allows rows to be treated like dictionaries vs tuples
+   rv.row_factory = sqlite3.Row           #this allows rows to be treated like dictionaries vs tuples
    return rv
 
 def get_db():
     """Opens a new database connection if none yet for current application context."""
-    if not hasattr(g, 'sqlite_db'):  #store db in a global variable 'g'
+    if not hasattr(g, 'sqlite_db'):       #store db in a global variable 'g'
         g.sqlite_db = connect_db()
     return g.sqlite_db
 
 @app.teardown_appcontext
-def close_db(error):          #if things go well the error parameter is None
+def close_db(error):                      #if things go well the error parameter is None
     """Closes the database again at end of request."""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
@@ -44,8 +44,8 @@ def close_db(error):          #if things go well the error parameter is None
 #FUNCTIONS TO UTILIZE DB
 def create_table():
     """To create table 'survivors' if table doesn't exist."""
-    conn = connect_db() #connection
-    cur = conn.cursor() #cursor
+    conn = connect_db()                   #connection
+    cur = conn.cursor()                   #cursor (TBD: see init_db 'c' for cursor: determine if a general cursor object for the entire app should get made)
     cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')
        
 
@@ -53,7 +53,7 @@ def create_table():
 def init_db():
     """Opens file from resource folder."""
     db = get_db()
-    c = db.cursor()   #db.cursor() used in flaskr tutorial rather than c
+    c = db.cursor()                         #db.cursor() used in flaskr tutorial rather than c (TBD: does this duplicate the create_table 'cur' variable? Can you simplify?)
     with app.open_resource('schema.sql', mode='r') as f:
        c.executescript(f.read())
     db.commit()
@@ -72,7 +72,7 @@ def initdb_command():
 @app.route('/home', methods = ['POST', 'GET'])
 def home():
    """ Handles home screen (home.html). """
-   render_template('home.html')
+   render_template('home.html', error = None)
    error = None
    while request.method == 'POST':     #should doWhat have a not null value????-ES 3/15/17
        doWhat = request.form['doWhat']
@@ -80,12 +80,13 @@ def home():
            return redirect(url_for("search"))
        elif doWhat == "signup":
            return redirect(url_for("signupSurvivor"))
-       else: # doWhat == "login":
+       elif doWhat == "login":
            return redirect(url_for("loginSurvivor"))
-      # else: #if nothing chosen but submit/enter button hit
-      #     return render_template('home.html', error = "Please select from one of the options.  Thank you.")
+       else: #if nothing chosen but submit/enter button hit (i.e. doWhat = None); THIS DOESN'T WORK! Currently an error at redirections/rendering 'home.html'-es3/17/17
+           return render_template('home.html', error = "TESTING WHICH ERROR MSG: Please select from one of the options.  Thank you.")
    else:    #request.method == 'GET'
-       return render_template('home.html')
+      # error = "Please select from one of the options.  Thank you."
+       return render_template('home.html')#, error = error)
 
 #@app.route('/celebrate/<personalname>', methods = ['GET', 'POST']) #not pulling dynamic stuff into URL - Es 3/13/17
 @app.route('/celebrate', methods = ['GET', 'POST'])
@@ -123,7 +124,7 @@ def signupSurvivor():
        #other = request.form['other']
        #sos = request.form['sos']
        #otherSOS = request.form['otherSOS']
-       password = request.form['password']   #####
+       password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
        #password2 = request.form['password2']
        
        if familyname and personalname and password: #for now to keep simple
@@ -172,11 +173,11 @@ def search():
         message = ""
         if familyname and personalname: #for now to keep simple
            db = get_db()
-           cur = db.execute('SELECT familyName, personalName FROM survivors WHERE familyName==familyname')  # AND personalName = personalname')             
+           cur = db.execute('SELECT familyName, personalName FROM survivors')             
            msgDB = ""
            for row in cur.fetchall():
-              if request.form['familyname'] and request.form['personalname'] in row:
-                 msgDB = msgDB + str(row[1] + row[0] + " ")
+              if request.form['familyname'] in row and request.form['personalname'] in row:
+                 msgDB = msgDB + str(row[1] + " " + row[0] + " ")
               else:
                  msgDB = msgDB
            if msgDB == "":
@@ -185,11 +186,11 @@ def search():
            else:
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
-              session['message'] = "WIP Message: these names pulled from the DB: " + msgDB
-          #session['message'] = "Celebrate! On [X date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
+             # session['message'] = "WIP Message: these names pulled from the DB: " + msgDB
+              session['message'] = "Celebrate! On [a certain date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!" +  "WIP Message: these names pulled from the DB: " + msgDB
               return redirect(url_for('celebrate'))
         else:
             error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
-            return render_template('search.html', error = error, personalname = personalname, familyname = familyname)
+            return render_template('search.html', error = error)
     else: #request.method == 'GET'
         return render_template('search.html', error = None)
