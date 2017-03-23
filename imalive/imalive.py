@@ -126,7 +126,7 @@ def signupSurvivor():
        #sos = request.form['sos']
        #otherSOS = request.form['otherSOS']
        password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
-       #password2 = request.form['password2']
+       #password2 = request.form['password2'] ### if password2 == password:... else: error
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
@@ -161,6 +161,9 @@ def loginSurvivor():
     error = None
     return render_template('loginSurvivor.html', error = error)
 
+ #NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
+ #always use the WHERE statement with an SQL UPDATE statement
+
 
 #SEARCH VIEW FUNCTIONS
 @app.route('/search', methods = ['POST', 'GET'])
@@ -174,11 +177,11 @@ def search():
         message = ""
         if familyname and personalname: #for now to keep simple
            db = get_db()
-           cur = db.execute('SELECT familyName, personalName FROM survivors')             
+           cur = db.execute("SELECT familyName, personalName FROM survivors WHERE familyName=familyname AND personalName=personalname")             
            msgDB = ""
            for row in cur.fetchall():
               if request.form['familyname'] in row and request.form['personalname'] in row:
-                 msgDB = msgDB + str(row[1] + " " + row[0] + " ")
+                 msgDB = msgDB + str(row[1] + " " + row[0] + "... ")
               else:
                  msgDB = msgDB
            if msgDB == "":
@@ -187,7 +190,6 @@ def search():
            else:
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
-             # session['message'] = "WIP Message: these names pulled from the DB: " + msgDB
               session['message'] = "Celebrate! On [a certain date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!" +  "WIP Message: these names pulled from the DB: " + msgDB
               return redirect(url_for('celebrate'))
         else:
