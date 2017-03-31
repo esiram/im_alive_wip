@@ -181,11 +181,11 @@ def search():
            db = get_db()
            cur = db.execute("SELECT familyName, personalName FROM survivors WHERE familyName=familyname AND personalName=personalname")             
            msgDB = ""
+           rowCount = 0
            for row in cur.fetchall():
-              rowCount = 0
-             # if request.form['familyname'] in row and request.form['personalname'] in row:
+             # if request.form['familyname'] in row and request.form['personalname'] in row:  #multiple personalname pulling that don't match
               if request.form['familyname'] in row[0] and request.form['personalname'] in row[1]:
-                 msgDB = msgDB + str(" * " + row[1] + " " + row[0] + " * ")
+                 msgDB = msgDB + str(row[1] + " " + row[0] + " * ")
                  rowCount = rowCount + 1
               else:
                  msgDB = msgDB
@@ -199,7 +199,7 @@ def search():
               if rowCount == 1:
                  session['message'] = "Celebrate! on [a certain date], " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               else: #rowCount != 0   
-                 session['message'] = "Celebrate! More than one person with the information provided has registered with I'mAlive:" + msgDB
+                 session['message'] = "Celebrate: " + str(rowCount) + "people have registered with this information on I'mAlive: " + msgDB
               return redirect(url_for('celebrate'))
         else:
             error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
