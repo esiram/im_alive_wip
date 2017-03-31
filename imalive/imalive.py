@@ -113,7 +113,7 @@ def signupSurvivor():
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        #additionalname = request.form['additionalname']
-       gender = request.form['gender']  ##### as of 3/15/17: if this field empty, website has error msg not made by me.-ES
+       gender = request.form['gender']  ##### as of 3/15/17: if this field empty, website has error msg not made by me.-ES (b/c NULL?)
        #age = request.form['age']
        #year = request.form['year']
        #month = request.form['month']
@@ -130,25 +130,27 @@ def signupSurvivor():
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
+          #db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
+          #            [request.form['familyname'], request.form['personalname'], request.form['gender'], request.form['password']])
           if gender: #until I figure out how to do this w/o multiple lines like this -ES3/15/17:
               db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
                          [request.form['familyname'], request.form['personalname'], request.form['gender'], request.form['password']])
           else:   
               db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
                          [request.form['familyname'], request.form['personalname'], request.form['password']])
-         # db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
-         #                                    other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-         #                                    [request.form['familyname'], request.form['personalname'], request.form['additionalname'], 
-         #                                    request.form['gender'], request.form['age'], request.form['year'], request.form['month'],
-         #                                    request.form['day'], request.form['country'], request.form['city'], request.form['county'], 
-         #                                    request.form['village'], request.form['other'], request.form['sos'], request.form['otherSOS'],
-         #                                    request.form['password']])
+              #db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
+               #         other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                #                             [request.form['familyname'], request.form['personalname'], request.form['additionalname'], 
+                 #                            request.form['gender'], request.form['age'], request.form['year'], request.form['month'],
+                 #                            request.form['day'], request.form['country'], request.form['city'], request.form['county'], 
+                  #                           request.form['village'], request.form['other'], request.form['sos'], request.form['otherSOS'],
+                   #                          request.form['password']])
           db.commit()
           session['personalname'] = request.form['personalname']   #added 3/13/17
           session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
           return redirect(url_for('celebrate'))                    #added 3/13/17
        else:
-           error = "Not enough information to continue, please fill in asterisked/starred items."
+           error = "Not enough information to continue, please fill in all asterisked/starred items."
            return render_template('signupSurvivor.html', error = error)
     else: #request.method == 'GET'
        return render_template('signupSurvivor.html', error = None)
@@ -180,17 +182,24 @@ def search():
            cur = db.execute("SELECT familyName, personalName FROM survivors WHERE familyName=familyname AND personalName=personalname")             
            msgDB = ""
            for row in cur.fetchall():
-              if request.form['familyname'] in row and request.form['personalname'] in row:
-                 msgDB = msgDB + str(row[1] + " " + row[0] + "... ")
+              rowCount = 0
+             # if request.form['familyname'] in row and request.form['personalname'] in row:
+              if request.form['familyname'] in row[0] and request.form['personalname'] in row[1]:
+                 msgDB = msgDB + str(" * " + row[1] + " " + row[0] + " * ")
+                 rowCount = rowCount + 1
               else:
                  msgDB = msgDB
+                 rowCount = rowCount
            if msgDB == "":
               error = "No such survivor with that name has enrolled with I'mAlive."
               return render_template('search.html', error = error)
-           else:
+           else:#msgDB != ""
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
-              session['message'] = "Celebrate! On [a certain date], " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!" +  "WIP Message: these names pulled from the DB: " + msgDB
+              if rowCount == 1:
+                 session['message'] = "Celebrate! on [a certain date], " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
+              else: #rowCount != 0   
+                 session['message'] = "Celebrate! More than one person with the information provided has registered with I'mAlive:" + msgDB
               return redirect(url_for('celebrate'))
         else:
             error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
