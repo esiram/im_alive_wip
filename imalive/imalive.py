@@ -185,7 +185,7 @@ def search():
            for row in cur.fetchall():
              # if request.form['familyname'] in row and request.form['personalname'] in row:  #multiple personalname pulling that don't match
               if request.form['familyname'] in row[0] and request.form['personalname'] in row[1]:
-                 msgDB = msgDB + str(row[1] + " " + row[0] + " * ")
+                 msgDB = msgDB + str(" * " + row[1] + " " + row[0] + " * ")
                  rowCount = rowCount + 1
               else:
                  msgDB = msgDB
@@ -193,13 +193,16 @@ def search():
            if msgDB == "":
               error = "No such survivor with that name has enrolled with I'mAlive."
               return render_template('search.html', error = error)
+           elif rowCount != 0:
+              error = "TEST: I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail."
+              return render_template('search.html', error = error)
            else:#msgDB != ""
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
               if rowCount == 1:
                  session['message'] = "Celebrate! on [a certain date], " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               else: #rowCount != 0   
-                 session['message'] = "Celebrate: " + str(rowCount) + "people have registered with this information on I'mAlive: " + msgDB
+                 session['message'] = "Start celebrating! I'mAlive has " + str(rowCount) + " people with this information in its database: " + msgDB
               return redirect(url_for('celebrate'))
         else:
             error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
