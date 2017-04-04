@@ -112,36 +112,31 @@ def signupSurvivor():
        #form inputs:
        familyname = request.form['familyname']
        personalname = request.form['personalname']
-       #additionalname = request.form['additionalname']
+       additionalname = request.form['additionalname']
        gender = None
        if 'gender' in request.form:
           gender = request.form['gender']  ##### Gender works: Thx to advice from D.
-       #age = request.form['age']
-       #year = request.form['year']
-       #month = request.form['month']
-       #day = request.form['day']
-       #country = request.form['country']
-       #city = request.form['city']
-       #county = request.form['county']
-       #village = request.form['village']
-       #other = request.form['other']
-       #sos = request.form['sos']
-       #otherSOS = request.form['otherSOS']
+       age = request.form['age']
+       year = request.form['year']
+       month = request.form['month']
+       day = request.form['day']
+       country = request.form['country']
+       city = request.form['city']
+       county = request.form['county']
+       village = request.form['village']
+       other = request.form['other']
+       sos = request.form['sos']
+       otherSOS = request.form['otherSOS']
        password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
        #password2 = request.form['password2'] ### if password2 == password:... else: error
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
-          db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
-                      [familyname, personalname, gender, password])
+         # db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
+          #            [familyname, personalname, gender, password])
       
-         #db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
-               #         other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-                #                             [request.form['familyname'], request.form['personalname'], request.form['additionalname'], 
-                 #                            request.form['gender'], request.form['age'], request.form['year'], request.form['month'],
-                 #                            request.form['day'], request.form['country'], request.form['city'], request.form['county'], 
-                  #                           request.form['village'], request.form['other'], request.form['sos'], request.form['otherSOS'],
-                   #                          request.form['password']])
+          db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                      [familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password])
           db.commit()
           session['personalname'] = request.form['personalname']
           session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
@@ -172,16 +167,20 @@ def search():
     while request.method == 'POST':
         familyname = request.form['familyname']
         personalname = request.form['personalname']
-        gender = request.form['gender']
+        if 'gender' in request.form:
+           gender = request.form['gender']
+        else:
+           gender = ""
         error = None
         message = ""
-        if familyname and personalname and gender: #for now to keep simple
+        if familyname and personalname: #for now to keep simple
            db = get_db()
            cur = db.execute("SELECT familyName, personalName, gender FROM survivors WHERE familyName=familyname AND personalName=personalname AND gender=gender")             
            msgDB = ""
            rowCount = 0
            for row in cur.fetchall():   #when adding row[] later: note position change(s)-ES 4/4/17
-              if request.form['familyname'] in row[0] and request.form['personalname'] in row[1] and request.form['gender'] in row[2]:  
+              if familyname in row[0] and personalname in row[1] and gender in row[2]:
+             # if request.form['familyname'] in row[0] and request.form['personalname'] in row[1] and request.form['gender'] in row[2]:  
                  msgDB = msgDB + str(row[1] + " " + row[0] + " ... ")
                  rowCount = rowCount + 1
               else:
@@ -198,7 +197,7 @@ def search():
               session['familyname'] = request.form['familyname']
               session['message'] = "Celebrate! on [a certain date] " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               return redirect(url_for('celebrate'))
-        else:  #if no gender selected, this error msg not responding WHY? -es 4/4/17
+        else:  
             error = "Not enough information to continue; please provide both a family name, a personal name, and a gender. Thank you."
             return render_template('search.html', error = error)
     else: #request.method == 'GET'
