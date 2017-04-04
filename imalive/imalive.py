@@ -54,7 +54,7 @@ def create_table():
 def init_db():
     """Opens file from resource folder."""
     db = get_db()
-    c = db.cursor()                         #db.cursor() used in flaskr tutorial rather than c (TBD: does this duplicate the create_table 'cur' variable? Can you simplify?)
+    c = db.cursor()                #db.cursor() used in flaskr tutorial rather than c (TBD: does this duplicate the create_table 'cur' variable? Can you simplify?)
     with app.open_resource('schema.sql', mode='r') as f:
        c.executescript(f.read())
     db.commit()
@@ -113,7 +113,7 @@ def signupSurvivor():
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        #additionalname = request.form['additionalname']
-       gender = request.form['gender']  ##### as of 3/15/17: if this field empty, website has error msg not made by me.-ES (b/c NULL?)
+       gender = request.form['gender']  ##### as of 3/15/17: if this field empty, website has error msg not made by me.-ES (b/c NULL?????)
        #age = request.form['age']
        #year = request.form['year']
        #month = request.form['month']
@@ -135,7 +135,7 @@ def signupSurvivor():
           if gender: #until I figure out how to do this w/o multiple lines like this -ES3/15/17:
               db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
                          [request.form['familyname'], request.form['personalname'], request.form['gender'], request.form['password']])
-          else:   
+          else:   # no gender
               db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
                          [request.form['familyname'], request.form['personalname'], request.form['password']])
               #db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
@@ -146,9 +146,9 @@ def signupSurvivor():
                   #                           request.form['village'], request.form['other'], request.form['sos'], request.form['otherSOS'],
                    #                          request.form['password']])
           db.commit()
-          session['personalname'] = request.form['personalname']   #added 3/13/17
+          session['personalname'] = request.form['personalname']
           session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
-          return redirect(url_for('celebrate'))                    #added 3/13/17
+          return redirect(url_for('celebrate')) 
        else:
            error = "Not enough information to continue, please fill in all asterisked/starred items."
            return render_template('signupSurvivor.html', error = error)
@@ -175,17 +175,17 @@ def search():
     while request.method == 'POST':
         familyname = request.form['familyname']
         personalname = request.form['personalname']
+        gender = request.form['gender']
         error = None
         message = ""
-        if familyname and personalname: #for now to keep simple
+        if familyname and personalname and gender: #for now to keep simple
            db = get_db()
-           cur = db.execute("SELECT familyName, personalName FROM survivors WHERE familyName=familyname AND personalName=personalname")             
+           cur = db.execute("SELECT familyName, personalName, gender FROM survivors WHERE familyName=familyname AND personalName=personalname AND gender=gender")             
            msgDB = ""
            rowCount = 0
            for row in cur.fetchall():
-             # if request.form['familyname'] in row and request.form['personalname'] in row:  #multiple personalname pulling that don't match
-              if request.form['familyname'] in row[0] and request.form['personalname'] in row[1]:
-                 msgDB = msgDB + str(" * " + row[1] + " " + row[0] + " * ")
+              if request.form['familyname'] in row[0] and request.form['personalname'] in row[1] and request.form['gender'] in row[2]:
+                 msgDB = msgDB + str(row[1] + " " + row[0] + " ... ")
                  rowCount = rowCount + 1
               else:
                  msgDB = msgDB
@@ -193,19 +193,16 @@ def search():
            if msgDB == "":
               error = "No such survivor with that name has enrolled with I'mAlive."
               return render_template('search.html', error = error)
-           elif rowCount != 0:
-              error = "TEST: I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail."
+           elif rowCount != 1:
+              error = "I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail."
               return render_template('search.html', error = error)
-           else:#msgDB != ""
+           else:#msgDB != "" and rowCount == 1
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
-              if rowCount == 1:
-                 session['message'] = "Celebrate! on [a certain date], " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
-              else: #rowCount != 0   
-                 session['message'] = "Start celebrating! I'mAlive has " + str(rowCount) + " people with this information in its database: " + msgDB
+              session['message'] = "Celebrate! on [a certain date], " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               return redirect(url_for('celebrate'))
-        else:
-            error = "Not enough information to continue; please provide both a family and a personal name. Thank you."
+        else:  #if no gender selected, this error msg not responding WHY? -es 4/4/17
+            error = "Not enough information to continue; please provide both a family name, a personal name, and a gender. Thank you."
             return render_template('search.html', error = error)
     else: #request.method == 'GET'
         return render_template('search.html', error = None)

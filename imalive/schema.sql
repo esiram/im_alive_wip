@@ -4,7 +4,7 @@ create table survivors (
   familyName text NOT NULL,
   personalName text NOT NULL,
   additionalName text,
-  gender text,
+  gender text NULL,
   age integer,
   year integer,
   month integer,
