@@ -105,7 +105,7 @@ def celebrate():
 def signupSurvivor():
     """Handles survivor signup screen (signupSurvivor.html)."""
     render_template('signupSurvivor.html', error = None)
-    while request.method == 'POST':
+    if request.method == 'POST':
        error = None
        message = ""
        
@@ -113,7 +113,9 @@ def signupSurvivor():
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        #additionalname = request.form['additionalname']
-       gender = request.form['gender']  ##### as of 3/15/17: if this field empty, website has error msg not made by me.-ES (b/c NULL?????)
+       gender = None
+       if 'gender' in request.form:
+          gender = request.form['gender']  ##### Gender works: Thx to advice from D.
        #age = request.form['age']
        #year = request.form['year']
        #month = request.form['month']
@@ -130,15 +132,10 @@ def signupSurvivor():
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
-          #db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
-          #            [request.form['familyname'], request.form['personalname'], request.form['gender'], request.form['password']])
-          if gender: #until I figure out how to do this w/o multiple lines like this -ES3/15/17:
-              db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
-                         [request.form['familyname'], request.form['personalname'], request.form['gender'], request.form['password']])
-          else:   # no gender
-              db.execute('INSERT INTO survivors (familyname, personalname, password) VALUES (?, ?, ?)',
-                         [request.form['familyname'], request.form['personalname'], request.form['password']])
-              #db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
+          db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
+                      [familyname, personalname, gender, password])
+      
+         #db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village,
                #         other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
                 #                             [request.form['familyname'], request.form['personalname'], request.form['additionalname'], 
                  #                            request.form['gender'], request.form['age'], request.form['year'], request.form['month'],
@@ -183,8 +180,8 @@ def search():
            cur = db.execute("SELECT familyName, personalName, gender FROM survivors WHERE familyName=familyname AND personalName=personalname AND gender=gender")             
            msgDB = ""
            rowCount = 0
-           for row in cur.fetchall():
-              if request.form['familyname'] in row[0] and request.form['personalname'] in row[1] and request.form['gender'] in row[2]:
+           for row in cur.fetchall():   #when adding row[] later: note position change(s)-ES 4/4/17
+              if request.form['familyname'] in row[0] and request.form['personalname'] in row[1] and request.form['gender'] in row[2]:  
                  msgDB = msgDB + str(row[1] + " " + row[0] + " ... ")
                  rowCount = rowCount + 1
               else:
@@ -199,7 +196,7 @@ def search():
            else:#msgDB != "" and rowCount == 1
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
-              session['message'] = "Celebrate! on [a certain date], " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
+              session['message'] = "Celebrate! on [a certain date] " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               return redirect(url_for('celebrate'))
         else:  #if no gender selected, this error msg not responding WHY? -es 4/4/17
             error = "Not enough information to continue; please provide both a family name, a personal name, and a gender. Thank you."
