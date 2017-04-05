@@ -126,14 +126,16 @@ def signupSurvivor():
        county = request.form['county']
        village = request.form['village']
        other = request.form['other']
-       sos = request.form['sos']
+       sos = None
+       if 'sos' in request.form:
+          sos = request.form['sos']
        otherSOS = request.form['otherSOS']
        password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
        #password2 = request.form['password2'] ### if password2 == password:... else: error
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
-          db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+          db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
                       [familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password])
           db.commit()
           session['personalname'] = request.form['personalname']
@@ -170,11 +172,10 @@ def search():
         #form inputs:
         familyname = request.form['familyname']
         personalname = request.form['personalname']
-        additionalname = request.form['additionalname']        
+        additionalname = request.form['additionalname']
+        gender = None
         if 'gender' in request.form:
            gender = request.form['gender']
-        else:
-           gender = None
         age = request.form['age']
         year = request.form['year']
         month = request.form['month']
