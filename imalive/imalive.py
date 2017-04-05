@@ -75,7 +75,8 @@ def home():
    """ Handles home screen (home.html). """
    render_template('home.html', error = None)
    error = None
-   while request.method == 'POST':     #should doWhat have a not null value????-ES 3/15/17
+  # while request.method == 'POST':     #should doWhat have a not null value????-ES 3/15/17
+   if request.method == 'POST':
        doWhat = request.form['doWhat']
        if doWhat == "search":
            return redirect(url_for("search"))
@@ -86,7 +87,7 @@ def home():
        else: #if nothing chosen but submit/enter button hit (i.e. doWhat = None); THIS DOESN'T WORK! Currently an error at redirections/rendering 'home.html'-es3/17/17
            return render_template('home.html', error = "TESTING WHICH ERROR MSG: Please select from one of the options.  Thank you.")
    else:    #request.method == 'GET'
-      # error = "Please select from one of the options.  Thank you."
+       error = "Please select from one of the options.  Thank you."
        return render_template('home.html')#, error = error)
 
 #@app.route('/celebrate/<personalname>', methods = ['GET', 'POST']) #not pulling dynamic stuff into URL - Es 3/13/17
@@ -132,9 +133,6 @@ def signupSurvivor():
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
-         # db.execute('INSERT INTO survivors (familyname, personalname, gender, password) VALUES (?, ?, ?, ?)',
-          #            [familyname, personalname, gender, password])
-      
           db.execute('INSERT INTO survivors (familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
                       [familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password])
           db.commit()
@@ -164,23 +162,39 @@ def loginSurvivor():
 def search():
     """Handles the search index screen (search.html)."""
     render_template('search.html', error = None)
-    while request.method == 'POST':
+   # while request.method == 'POST':
+    if request.method == 'POST':
+        error = None
+        message = ""
+        
+        #form inputs:
         familyname = request.form['familyname']
         personalname = request.form['personalname']
+        additionalname = request.form['additionalname']        
         if 'gender' in request.form:
            gender = request.form['gender']
         else:
-           gender = ""
-        error = None
-        message = ""
+           gender = None
+        age = request.form['age']
+        year = request.form['year']
+        month = request.form['month']
+        day = request.form['day']
+        country = request.form['country']
+        county = request.form['county']
+        city = request.form['city']
+        village = request.form['village']
+        other = request.form['other']
+
         if familyname and personalname: #for now to keep simple
            db = get_db()
-           cur = db.execute("SELECT familyName, personalName, gender FROM survivors WHERE familyName=familyname AND personalName=personalname AND gender=gender")             
+           cur = db.execute("SELECT familyName, personalName, additionalName, gender, age, year, month, day, country, county, city, village, other FROM survivors WHERE familyName=familyname AND personalName=personalname AND age=age AND year=year AND month=month AND day=day AND country=country AND county=county AND city=city AND village=village AND other=other")  
+          #cur = db.execute("SELECT familyName, personalName, gender FROM survivors WHERE familyName=familyname AND personalName=personalname AND gender=gender")             
            msgDB = ""
            rowCount = 0
            for row in cur.fetchall():   #when adding row[] later: note position change(s)-ES 4/4/17
-              if familyname in row[0] and personalname in row[1] and gender in row[2]:
-             # if request.form['familyname'] in row[0] and request.form['personalname'] in row[1] and request.form['gender'] in row[2]:  
+          #    if familyname in row[0] and personalname in row[1] and gender in row[2]:
+          #   # if request.form['familyname'] in row[0] and request.form['personalname'] in row[1] and request.form['gender'] in row[2]:
+              if familyname in row[0] and personalname in row[1] and additionalname in row[2]:
                  msgDB = msgDB + str(row[1] + " " + row[0] + " ... ")
                  rowCount = rowCount + 1
               else:
