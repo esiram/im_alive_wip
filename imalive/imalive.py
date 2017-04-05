@@ -122,6 +122,7 @@ def signupSurvivor():
        month = request.form['month']
        day = request.form['day']
        country = request.form['country']
+       state = request.form['state']
        city = request.form['city']
        county = request.form['county']
        village = request.form['village']
@@ -132,11 +133,12 @@ def signupSurvivor():
        otherSOS = request.form['otherSOS']
        password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
        #password2 = request.form['password2'] ### if password2 == password:... else: error
+       signupDate = 12  #hard code for now
        
        if familyname and personalname and password: #for now to keep simple
           db = get_db()
-          db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-                      [familyname, personalname, additionalname, gender, age, year, month, day, country, city, county, village, other, sos, otherSOS, password])
+          db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, password, signupDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                      [familyname, personalname, additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, password, signupDate])
           db.commit()
           session['personalname'] = request.form['personalname']
           session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
@@ -181,14 +183,15 @@ def search():
         month = request.form['month']
         day = request.form['day']
         country = request.form['country']
-        county = request.form['county']
+        state= request.form['state']
         city = request.form['city']
+        county = request.form['county']       
         village = request.form['village']
         other = request.form['other']
 
         if familyname and personalname: #for now to keep simple
            db = get_db()
-           cur = db.execute("SELECT familyName, personalName, additionalName, gender, age, year, month, day, country, county, city, village, other FROM survivors WHERE familyName=familyname AND personalName=personalname AND age=age AND year=year AND month=month AND day=day AND country=country AND county=county AND city=city AND village=village AND other=other")  
+           cur = db.execute("SELECT familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other FROM survivors WHERE familyName=familyname AND personalName=personalname AND age=age AND year=year AND month=month AND day=day AND country=country AND state=state AND city=city AND county=county AND village=village AND other=other")  
           #cur = db.execute("SELECT familyName, personalName, gender FROM survivors WHERE familyName=familyname AND personalName=personalname AND gender=gender")             
            msgDB = ""
            rowCount = 0
