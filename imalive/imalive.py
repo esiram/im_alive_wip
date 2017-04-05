@@ -133,6 +133,7 @@ def signupSurvivor():
        otherSOS = request.form['otherSOS']
        password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
        #password2 = request.form['password2'] ### if password2 == password:... else: error
+       #automatic input
        signupDate = 12  #hard code for now
        
        if familyname and personalname and password: #for now to keep simple
@@ -191,14 +192,12 @@ def search():
 
         if familyname and personalname: #for now to keep simple
            db = get_db()
-           cur = db.execute("SELECT familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other FROM survivors WHERE familyName=familyname AND personalName=personalname AND age=age AND year=year AND month=month AND day=day AND country=country AND state=state AND city=city AND county=county AND village=village AND other=other")  
-          #cur = db.execute("SELECT familyName, personalName, gender FROM survivors WHERE familyName=familyname AND personalName=personalname AND gender=gender")             
+           cur = db.execute("SELECT familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, signupDate FROM survivors WHERE familyName=familyname AND personalName=personalname AND additionalName=additionalname AND gender=gender AND age=age AND year=year AND month=month AND day=day AND country=country AND state=state AND city=city AND county=county AND village=village AND other=other")             
            msgDB = ""
            rowCount = 0
            for row in cur.fetchall():   #when adding row[] later: note position change(s)-ES 4/4/17
           #    if familyname in row[0] and personalname in row[1] and gender in row[2]:
-          #   # if request.form['familyname'] in row[0] and request.form['personalname'] in row[1] and request.form['gender'] in row[2]:
-              if familyname in row[0] and personalname in row[1] and additionalname in row[2]:
+              if familyname in row[0] and personalname in row[1]:
                  msgDB = msgDB + str(row[1] + " " + row[0] + " ... ")
                  rowCount = rowCount + 1
               else:
