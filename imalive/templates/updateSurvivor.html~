@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}SurvivorSignup{% endblock %}
+{% block title %}SurvivorUpdate{% endblock %}
 
 {% block content %}
 <h1>I'mAlive Signup</h1>
@@ -46,7 +46,7 @@
     <input type="text" name="city"><br>
     Origin County:
     <input type="text" name="county"><br>
-    Origin Village/Neighborhood/Borough/Town:
+    Origin Village/Neighborhood/Borough/Town*:
     <input type="text" name="village"><br>
     Other Origin Information:
     <input type="text" name="other"<br>

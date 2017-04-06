@@ -97,7 +97,8 @@ def celebrate():
     if 'personalname' in session:                                                        #this pulls name dynamically into template, URL not showing yet as of 3/13/17
        return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])  #this pulls name dynamically as of 3/13/17
     else:
-       return render_template('celebrate.html', personalname = "EstherTester", signupDate = "TesterDateToday")
+       message= "Celebrate, you live!!!  If you want to look somoone else up, please check out the I'mAlive's Search page."
+       return render_template('celebrate.html', message = message)
 
     
    
@@ -157,10 +158,17 @@ def loginSurvivor():
     render_template('loginSurvivor.html')    
     error = None
     return render_template('loginSurvivor.html', error = error)
+ #when logged in this should redirect(url_for('updateSurvivor'))
 
  #NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
  #always use the WHERE statement with an SQL UPDATE statement
-
+""" I need to have an update info page so that pulls current info, but also shows all updates once updated.  Only folks a person logged in can access his/her personal page. """
+@app.route('/updateSurvivor', methods = ['GET', 'POST'])
+def updateSurvivor():
+   """Handles survivor update information, only accessible when logged in."""
+   render_template('updateSurvivor.html')
+   error = None
+   return render_template('updateSurvivor.html', error = error)
 
 #SEARCH VIEW FUNCTIONS
 @app.route('/search', methods = ['POST', 'GET'])
@@ -195,34 +203,53 @@ def search():
            msgDB = ""
            rowCount = 0
            idList = []
+           lastDate = 0
            for row in cur.fetchall():   #when adding row[] later: note position change(s) from selected db columns
-              if familyname in row[1] and personalname in row[2]:
+              if familyname in row[1] and personalname in row[2]:  THIS WORKS
                  msgDB = msgDB + str(row[2] + " " + row[1]) + " ID # " + str(row[0]) + "... "
                  rowCount = rowCount + 1
                  idList = idList + [row[0]]
+                 lastDate = lastDate + row[15]
               else:
                  msgDB = msgDB
                  rowCount = rowCount
                  idList = idList
+                 lastDate = lastDate
+                 
            if msgDB == "":
               error = "No such survivor with that name has enrolled with I'mAlive."
               return render_template('search.html', error = error)
+           
            elif rowCount != 1: # multiple survivors with similar info
-              newRowCount = 0
-              msgDB2 = "For i in idList Message: "
-              for i in idList:
-                 if i == row[0] and (additionalname == row[3] or gender == row[4] or age == row[5] or year == row[6] or month == row[7] or day == row[8] or country == row[9] or state == row[10] or city == row[11] or county == row[12] or village == row[13] or other == row[14]):
-                    newRowCount = newRowCount + 1
-                    msgDB2 = msgDB2 + str(row[2] + " " + row[1] + "ID# " + row[0])
-                    error = msgDB2 + " " +  str(newRowCount)
-                    return render_template('search.html', error = error)
-                 else:   
-                    error = "I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail." + " TEST: " +str(idList)
-                    return render_template('search.html', error = error)
+           #   newRowCount = 0
+           #   msgDB2 = "For i in idList Message: "
+           #   for i in idList:     ### would it be better to use length of idList????-Es 4/7/17
+           #      if i == row[0] and (additionalname == row[3] or gender == row[4]):
+####or age == row[5] or year == row[6] or month == row[7] or day == row[8] or country == row[9] or state == row[10] or city == row[11] or county == row[12] or village == row[13] or other == row[14]):
+           #         newRowCount = newRowCount + 1
+           #         msgDB2 = msgDB2 + str(row[2] + " " + row[1] + "ID# " + row[0])
+           #         error = msgDB2 + " " +  str(newRowCount)
+           #         if msgDB2 == "For i in idList Messag: ":     #basically nothing matching in row[]
+           #            error = "[test 'for i in idList' msg:] I'mAlive has " + str(newRowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail. ID LIST TEST: " +str(idList)
+           #            return render_template('search.html', error = error)
+           #         elif newRowCount != 1:
+           #         error = "[test 'newRowCount != 1' msg:] I'mAlive has " + str(newRowCount) + " people with this information registered in its database: " + msgDB2 + "Please provide more detail. ID LIST TEST: " + str(idList)
+           #         return render_template('search.html', error = error)
+           #          else:
+           #            session['personalname'] = request.form['personalname']
+           #            session['familyname'] = request.form['familyname']
+           #            session['lastDate'] = request.form['lastDate']
+           #            session['message'] = "[after iterating through additional data] msg: Celebrate! On " + str(session['lastDate']) + " " + session ['personalname'] + " " + session['familyname'] + " register with I'mAlive.  Hooray!!!!"
+           #            return redirect(url_for('celebrate'))
+           #      else:   
+              error = "I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail." + " ID LIST TEST: " +str(idList)
+              return render_template('search.html', error = error)
+           
            else:#msgDB != "" and rowCount == 1
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
-              session['message'] = "Celebrate! on [a certain date] " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
+              session['lastDate'] = lastDate
+              session['message'] = "Celebrate! On " + str(session['lastDate']) + " " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               return redirect(url_for('celebrate'))
         else:  
             error = "Not enough information to continue; please provide both a family name, a personal name, and a gender. Thank you."

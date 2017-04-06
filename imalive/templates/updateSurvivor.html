@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}SurvivorSignup{% endblock %}
+{% block title %}SurvivorUpdate{% endblock %}
 
 {% block content %}
-<h1>I'mAlive Signup</h1>
+<h1>I'mAlive Update Information</h1>
    
-<form action="http://127.0.0.1:5000/signupSurvivor" method="post">
+<form action="http://127.0.0.1:5000/updateSurvivor" method="post">
 
     {% if error %}
     <p><strong>Error: {{ error }}</strong>
