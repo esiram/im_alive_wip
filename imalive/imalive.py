@@ -167,7 +167,6 @@ def loginSurvivor():
 def search():
     """Handles the search index screen (search.html)."""
     render_template('search.html', error = None)
-   # while request.method == 'POST':
     if request.method == 'POST':
         error = None
         message = ""
@@ -190,25 +189,36 @@ def search():
         village = request.form['village']
         other = request.form['other']
 
-        if familyname and personalname: #for now to keep simple
+        if familyname and personalname: #for now to keep simple  ### Q) should I only pull the not null values?-es 4/6/17
            db = get_db()
-           cur = db.execute("SELECT familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, signupDate FROM survivors WHERE familyName=familyname AND personalName=personalname AND additionalName=additionalname AND gender=gender AND age=age AND year=year AND month=month AND day=day AND country=country AND state=state AND city=city AND county=county AND village=village AND other=other")             
+           cur = db.execute("SELECT id, familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, signupDate FROM survivors WHERE familyName=familyname AND personalName=personalname AND additionalName=additionalname AND gender=gender AND age=age AND year=year AND month=month AND day=day AND country=country AND state=state AND city=city AND county=county AND village=village AND other=other")             
            msgDB = ""
            rowCount = 0
-           for row in cur.fetchall():   #when adding row[] later: note position change(s)-ES 4/4/17
-          #    if familyname in row[0] and personalname in row[1] and gender in row[2]:
-              if familyname in row[0] and personalname in row[1]:
-                 msgDB = msgDB + str(row[1] + " " + row[0] + " ... ")
+           idList = []
+           for row in cur.fetchall():   #when adding row[] later: note position change(s) from selected db columns
+              if familyname in row[1] and personalname in row[2]:
+                 msgDB = msgDB + str(row[2] + " " + row[1]) + " ID # " + str(row[0]) + "... "
                  rowCount = rowCount + 1
+                 idList = idList + [row[0]]
               else:
                  msgDB = msgDB
                  rowCount = rowCount
+                 idList = idList
            if msgDB == "":
               error = "No such survivor with that name has enrolled with I'mAlive."
               return render_template('search.html', error = error)
-           elif rowCount != 1:
-              error = "I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail."
-              return render_template('search.html', error = error)
+           elif rowCount != 1: # multiple survivors with similar info
+              newRowCount = 0
+              msgDB2 = "For i in idList Message: "
+              for i in idList:
+                 if i == row[0] and (additionalname == row[3] or gender == row[4] or age == row[5] or year == row[6] or month == row[7] or day == row[8] or country == row[9] or state == row[10] or city == row[11] or county == row[12] or village == row[13] or other == row[14]):
+                    newRowCount = newRowCount + 1
+                    msgDB2 = msgDB2 + str(row[2] + " " + row[1] + "ID# " + row[0])
+                    error = msgDB2 + " " +  str(newRowCount)
+                    return render_template('search.html', error = error)
+                 else:   
+                    error = "I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail." + " TEST: " +str(idList)
+                    return render_template('search.html', error = error)
            else:#msgDB != "" and rowCount == 1
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
