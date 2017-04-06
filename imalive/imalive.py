@@ -77,15 +77,16 @@ def home():
    error = None
   # while request.method == 'POST':     #should doWhat have a not null value????-ES 3/15/17
    if request.method == 'POST':
-       doWhat = request.form['doWhat']
-       if doWhat == "search":
-           return redirect(url_for("search"))
-       elif doWhat == "signup":
-           return redirect(url_for("signupSurvivor"))
-       elif doWhat == "login":
-           return redirect(url_for("loginSurvivor"))
+       if 'doWhat' in request.form:
+           doWhat = request.form['doWhat']
+           if doWhat == "search":
+              return redirect(url_for("search"))
+           elif doWhat == "signup":
+              return redirect(url_for("signupSurvivor"))
+           else: # doWhat == "login":
+              return redirect(url_for("loginSurvivor"))
        else: #if nothing chosen but submit/enter button hit (i.e. doWhat = None); THIS DOESN'T WORK! Currently an error at redirections/rendering 'home.html'-es3/17/17
-           return render_template('home.html', error = "TESTING WHICH ERROR MSG: Please select from one of the options.  Thank you.")
+           return render_template('home.html', error = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you.")
    else:    #request.method == 'GET'
        error = "Please select from one of the options.  Thank you."
        return render_template('home.html')#, error = error)
@@ -197,7 +198,7 @@ def search():
         village = request.form['village']
         other = request.form['other']
 
-        if familyname and personalname: #for now to keep simple  ### Q) should I only pull the not null values?-es 4/6/17
+        if familyname or personalname: #when "or" used here instead of "and" it lists those with shared last names.-es 4/6/17 ### Q) should I only pull the not null values?-es 4/6/17
            db = get_db()
            cur = db.execute("SELECT id, familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, signupDate FROM survivors WHERE familyName=familyname AND personalName=personalname AND additionalName=additionalname AND gender=gender AND age=age AND year=year AND month=month AND day=day AND country=country AND state=state AND city=city AND county=county AND village=village AND other=other")             
            msgDB = ""
@@ -206,7 +207,7 @@ def search():
            lastDate = 0
            for row in cur.fetchall():   #when adding row[] later: note position change(s) from selected db columns
               if familyname in row[1] and personalname in row[2]:#This Works
-                 msgDB = msgDB + str(row[2] + " " + row[1]) + " ID # " + str(row[0]) + "... "
+                 msgDB = msgDB + str(row[2] + " " + row[1]) + " ID# " + str(row[0]) + "... "
                  rowCount = rowCount + 1
                  idList = idList + [row[0]]
                  lastDate = lastDate + row[15]
@@ -221,27 +222,14 @@ def search():
               return render_template('search.html', error = error)
            
            elif rowCount != 1: # multiple survivors with similar info
-              ###THIS DOES NOT WORK: ###
-              details = ""
-              for row in cur.fetchall():
-                 if i in idList == row[0]:
-                    while additionalname == row[3] or age == row[5] or year == row[6] or month == row[7] or day == row[8] or country == row[9] or state == row[10] or city == row[11] or county == row[12] or village == row[13] or other == row[14]:
-                       details = details + str(row[2]) + " " + str(row[1]) + " ID # " + str(row[0]) + ", Dated: " + str(row[15]) + "*** "
-                 else:
-                    details = details
-                      
-              #error = "I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more detail." + " ID LIST TEST: " + str(idList)
-              if details == "":
-                 error = "Details == ''"
-              else:   
-                 error = "I'mAlive has " + details + " Testing while loop with rowCount!=1."
+              error = "I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more details."
               return render_template('search.html', error = error)
            
            else:#msgDB != "" and rowCount == 1
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
               session['lastDate'] = lastDate
-              session['message'] = "Celebrate! On " + str(session['lastDate']) + " " + session ['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
+              session['message'] = "Celebrate! On " + str(session['lastDate']) + " " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               return redirect(url_for('celebrate'))
         else:  
             error = "Not enough information to continue; please provide both a family name, a personal name, and a gender. Thank you."
