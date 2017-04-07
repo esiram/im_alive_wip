@@ -20,7 +20,6 @@ app.config.update(dict(
 app.config.from_envvar('IMALIVE_SETTINGS', silent=True)
 
 
-
 ### DATABASE FUNCTIONS ###
 #FUNCTIONS TO CONNECT DB
 def connect_db():
@@ -64,8 +63,7 @@ def initdb_command():
     """Initializes the database."""
     init_db()
     print('Initialized the database.')
-
-    
+ 
     
 ### VIEW FUNCTIONS ###
 #GENERAL VIEW FUNCTIONS
@@ -75,9 +73,8 @@ def home():
    """ Handles home screen (home.html). """
    render_template('home.html', error = None)
    error = None
-  # while request.method == 'POST':     #should doWhat have a not null value????-ES 3/15/17
-   if request.method == 'POST':
-       if 'doWhat' in request.form:
+   if request.method == 'POST':  
+       if 'doWhat' in request.form:    #should doWhat have a not null value????-ES 3/15/17
            doWhat = request.form['doWhat']
            if doWhat == "search":
               return redirect(url_for("search"))
@@ -88,8 +85,7 @@ def home():
        else: #if nothing chosen but submit/enter button hit (i.e. doWhat = None); THIS DOESN'T WORK! Currently an error at redirections/rendering 'home.html'-es3/17/17
            return render_template('home.html', error = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you.")
    else:    #request.method == 'GET'
-       error = "Please select from one of the options.  Thank you."
-       return render_template('home.html')#, error = error)
+       return render_template('home.html', error = error)
 
 #@app.route('/celebrate/<personalname>', methods = ['GET', 'POST']) #not pulling dynamic stuff into URL - Es 3/13/17
 @app.route('/celebrate', methods = ['GET', 'POST'])
@@ -136,9 +132,9 @@ def signupSurvivor():
        password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
        #password2 = request.form['password2'] ### if password2 == password:... else: error
        #automatic input
-       signupDate = 12  #hard code for now
+       signupDate = 12122012  #hard code for now
        
-       if familyname and personalname and password: #for now to keep simple
+       if familyname and personalname and password: #only requiring these
           db = get_db()
           db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, password, signupDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
                       [familyname, personalname, additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, password, signupDate])
@@ -158,18 +154,32 @@ def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""  #WIP:more info needed
     render_template('loginSurvivor.html')    
     error = None
-    return render_template('loginSurvivor.html', error = error)
- #when logged in this should redirect(url_for('updateSurvivor'))
+    if request.method == 'POST':
+       if request.form['personalname'] != app.config['USERNAME']  #should this be app.configUSERNAME?????
+           error = "Invalid username."  #I need to get a username in the db
+       elif request.form['password'] != app.config['PASSWORD']:
+          error =  "Invalid password."
+       else:
+          session['logged_in'] = True
+          flash("You are logged in.")
+          return redirect(url_for('updateSurvivor'))
+    return render_template('updateSurvivor.html', error = error)
 
- #NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
- #always use the WHERE statement with an SQL UPDATE statement
-""" I need to have an update info page so that pulls current info, but also shows all updates once updated.  Only folks a person logged in can access his/her personal page. """
+
+
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
 def updateSurvivor():
    """Handles survivor update information, only accessible when logged in."""
    render_template('updateSurvivor.html')
    error = None
    return render_template('updateSurvivor.html', error = error)
+
+#NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
+#always use the WHERE statement with an SQL UPDATE statement
+#I need to have an update info page so that pulls current info, but also shows all updates once updated.  Only folks a person logged in can access his/her personal page. """
+
+
+
 
 #SEARCH VIEW FUNCTIONS
 @app.route('/search', methods = ['POST', 'GET'])
