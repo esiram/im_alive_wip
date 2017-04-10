@@ -158,17 +158,15 @@ def signupSurvivor():
        return render_template('signupSurvivor.html', error = None)
 
 
-@app.route('/loginSurvivor', methods = ['GET', 'POST'])
+@app.route('/loginSurvivor', methods = ['POST', 'GET'])
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""  #WIP:more info needed
     render_template('loginSurvivor.html', error = None)
     if request.method == 'POST':
        error = None
-       msg = ""
-             
        personalname = request.form['personalname']
        familyname = request.form['familyname']
-       username = request.form['username']  #SHOULD username BE UNIQUE IN schema.sql???
+       username = request.form['username']  #SHOULD username BE UNIQUE IN schema.sql??? I think so.  Work on this.
        password = request.form['password']
        db = get_db()   #this is redundant in different views, maybe make a function to call db and use the cursor later on???
        cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=familyname AND personalName=personalname AND username=username AND password=password")
@@ -179,16 +177,20 @@ def loginSurvivor():
              session['personalname'] = personalname
              session['username'] = username
              session['id'] = loginID
-             flash("You are logged in.")
+             session['message'] = session['personalname'] + ", please verify the information about you in I'mAlive's database and update as needed.  Thank you."
+            # flash("You are logged in.")
              return redirect(url_for('updateSurvivor'))
           else:
              error = "Try again please.  Something doesn't match."
-             return render_template('updateSurvivor.html', error = error)   
+             return render_template('updateSurvivor.html', error = error)
+    else: # request.method == 'GET':
+       error = "THIS METHOD IS get; ASK ESTHER TO CORRECT."
+       return render_template('loginSurvivor.html', error = error)
 
 
 
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
-@app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
+#@app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
 def updateSurvivor():
    """Handles survivor update information, only accessible when logged in."""
    render_template('updateSurvivor.html')
