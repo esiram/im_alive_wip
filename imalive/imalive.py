@@ -48,7 +48,7 @@ def create_table():
     """To create table 'survivors' if table doesn't exist."""
     conn = connect_db()       #connection
     cur = conn.cursor()       #cursor (TBD: see init_db 'c' for cursor: determine if a general cursor object for the entire app should get made)
-    cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')
+    cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')#should I update the columns here????? the db has loaded regardless.-4/10/17
        
 
 #FUNCTIONS TO INITIALIZE DB
@@ -61,7 +61,7 @@ def init_db():
     db.commit()
     
 @app.cli.command('initdb')  #flask creates an application context bound to correct application
-def initdb_command():
+def initdb_command():  #in the command line type: flask initdb
     """Initializes the database."""
     init_db()
     print('Initialized the database.')
@@ -117,7 +117,7 @@ def signupSurvivor():
        additionalname = request.form['additionalname']
        gender = None
        if 'gender' in request.form:
-          gender = request.form['gender']  ##### Gender works: Thx to advice from D.
+          gender = request.form['gender']
        age = request.form['age']
        year = request.form['year']
        month = request.form['month']
@@ -132,19 +132,25 @@ def signupSurvivor():
        if 'sos' in request.form:
           sos = request.form['sos']
        otherSOS = request.form['otherSOS']
+       username = request.form['username']#### Will need to make this unique somehow, or just leave the password as a unique password???
        password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
-       #password2 = request.form['password2'] ### if password2 == password:... else: error
-       #automatic input
-       signupDate = 12122012  #hard code for now
+       password2 = request.form['password2']
+       ### if password2 == password:... else: error
        
-       if familyname and personalname and password: #only requiring these
+       #automatic input:
+       signupDate = 12122012  #hard code for now; later this should automatically update later
+   
+       if familyname and personalname and username and password == password2: #only requiring these
           db = get_db()
-          db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, password, signupDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-                      [familyname, personalname, additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, password, signupDate])
+          db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, password, signupDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                      [familyname, personalname, additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, password, signupDate])
           db.commit()
           session['personalname'] = request.form['personalname']
           session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
-          return redirect(url_for('celebrate')) 
+          return redirect(url_for('celebrate'))
+       elif password != password2:
+          error = "The passwords do not match.  Please try again.  Thank you."
+          return render_template('signupSurvivor.html', error = error)
        else:
            error = "Not enough information to continue, please fill in all asterisked/starred items."
            return render_template('signupSurvivor.html', error = error)
@@ -156,22 +162,33 @@ def signupSurvivor():
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""  #WIP:more info needed
     render_template('loginSurvivor.html', error = None)
-    return render_template('loginSurvivor.html', error = None)
-   # error = None
-    #if request.method == 'POST':
-     #  if request.form['personalname'] != app.config['USERNAME']:  #should this be app.configUSERNAME???
-      #     error = "Invalid username."  #I need to get a username in the db
-       #elif request.form['password'] != app.config['PASSWORD']:
-        #  error =  "Invalid password."
-       #else:
-        #  session['logged_in'] = True
-         # flash("You are logged in.")
-         # return redirect(url_for('updateSurvivor'))
-   # return render_template('updateSurvivor.html', error = error)
+    if request.method == 'POST':
+       error = None
+       msg = ""
+             
+       personalname = request.form['personalname']
+       familyname = request.form['familyname']
+       username = request.form['username']  #SHOULD username BE UNIQUE IN schema.sql???
+       password = request.form['password']
+       db = get_db()   #this is redundant in different views, maybe make a function to call db and use the cursor later on???
+       cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=familyname AND personalName=personalname AND username=username AND password=password")
+       for row in cur.fetchall:
+          if familyname in row[1] and personalname in row[2] and username in row[3] and password in row[4]:
+             loginID = row[0]
+             session['logged_in'] = True
+             session['personalname'] = personalname
+             session['username'] = username
+             session['id'] = loginID
+             flash("You are logged in.")
+             return redirect(url_for('updateSurvivor'))
+          else:
+             error = "Try again please.  Something doesn't match."
+             return render_template('updateSurvivor.html', error = error)   
 
 
 
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
+@app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
 def updateSurvivor():
    """Handles survivor update information, only accessible when logged in."""
    render_template('updateSurvivor.html')

@@ -17,6 +17,7 @@ create table survivors (
   other text NULL,
   sos text NULL,
   otherSOS text NULL,
+  username text NOT NULL,
   password text NOT NULL,
   signupDate timestamp NOT NULL,
   updateDate timestamp NULL
