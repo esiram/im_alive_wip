@@ -1,7 +1,9 @@
 ### ALL IMPORTS ###
 import os
 import sqlite3
-import datetime #for date stamp -- TO BE USED WITH DB ITEMS; not used as of 3/17/17
+from datetime import datetime # per flask minitwit example 4/10/17
+from hashlib import md5 # per flask minitwit example 4/10/17
+from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 
@@ -44,8 +46,8 @@ def close_db(error):                      #if things go well the error parameter
 #FUNCTIONS TO UTILIZE DB
 def create_table():
     """To create table 'survivors' if table doesn't exist."""
-    conn = connect_db()                   #connection
-    cur = conn.cursor()                   #cursor (TBD: see init_db 'c' for cursor: determine if a general cursor object for the entire app should get made)
+    conn = connect_db()       #connection
+    cur = conn.cursor()       #cursor (TBD: see init_db 'c' for cursor: determine if a general cursor object for the entire app should get made)
     cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')
        
 
@@ -81,6 +83,7 @@ def home():
            elif doWhat == "signup":
               return redirect(url_for("signupSurvivor"))
            else: # doWhat == "login":
+              print("This should redirect to loginSurvivor.html.")
               return redirect(url_for("loginSurvivor"))
        else: #if nothing chosen but submit/enter button hit (i.e. doWhat = None); THIS DOESN'T WORK! Currently an error at redirections/rendering 'home.html'-es3/17/17
            return render_template('home.html', error = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you.")
@@ -152,18 +155,19 @@ def signupSurvivor():
 @app.route('/loginSurvivor', methods = ['GET', 'POST'])
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""  #WIP:more info needed
-    render_template('loginSurvivor.html')    
-    error = None
-    if request.method == 'POST':
-       if request.form['personalname'] != app.config['USERNAME']  #should this be app.configUSERNAME?????
-           error = "Invalid username."  #I need to get a username in the db
-       elif request.form['password'] != app.config['PASSWORD']:
-          error =  "Invalid password."
-       else:
-          session['logged_in'] = True
-          flash("You are logged in.")
-          return redirect(url_for('updateSurvivor'))
-    return render_template('updateSurvivor.html', error = error)
+    render_template('loginSurvivor.html', error = None)
+    return render_template('loginSurvivor.html', error = None)
+   # error = None
+    #if request.method == 'POST':
+     #  if request.form['personalname'] != app.config['USERNAME']:  #should this be app.configUSERNAME???
+      #     error = "Invalid username."  #I need to get a username in the db
+       #elif request.form['password'] != app.config['PASSWORD']:
+        #  error =  "Invalid password."
+       #else:
+        #  session['logged_in'] = True
+         # flash("You are logged in.")
+         # return redirect(url_for('updateSurvivor'))
+   # return render_template('updateSurvivor.html', error = error)
 
 
 
