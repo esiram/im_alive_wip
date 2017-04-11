@@ -185,7 +185,7 @@ def loginSurvivor():
                 return redirect(url_for('updateSurvivor'))
              else:
                 error = "Try again please.  Something doesn't match."
-                return render_template('updateSurvivor.html', error = error)
+                return render_template('loginSurvivor.html', error = error)
        else: #missing familyname, personalname, username and/or password
           error = "Please enter information in all fields.  Thank you."
           render_template('loginSurvivor.html', error = error)
