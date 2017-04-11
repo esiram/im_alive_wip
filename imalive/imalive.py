@@ -182,7 +182,7 @@ def loginSurvivor():
                 session['id'] = row[0]
                 session['message'] = session['personalname'] + ", please verify the information about you in I'mAlive's database and update as needed.  Thank you."
                 # flash("You are logged in.")
-                return redirect(url_for('updateSurvivor'))
+                return redirect(url_for('updateSurvivor', personalname=session['personalname']))
              else:
                 error = "Try again please.  Something doesn't match."
                 return render_template('loginSurvivor.html', error = error)
@@ -192,11 +192,11 @@ def loginSurvivor():
 
 
 
-@app.route('/updateSurvivor', methods = ['GET', 'POST'])
-#@app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
-def updateSurvivor():
+#@app.route('/updateSurvivor', methods = ['GET', 'POST'])
+@app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
+def updateSurvivor(personalname):
    """Handles survivor update information, only accessible when logged in."""
-   render_template('updateSurvivor.html')
+   render_template('updateSurvivor.html', personalname=session['personalname'])
    error = None
    return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'])
 
