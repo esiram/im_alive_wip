@@ -6,13 +6,16 @@
 <h1>I'mAlive: Update Information</h1>
 <!--
 <div action="http://127.0.0.1:5000/updateSurvivor" method="get">
-  <li> {{ message }} </li>
 -->
+    {% if message %}
+         <li><strong>{{ message }}</strong></li>
+    {% endif %}
+  
 <form action="http://127.0.0.1:5000/updateSurvivor" method="post">
 
     {% if error %}
-    <p><strong>Error: {{ error }}</strong>
-    <br>
+         <p><strong>Error: {{ error }}</strong></p>
+         <br>
     {% endif %} 
   
     Family (Last) Name*:

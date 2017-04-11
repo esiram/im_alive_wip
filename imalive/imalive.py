@@ -198,7 +198,7 @@ def updateSurvivor():
    """Handles survivor update information, only accessible when logged in."""
    render_template('updateSurvivor.html')
    error = None
-   return render_template('updateSurvivor.html', error = error)
+   return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'])
 
 #NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
 #always use the WHERE statement with an SQL UPDATE statement
