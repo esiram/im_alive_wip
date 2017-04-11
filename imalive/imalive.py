@@ -103,7 +103,7 @@ def celebrate():
     
    
 #SURVIVOR VIEW FUNCTIONS
-@app.route('/signupSurvivor', methods = ['GET', 'POST'])
+@app.route('/signupSurvivor', methods = ['POST', 'GET'])
 def signupSurvivor():
     """Handles survivor signup screen (signupSurvivor.html)."""
     render_template('signupSurvivor.html', error = None)
@@ -162,30 +162,33 @@ def signupSurvivor():
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""  #WIP:more info needed
     render_template('loginSurvivor.html', error = None)
-    if request.method == 'POST':
+    if request.method == 'GET': #initially this is GET
+       error = None
+       return render_template('loginSurvivor.html', error = error)
+    else: #request.method == 'POST':
        error = None
        personalname = request.form['personalname']
        familyname = request.form['familyname']
        username = request.form['username']  #SHOULD username BE UNIQUE IN schema.sql??? I think so.  Work on this.
        password = request.form['password']
-       db = get_db()   #this is redundant in different views, maybe make a function to call db and use the cursor later on???
-       cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=familyname AND personalName=personalname AND username=username AND password=password")
-       for row in cur.fetchall:
-          if familyname in row[1] and personalname in row[2] and username in row[3] and password in row[4]:
-             loginID = row[0]
-             session['logged_in'] = True
-             session['personalname'] = personalname
-             session['username'] = username
-             session['id'] = loginID
-             session['message'] = session['personalname'] + ", please verify the information about you in I'mAlive's database and update as needed.  Thank you."
-            # flash("You are logged in.")
-             return redirect(url_for('updateSurvivor'))
-          else:
-             error = "Try again please.  Something doesn't match."
-             return render_template('updateSurvivor.html', error = error)
-    else: # request.method == 'GET':
-       error = "THIS METHOD IS get; ASK ESTHER TO CORRECT."
-       return render_template('loginSurvivor.html', error = error)
+       if personalname and familyname and username and password:
+          db = get_db()   #this is redundant in different views, maybe make a function to call db and use the cursor later on???
+          cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=familyname AND personalName=personalname AND username=username AND password=password")
+          for row in cur.fetchall():
+             if familyname == row[1] and personalname == row[2] and username == row[3] and password == row[4]:
+                session['logged_in'] = True
+                session['personalname'] = personalname
+                session['username'] = username
+                session['id'] = row[0]
+                session['message'] = session['personalname'] + ", please verify the information about you in I'mAlive's database and update as needed.  Thank you."
+                # flash("You are logged in.")
+                return redirect(url_for('updateSurvivor'))
+             else:
+                error = "Try again please.  Something doesn't match."
+                return render_template('updateSurvivor.html', error = error)
+       else: #missing familyname, personalname, username and/or password
+          error = "Please enter information in all fields.  Thank you."
+          render_template('loginSurvivor.html', error = error)
 
 
 
