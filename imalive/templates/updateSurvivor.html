@@ -10,6 +10,11 @@
     {% if message %}
          <li><strong>{{ message }}</strong></li>
     {% endif %}
+	 <br>
+	 <br>
+    {% if message2 %}
+        <li>{{ message2}}</li>
+    {% endif %}
   
 <form action="http://127.0.0.1:5000/updateSurvivor" method="post">
 
@@ -72,16 +77,26 @@
     <br>
     <br>
     
-    Create a Password*:
+    Change Password:
     <input type="password" name="password"<br>
     <br>
     Retype Password for Verification:
     <input type="password" name="password2"<br>
-
+    
     <br>	   
     <br>
     <br>
-    <input type="submit" value="Submit">	   
+
+    Log Out Without Changing Your Information:<br>
+    <input type="radio" name="logout" value="yes"> Yes, please.<br>
+    <input type="radio" name="logout" value="no"> No, thank you.<br>
+
+    <br>
+    <br>
+    <br>
+    
+    <input type="submit" value="Submit">
+
 	   
 	   
   </form>

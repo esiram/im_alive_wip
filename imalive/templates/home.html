@@ -6,15 +6,18 @@
 <br>
 <br>
 <form id="home-form" action = "http://127.0.0.1:5000" method = "post">
+
+  {% if message %}
+      <p><strong>{{ message }}</strong>
+  {% endif %}  
   
   <input type="radio" name="doWhat" value="search"> Look Up Someone<br>
   <input type="radio" name="doWhat" value="signup"> Let Others Know You Live (Sign Up)<br>
   <input type="radio" name="doWhat" value="login"> Update Your Information (Log In)<br>
   <input type="submit" value="Submit">
    <br>
-       {% if error %} <!-- ##SHOULD doWhat have a notnull value too? -es 3/15/17## -->
-       <p><strong>{{ error }}</strong>
-       <br>
+       {% if error %} 
+           <p><strong>{{ error }}</strong>
        {% endif %}
 
 </form>  

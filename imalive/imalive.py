@@ -73,23 +73,24 @@ def initdb_command():  #in the command line type: flask initdb
 @app.route('/home', methods = ['POST', 'GET'])
 def home():
    """ Handles home screen (home.html). """
-   render_template('home.html', error = None)
+   render_template('home.html', error = None, message = None)
    error = None
+   message = None
    if request.method == 'POST':  
-       if 'doWhat' in request.form:    #should doWhat have a not null value????-ES 3/15/17
+       if 'doWhat' in request.form:
            doWhat = request.form['doWhat']
            if doWhat == "search":
               return redirect(url_for("search"))
            elif doWhat == "signup":
               return redirect(url_for("signupSurvivor"))
            else: # doWhat == "login":
-              print("This should redirect to loginSurvivor.html.")
               return redirect(url_for("loginSurvivor"))
-       else: #if nothing chosen but submit/enter button hit (i.e. doWhat = None); THIS DOESN'T WORK! Currently an error at redirections/rendering 'home.html'-es3/17/17
-           return render_template('home.html', error = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you.")
+       else: #if nothing chosen but submit/enter button hit
+           return render_template('home.html', error = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you.", message = message)
    else:    #request.method == 'GET'
-       return render_template('home.html', error = error)
+       return render_template('home.html', error = error, message = message)
 
+    
 #@app.route('/celebrate/<personalname>', methods = ['GET', 'POST']) #not pulling dynamic stuff into URL - Es 3/13/17
 @app.route('/celebrate', methods = ['GET', 'POST'])
 def celebrate():
@@ -107,11 +108,12 @@ def celebrate():
 def signupSurvivor():
     """Handles survivor signup screen (signupSurvivor.html)."""
     render_template('signupSurvivor.html', error = None)
-    if request.method == 'POST':
+    if request.method == 'GET':
+       return render_template('signupSurvivor.html', error = None)
+    else: # request.method == 'POST':
        error = None
        message = ""
-       
-       #form inputs:
+  #form inputs:
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        additionalname = request.form['additionalname']
@@ -135,9 +137,8 @@ def signupSurvivor():
        username = request.form['username']#### Will need to make this unique somehow, or just leave the password as a unique password???
        password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
        password2 = request.form['password2']
-       ### if password2 == password:... else: error
-       
-       #automatic input:
+       ### if password2 == password:... else: error       
+ #automatic input:
        signupDate = 12122012  #hard code for now; later this should automatically update later
    
        if familyname and personalname and username and password == password2: #only requiring these
@@ -154,18 +155,14 @@ def signupSurvivor():
        else:
            error = "Not enough information to continue, please fill in all asterisked/starred items."
            return render_template('signupSurvivor.html', error = error)
-    else: #request.method == 'GET'
-       return render_template('signupSurvivor.html', error = None)
 
 
-@app.route('/loginSurvivor', methods = ['POST', 'GET'])
+
+@app.route('/loginSurvivor', methods = ['GET', 'POST'])
 def loginSurvivor():
-    """Handles survivor login to update information (loginSurvivor.html)."""  #WIP:more info needed
+    """Handles survivor login to update information (loginSurvivor.html).""" 
     render_template('loginSurvivor.html', error = None)
-    if request.method == 'GET': #initially this is GET
-       error = None
-       return render_template('loginSurvivor.html', error = error)
-    else: #request.method == 'POST':
+    if request.method == 'POST':
        error = None
        personalname = request.form['personalname']
        familyname = request.form['familyname']
@@ -179,9 +176,11 @@ def loginSurvivor():
                 session['logged_in'] = True
                 session['personalname'] = personalname
                 session['username'] = username
-                session['id'] = row[0]
-                session['message'] = session['personalname'] + ", please verify the information about you in I'mAlive's database and update as needed.  Thank you."
-                # flash("You are logged in.")
+                session['idNum'] = row[0] #temporary check
+                session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed.  Thank you."
+                session['message2'] = ""
+                print("You are logged in, " + session['personalname'] + ".")
+                print("this is the ID: " + str(session['idNum']))#temporary check
                 return redirect(url_for('updateSurvivor', personalname=session['personalname']))
              else:
                 error = "Try again please.  Something doesn't match."
@@ -189,16 +188,30 @@ def loginSurvivor():
        else: #missing familyname, personalname, username and/or password
           error = "Please enter information in all fields.  Thank you."
           render_template('loginSurvivor.html', error = error)
+    else:#request.method == 'GET' #initially this is GET
+       error = None
+       return render_template('loginSurvivor.html', error = error)
 
 
-
-#@app.route('/updateSurvivor', methods = ['GET', 'POST'])
+@app.route('/updateSurvivor', methods = ['GET', 'POST'])
 @app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
-def updateSurvivor(personalname):
+def updateSurvivor(personalname=None):
    """Handles survivor update information, only accessible when logged in."""
-   render_template('updateSurvivor.html', personalname=session['personalname'])
-   error = None
-   return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'])
+   if request.method == 'GET':
+      error = None                  
+      return render_template('updateSurvivor.html', message = (session['message'] + " " + session['message2']), personalname = session['personalname'])
+   else: #request.method == 'POST'
+      error = None
+      if 'logout'in request.form:
+         logout = request.form['logout']
+         if logout == "yes":
+            message = "You are logged out."
+            return redirect(url_for("home"))
+         else: #logout == "no":
+            render_template('updateSurvivor.html', message = "logout=no", personaname = session['personalname'])
+      return render_template('updateSurvivor.html', message = "POST method now", personalname = session['personalname'])
+      
+
 
 #NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
 #always use the WHERE statement with an SQL UPDATE statement
