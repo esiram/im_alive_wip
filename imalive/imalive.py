@@ -15,7 +15,7 @@ app.config.from_object(__name__)     # load config from this file, imalive.py
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'imalive.db'),
-    SECRET_KEY='development key',
+    SECRET_KEY='development key',      #for sessions
     USERNAME='admin',
     PASSWORD='default'
     ))
@@ -162,6 +162,9 @@ def signupSurvivor():
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html).""" 
     render_template('loginSurvivor.html', error = None)
+    #if session['logged_in'] == True:
+     #  session.pop(logged_in, None)
+      # return render_template('loginSurvivor.html', error = "You are logged out; initial IF message.")
     if request.method == 'POST':
        error = None
        personalname = request.form['personalname']
@@ -182,8 +185,17 @@ def loginSurvivor():
                 print("You are logged in, " + session['personalname'] + ".")
                 print("this is the ID: " + str(session['idNum']))#temporary check
                 return redirect(url_for('updateSurvivor', personalname=session['personalname']))
-             else:
-                error = "Try again please.  Something doesn't match."
+             elif familyname != row[1]:
+                error = "Try again please: the family name does not match."
+                return render_template('loginSurvivor.html', error = error)
+             elif personalname != row[2]:
+                error = "Try again please: the personal name does not match."
+                return render_template('loginSurvivor.html', error = error)
+             elif username != row[3]:
+                error = "Try again please: incorrect username."
+                return render_template('loginSurvivor.html', error = error)
+             else: # password != row[4]
+                error = "Try again please: invalid password."
                 return render_template('loginSurvivor.html', error = error)
        else: #missing familyname, personalname, username and/or password
           error = "Please enter information in all fields.  Thank you."
@@ -198,20 +210,25 @@ def loginSurvivor():
 def updateSurvivor(personalname=None):
    """Handles survivor update information, only accessible when logged in."""
    if request.method == 'GET':
-      error = None                  
-      return render_template('updateSurvivor.html', message = (session['message'] + " " + session['message2']), personalname = session['personalname'])
+      if session['logged_in'] == False:
+         redirect(url_for("loginSurvivor"))
+      else: #logged_in == True
+         error = None                  
+         return render_template('updateSurvivor.html', message = (session['message'] + " " + session['message2']), personalname = session['personalname'])
    else: #request.method == 'POST'
       error = None
-      if 'logout'in request.form:
+      if 'logout' in request.form:#THESE STILL NEED MORE WORK
          logout = request.form['logout']
          if logout == "yes":
+            session.pop('logged_in', None)
+            session['logged_in'] = False
             message = "You are logged out."
-            return redirect(url_for("home"))
-         else: #logout == "no":
-            render_template('updateSurvivor.html', message = "logout=no", personaname = session['personalname'])
-      return render_template('updateSurvivor.html', message = "POST method now", personalname = session['personalname'])
+            print(message)
+            return redirect(url_for("home", message = message))
+      return render_template('updateSurvivor.html', message = session['personalname'] +": POST method now", personalname = session['personalname'])#test message
       
-
+###Note 4/11/17 at end of day: make sure to look at logout and login with sessions.
+###Left to do backend: login/logout with sessions, the update db, the salting and hashing pw; work out kinks in db pulling.-ES 4/11/17
 
 #NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
 #always use the WHERE statement with an SQL UPDATE statement
@@ -227,9 +244,8 @@ def search():
     render_template('search.html', error = None)
     if request.method == 'POST':
         error = None
-        message = ""
-        
-        #form inputs:
+        message = ""     
+ #form inputs:
         familyname = request.form['familyname']
         personalname = request.form['personalname']
         additionalname = request.form['additionalname']
