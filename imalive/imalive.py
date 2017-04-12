@@ -162,47 +162,72 @@ def signupSurvivor():
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html).""" 
     render_template('loginSurvivor.html', error = None)
-    #if session['logged_in'] == True:
-     #  session.pop(logged_in, None)
-      # return render_template('loginSurvivor.html', error = "You are logged out; initial IF message.")
-    if request.method == 'POST':
-       error = None
-       personalname = request.form['personalname']
-       familyname = request.form['familyname']
-       username = request.form['username']  #SHOULD username BE UNIQUE IN schema.sql??? I think so.  Work on this.
-       password = request.form['password']
-       if personalname and familyname and username and password:
-          db = get_db()   #this is redundant in different views, maybe make a function to call db and use the cursor later on???
-          cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=familyname AND personalName=personalname AND username=username AND password=password")
-          for row in cur.fetchall():
-             if familyname == row[1] and personalname == row[2] and username == row[3] and password == row[4]:
-                session['logged_in'] = True
-                session['personalname'] = personalname
-                session['username'] = username
-                session['idNum'] = row[0] #temporary check
-                session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed.  Thank you."
-                session['message2'] = ""
-                print("You are logged in, " + session['personalname'] + ".")
-                print("this is the ID: " + str(session['idNum']))#temporary check
-                return redirect(url_for('updateSurvivor', personalname=session['personalname']))
-             elif familyname != row[1]:
-                error = "Try again please: the family name does not match."
-                return render_template('loginSurvivor.html', error = error)
-             elif personalname != row[2]:
-                error = "Try again please: the personal name does not match."
-                return render_template('loginSurvivor.html', error = error)
-             elif username != row[3]:
-                error = "Try again please: incorrect username."
-                return render_template('loginSurvivor.html', error = error)
-             else: # password != row[4]
-                error = "Try again please: invalid password."
-                return render_template('loginSurvivor.html', error = error)
-       else: #missing familyname, personalname, username and/or password
-          error = "Please enter information in all fields.  Thank you."
-          render_template('loginSurvivor.html', error = error)
-    else:#request.method == 'GET' #initially this is GET
-       error = None
+    if request.method == 'GET': #initially this is GET
+       error = "INITIAL GET METHOD PAGE"
        return render_template('loginSurvivor.html', error = error)
+    
+    else:# request.method == 'POST':
+       session['logged_in'] = False
+       error = None       
+       if 'familyname' in request.form:
+          familyname = request.form['familyname']
+          if 'personalname' in request.form:
+             personalname = request.form['personalname']
+             if 'username' in request.form:
+                username = request.form['username']
+                if 'password' in request.form:
+                   password = request.form['password']
+                   db = get_db()   #this is redundant in different views, maybe make a function to call db and use the cursor later on???
+                   cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=familyname AND personalName=personalname AND username=username AND password=password")
+
+                   for row in cur.fetchall():
+                      if familyname == row[1]:
+                         if personalname == row[2]:
+                            if username == row[3]:
+                               if password == row[4]:
+                                  session['logged_in'] = True
+                                  session['personalname'] = personalname
+                                  session['username'] = username
+                                  session['idNum'] = row[0] #temporary check
+                                  session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed.  Thank you."
+                                  session['message2'] = ""
+                                  print("You are logged in, " + session['personalname'] + ".")
+                                  print("this is the ID: " + str(session['idNum']))#temporary check
+                                  return redirect(url_for('updateSurvivor', personalname=session['personalname']))
+                               else: # password != row[4]
+                                  error = "Try again please: invalid password."
+                                  return render_template('loginSurvivor.html', error = error)
+                            else: # username != row[3]:
+                               error = "Try again please: incorrect username."
+                               return render_template('loginSurvivor.html', error = error)
+                         else: # personalname != row[2] or personalname not in row[2]:
+                            error = "Try again please: the personal name does not match."
+                            return render_template('loginSurvivor.html', error = error)
+                      else:# familyname != row[1] or familyname not in row[1]:
+                         error = "Try again please: the family name does not match."
+                         return render_template('loginSurvivor.html', error = error)
+                else:#'password' in request.form = None
+                   error = "Please enter information in all fields: password missing."
+                   return render_template('loginSurvivor.html', error = error)
+             else: # 'username' in request.form = None
+                error = "Please enter information in all fields: username missing."
+                return render_template('loginSurvivor.html', error = error)
+          else: # 'personalname' in request.form = None
+             error = "Please enter information in all fields: personal name missing."
+             return render_template('loginSurvivor.html', error = error)
+       else: # 'familyname' in request.form = None      
+          error = "Please enter information in all fields: family name missing."
+          return render_template('loginSurvivor.html', error = error)
+      
+
+       #else:# personalname and familyname and username and password in request.form:
+       #   familyname = request.form['familyname']
+       #   personalname = request.form['personalname']
+       #   username = request.form['username']  #SHOULD username BE UNIQUE IN schema.sql??? I think so.  Work on this.
+       #   password = request.form['password']
+          
+
+
 
 
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
@@ -216,12 +241,11 @@ def updateSurvivor(personalname=None):
          error = None                  
          return render_template('updateSurvivor.html', message = (session['message'] + " " + session['message2']), personalname = session['personalname'])
    else: #request.method == 'POST'
-      error = None
       if 'logout' in request.form:#THESE STILL NEED MORE WORK
          logout = request.form['logout']
          if logout == "yes":
             session.pop('logged_in', None)
-            session['logged_in'] = False
+            #session['logged_in'] = False
             message = "You are logged out."
             print(message)
             return redirect(url_for("home", message = message))
