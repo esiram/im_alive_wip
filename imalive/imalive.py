@@ -163,34 +163,33 @@ def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html).""" 
     render_template('loginSurvivor.html', error = None)
     if request.method == 'GET': #initially this is GET
-       error = "INITIAL GET METHOD PAGE"
+       error = "Temporary development message: INITIAL GET METHOD PAGE"  #temporary development message
        return render_template('loginSurvivor.html', error = error)
-    
     else:# request.method == 'POST':
-       session['logged_in'] = False
-       error = None       
-       if 'familyname' in request.form:
-          familyname = request.form['familyname']
-          if 'personalname' in request.form:
-             personalname = request.form['personalname']
-             if 'username' in request.form:
-                username = request.form['username']
-                if 'password' in request.form:
-                   password = request.form['password']
-                   db = get_db()   #this is redundant in different views, maybe make a function to call db and use the cursor later on???
-                   cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=familyname AND personalName=personalname AND username=username AND password=password")
+       error = "Temporary development message: POST METHOD PAGE"
+       return render_template ('loginSurvivor.html', error=error)
+""" #BEGIN LONG COMMENTED OUT SECTION --ES 4/13/17 
 
+      error = None
+       if 'familyname' in request.form:
+          if 'personalname' in request.form:
+             if 'username' in request.form:
+                if 'password' in request.form:
+                   #familyname = request.form['familyname']
+                   #personalname = request.form['personalname']
+                   #username = request.form['username']
+                   #password = request.form['password']
+                   db = get_db()
+                   cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=? AND personalName=? AND username=? AND password=?", [request.form['familyname']], [request.form['personalname']], [request.form['username']], [request.form['password']])
                    for row in cur.fetchall():
-                      if familyname == row[1]:
-                         if personalname == row[2]:
-                            if username == row[3]:
-                               if password == row[4]:
-                                  session['logged_in'] = True
+                      if row[1] == request.form['familyname']:
+                         if row[2] == request.form['personalname']:
+                            if row[3] == request.form['username']:
+                               if row[4] == request.form['password']:
                                   session['personalname'] = personalname
                                   session['username'] = username
-                                  session['idNum'] = row[0] #temporary check
+                                  session['idNum'] = row[0] #temporary check for id
                                   session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed.  Thank you."
-                                  session['message2'] = ""
                                   print("You are logged in, " + session['personalname'] + ".")
                                   print("this is the ID: " + str(session['idNum']))#temporary check
                                   return redirect(url_for('updateSurvivor', personalname=session['personalname']))
@@ -216,17 +215,10 @@ def loginSurvivor():
              error = "Please enter information in all fields: personal name missing."
              return render_template('loginSurvivor.html', error = error)
        else: # 'familyname' in request.form = None      
-          error = "Please enter information in all fields: family name missing."
+          error = "Please enter information in all fields: family name missing." 
           return render_template('loginSurvivor.html', error = error)
-      
 
-       #else:# personalname and familyname and username and password in request.form:
-       #   familyname = request.form['familyname']
-       #   personalname = request.form['personalname']
-       #   username = request.form['username']  #SHOULD username BE UNIQUE IN schema.sql??? I think so.  Work on this.
-       #   password = request.form['password']
-          
-
+#End long commented out section.-Es 4/13/17"""
 
 
 
@@ -235,20 +227,20 @@ def loginSurvivor():
 def updateSurvivor(personalname=None):
    """Handles survivor update information, only accessible when logged in."""
    if request.method == 'GET':
-      if session['logged_in'] == False:
-         redirect(url_for("loginSurvivor"))
-      else: #logged_in == True
-         error = None                  
-         return render_template('updateSurvivor.html', message = (session['message'] + " " + session['message2']), personalname = session['personalname'])
+      error = None                  
+      return render_template('updateSurvivor.html', message = (session['message']), personalname = session['personalname'])
    else: #request.method == 'POST'
-      if 'logout' in request.form:#THESE STILL NEED MORE WORK
+      if 'logout' in request.form:#THESE STILL NEED WORK
          logout = request.form['logout']
          if logout == "yes":
-            session.pop('logged_in', None)
-            #session['logged_in'] = False
+            session.pop('username', None)
+            session.pop('personalname', None)
+            session.pop('familyname', None)
+            session.pop('idNum', None)
+            session.pop('message', None)
             message = "You are logged out."
             print(message)
-            return redirect(url_for("home", message = message))
+            return redirect(url_for("home"))
       return render_template('updateSurvivor.html', message = session['personalname'] +": POST method now", personalname = session['personalname'])#test message
       
 ###Note 4/11/17 at end of day: make sure to look at logout and login with sessions.
@@ -321,7 +313,7 @@ def search():
               session['message'] = "Celebrate! On " + str(session['lastDate']) + " " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               return redirect(url_for('celebrate'))
         else:  
-            error = "Not enough information to continue; please provide both a family name, a personal name, and a gender. Thank you."
+            error = "Not enough information to continue; please provide both a family name and a personal name. Thank you."
             return render_template('search.html', error = error)
     else: #request.method == 'GET'
         return render_template('search.html', error = None)
