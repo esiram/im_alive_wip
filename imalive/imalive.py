@@ -78,7 +78,7 @@ def home():
    """ Handles home screen (home.html). """
    message = None
    error = None
-   render_template('home.html', error = error)
+   render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
        if 'doWhat' in request.form:
            doWhat = request.form['doWhat']
@@ -198,34 +198,33 @@ def logout():
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
 @app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
 def updateSurvivor(personalname=None):
-   """Handles survivor update information, only accessible when logged in."""   
+   """Handles survivor update information, only accessible when logged in."""
    if request.method == 'GET':
+      #if session['logged_in'] != True:
+       #  return redirect(url_for("loginSurvivor"))
       error = None
       message = None
       if message in session:
          message = session['message']
-      return render_template('updateSurvivor.html', message = (session['message']), personalname = session['personalname'])
+      personalname = None
+      if personalname in session:
+         personalname = session['personalname']
+      return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'])
    else: #request.method == 'POST'
-      if 'logout' in request.form:                 #THESE STILL NEED WORK
+      if 'logout' in request.form:
          logout = request.form['logout']
          if logout == "yes":
             session.pop('username', None)
             session.pop('personalname', None)
-            session.pop('familyname', None)
-            session.pop('idNum', None)
             session.pop('message', None)
             message = "You are logged out."
             print(message)
-            return redirect(url_for("home"))
+            return redirect(url_for("logout"))
          else:
             session['message'] = session['personalname'] + ", please review and update your information as needed."
       return redirect(url_for("updateSurvivor", personalname = session['personalname']))   
-      #return render_template('updateSurvivor.html', personalname = session['personalname'], message = session['personalname'] + ": please review and update as needed.")#test message
 
-# End commented out section. -ES 4/13/17"""  
-      
-###Note 4/11/17 at end of day: make sure to look at logout and login with sessions.
-###Left to do backend: login/logout with sessions, the update db, the salting and hashing pw; work out kinks in db pulling.-ES 4/11/17
+###Left to do backend: the update db in update survivors, the salting and hashing pw; work out kinks in db pulling and anything else that turns up.-ES 4/13/17
 
 #NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
 #always use the WHERE statement with an SQL UPDATE statement
