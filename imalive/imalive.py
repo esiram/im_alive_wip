@@ -73,9 +73,12 @@ def initdb_command():  #in the command line type: flask initdb
 @app.route('/home', methods = ['POST', 'GET'])
 def home():
    """ Handles home screen (home.html). """
-   render_template('home.html', error = None, message = None)
+   render_template('home.html')
    error = None
    message = None
+   if 'message' in session:
+      error = session['message']
+   render_template('home.html', error = error)
    if request.method == 'POST':  
        if 'doWhat' in request.form:
            doWhat = request.form['doWhat']
@@ -230,6 +233,7 @@ def logout():
    session.pop('logged_in', None)
    message = "Logged Out"
    print message
+   session['message'] = message
    return redirect(url_for('home'))
 
    
