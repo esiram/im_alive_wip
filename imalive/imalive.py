@@ -160,14 +160,18 @@ def signupSurvivor():
 
 @app.route('/loginSurvivor', methods = ['GET', 'POST'])
 def loginSurvivor():
-    """Handles survivor login to update information (loginSurvivor.html).""" 
+    """Handles survivor login to update information (loginSurvivor.html)."""
+    error = None
     render_template('loginSurvivor.html', error = None)
-    if request.method == 'GET': #initially this is GET
-       error = "Temporary development message: INITIAL GET METHOD PAGE"  #temporary development message
-       return render_template('loginSurvivor.html', error = error)
-    else:# request.method == 'POST':
-       error = "Temporary development message: POST METHOD PAGE"
-       return render_template ('loginSurvivor.html', error=error)
+    if request.method == 'POST':
+       if request.form['username'] != app.config['USERNAME']:#hardcoding for now
+          error = "Invalid username, please try again."
+       elif request.form['password'] != app.config['PASSWORD']:#hardcoding for now
+          error = "Invalid password, please try again."
+       else:
+          session['logged_in'] = True
+          return redirect(url_for('updateSurvivor'))
+    return render_template ('loginSurvivor.html', error=error)
 """ #BEGIN LONG COMMENTED OUT SECTION --ES 4/13/17 
 
       error = None
@@ -220,17 +224,30 @@ def loginSurvivor():
 
 #End long commented out section.-Es 4/13/17"""
 
+@app.route('/logout')
+def logout():
+   """Handles logging user out."""
+   session.pop('logged_in', None)
+   message = "Logged Out"
+   print message
+   return redirect(url_for('home'))
 
-
+   
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
 @app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
 def updateSurvivor(personalname=None):
    """Handles survivor update information, only accessible when logged in."""
+   return render_template('updateSurvivor.html', message = None, error = None)
+
+"""#Commenting out work from 4/12/17 to try a new way.-ES 4/13/17   
    if request.method == 'GET':
       error = None                  
-      return render_template('updateSurvivor.html', message = (session['message']), personalname = session['personalname'])
+      return render_template('updateSurvivor.html', message = "Temporary Development Message: GET method.")#message = (session['message']), personalname = session['personalname'])
    else: #request.method == 'POST'
-      if 'logout' in request.form:#THESE STILL NEED WORK
+      return render_template('updateSurvivor.html', message = "Temporary Development Message: Post method.")
+
+
+      if 'logout' in request.form:                 #THESE STILL NEED WORK
          logout = request.form['logout']
          if logout == "yes":
             session.pop('username', None)
@@ -242,6 +259,8 @@ def updateSurvivor(personalname=None):
             print(message)
             return redirect(url_for("home"))
       return render_template('updateSurvivor.html', message = session['personalname'] +": POST method now", personalname = session['personalname'])#test message
+
+# End commented out section. -ES 4/13/17"""  
       
 ###Note 4/11/17 at end of day: make sure to look at logout and login with sessions.
 ###Left to do backend: login/logout with sessions, the update db, the salting and hashing pw; work out kinks in db pulling.-ES 4/11/17
