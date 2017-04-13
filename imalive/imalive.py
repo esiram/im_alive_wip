@@ -182,71 +182,9 @@ def loginSurvivor():
                 return redirect(url_for("updateSurvivor", personalname=session['personalname']))
              else:
                 error = "Invalid username or password."
-               # return render_template('loginSurvivor.html', error=error)
        else:
           error = "Please provide both a valid username and password."
-       return render_template('loginSurvivor.html', error=error)
-      
-      
-      # if request.form['username'] != app.config['USERNAME']:#hardcoding for now
-       #   error = "Invalid username, please try again."
-       #elif request.form['password'] != app.config['PASSWORD']:#hardcoding for now
-       #   error = "Invalid password, please try again."
-      # else:
-       #   session['logged_in'] = True
-       #   return redirect(url_for('updateSurvivor'))
     return render_template ('loginSurvivor.html', error=error)
-""" #BEGIN LONGIN COMMENTED OUT SECTION --ES 4/13/17 
-
-      error = None
-       if 'familyname' in request.form:
-          if 'personalname' in request.form:
-             if 'username' in request.form:
-                if 'password' in request.form:
-                   #familyname = request.form['familyname']
-                   #personalname = request.form['personalname']
-                   #username = request.form['username']
-                   #password = request.form['password']
-                   db = get_db()
-                   cur = db.execute("SELECT id, familyName, personalName, username, password FROM survivors WHERE familyName=? AND personalName=? AND username=? AND password=?", [request.form['familyname']], [request.form['personalname']], [request.form['username']], [request.form['password']])
-                   for row in cur.fetchall():
-                      if row[1] == request.form['familyname']:
-                         if row[2] == request.form['personalname']:
-                            if row[3] == request.form['username']:
-                               if row[4] == request.form['password']:
-                                  session['personalname'] = personalname
-                                  session['username'] = username
-                                  session['idNum'] = row[0] #temporary check for id
-                                  session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed.  Thank you."
-                                  print("You are logged in, " + session['personalname'] + ".")
-                                  print("this is the ID: " + str(session['idNum']))#temporary check
-                                  return redirect(url_for('updateSurvivor', personalname=session['personalname']))
-                               else: # password != row[4]
-                                  error = "Try again please: invalid password."
-                                  return render_template('loginSurvivor.html', error = error)
-                            else: # username != row[3]:
-                               error = "Try again please: incorrect username."
-                               return render_template('loginSurvivor.html', error = error)
-                         else: # personalname != row[2] or personalname not in row[2]:
-                            error = "Try again please: the personal name does not match."
-                            return render_template('loginSurvivor.html', error = error)
-                      else:# familyname != row[1] or familyname not in row[1]:
-                         error = "Try again please: the family name does not match."
-                         return render_template('loginSurvivor.html', error = error)
-                else:#'password' in request.form = None
-                   error = "Please enter information in all fields: password missing."
-                   return render_template('loginSurvivor.html', error = error)
-             else: # 'username' in request.form = None
-                error = "Please enter information in all fields: username missing."
-                return render_template('loginSurvivor.html', error = error)
-          else: # 'personalname' in request.form = None
-             error = "Please enter information in all fields: personal name missing."
-             return render_template('loginSurvivor.html', error = error)
-       else: # 'familyname' in request.form = None      
-          error = "Please enter information in all fields: family name missing." 
-          return render_template('loginSurvivor.html', error = error)
-
-#End long commented out section.-Es 4/13/17"""
 
 @app.route('/logout')
 def logout():
@@ -260,17 +198,14 @@ def logout():
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
 @app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
 def updateSurvivor(personalname=None):
-   """Handles survivor update information, only accessible when logged in."""
-   return render_template('updateSurvivor.html', message = None, error = None)
-
-"""#Commenting out work from 4/12/17 to try a new way.-ES 4/13/17   
+   """Handles survivor update information, only accessible when logged in."""   
    if request.method == 'GET':
-      error = None                  
-      return render_template('updateSurvivor.html', message = "Temporary Development Message: GET method.")#message = (session['message']), personalname = session['personalname'])
+      error = None
+      message = None
+      if message in session:
+         message = session['message']
+      return render_template('updateSurvivor.html', message = (session['message']), personalname = session['personalname'])
    else: #request.method == 'POST'
-      return render_template('updateSurvivor.html', message = "Temporary Development Message: Post method.")
-
-
       if 'logout' in request.form:                 #THESE STILL NEED WORK
          logout = request.form['logout']
          if logout == "yes":
@@ -282,7 +217,10 @@ def updateSurvivor(personalname=None):
             message = "You are logged out."
             print(message)
             return redirect(url_for("home"))
-      return render_template('updateSurvivor.html', message = session['personalname'] +": POST method now", personalname = session['personalname'])#test message
+         else:
+            session['message'] = session['personalname'] + ", please review and update your information as needed."
+      return redirect(url_for("updateSurvivor", personalname = session['personalname']))   
+      #return render_template('updateSurvivor.html', personalname = session['personalname'], message = session['personalname'] + ": please review and update as needed.")#test message
 
 # End commented out section. -ES 4/13/17"""  
       
