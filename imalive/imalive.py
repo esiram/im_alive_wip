@@ -5,6 +5,9 @@ from datetime import datetime # per flask minitwit example 4/10/17
 from hashlib import md5 # per flask minitwit example 4/10/17
 from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+#import flask_login  ##attempted 4/13/17 from flask login docs
+#login_manager = flask_login.LoginManager()  ##attempted 4/13/17 from flask login docs
+#login_manager.init_app(app)  ##attempted 4/13/17 from flask login docs
 
 
 ### CONFIGURATION CODE ###
@@ -73,11 +76,8 @@ def initdb_command():  #in the command line type: flask initdb
 @app.route('/home', methods = ['POST', 'GET'])
 def home():
    """ Handles home screen (home.html). """
-   render_template('home.html')
-   error = None
    message = None
-   if 'message' in session:
-      error = session['message']
+   error = None
    render_template('home.html', error = error)
    if request.method == 'POST':  
        if 'doWhat' in request.form:
@@ -160,22 +160,43 @@ def signupSurvivor():
            return render_template('signupSurvivor.html', error = error)
 
 
-
 @app.route('/loginSurvivor', methods = ['GET', 'POST'])
 def loginSurvivor():
     """Handles survivor login to update information (loginSurvivor.html)."""
-    error = None
-    render_template('loginSurvivor.html', error = None)
-    if request.method == 'POST':
-       if request.form['username'] != app.config['USERNAME']:#hardcoding for now
-          error = "Invalid username, please try again."
-       elif request.form['password'] != app.config['PASSWORD']:#hardcoding for now
-          error = "Invalid password, please try again."
+    if request.method == 'GET':
+       error = None
+       return render_template('loginSurvivor.html', error = None)
+    else: #request.method == 'POST':
+       username = request.form['username']
+       password = request.form['password']
+       if username and password:
+          db = get_db()
+          cur = db.execute("SELECT id, personalName, username, password FROM survivors WHERE username=username AND password=password")
+          for row in cur.fetchall():
+             if request.form['username'] == row[2] and request.form['password'] == row[3]:
+                session['logged_in'] = True
+                session['personalname'] = row[1]
+                session['id'] = row[0]
+                session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
+                print("Logged in session ID = " + str(session['id']) + " for name " + session['personalname'] + "."  )
+                return redirect(url_for("updateSurvivor", personalname=session['personalname']))
+             else:
+                error = "Invalid username or password."
+               # return render_template('loginSurvivor.html', error=error)
        else:
-          session['logged_in'] = True
-          return redirect(url_for('updateSurvivor'))
+          error = "Please provide both a valid username and password."
+       return render_template('loginSurvivor.html', error=error)
+      
+      
+      # if request.form['username'] != app.config['USERNAME']:#hardcoding for now
+       #   error = "Invalid username, please try again."
+       #elif request.form['password'] != app.config['PASSWORD']:#hardcoding for now
+       #   error = "Invalid password, please try again."
+      # else:
+       #   session['logged_in'] = True
+       #   return redirect(url_for('updateSurvivor'))
     return render_template ('loginSurvivor.html', error=error)
-""" #BEGIN LONG COMMENTED OUT SECTION --ES 4/13/17 
+""" #BEGIN LONGIN COMMENTED OUT SECTION --ES 4/13/17 
 
       error = None
        if 'familyname' in request.form:
@@ -232,8 +253,7 @@ def logout():
    """Handles logging user out."""
    session.pop('logged_in', None)
    message = "Logged Out"
-   print message
-   session['message'] = message
+   print(message)
    return redirect(url_for('home'))
 
    
