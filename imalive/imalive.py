@@ -93,12 +93,14 @@ def home():
    else:    #request.method == 'GET'
        return render_template('home.html', error = error, message = message)
 
-    
-#@app.route('/celebrate/<personalname>', methods = ['GET', 'POST']) #not pulling dynamic stuff into URL - Es 3/13/17
-@app.route('/celebrate', methods = ['GET', 'POST'])
-def celebrate():
+
+@app.route('/celebrate', methods = ['GET', 'POST'])    
+@app.route('/celebrate/<personalname>', methods = ['GET', 'POST']) #not pulling dynamic stuff into URL - Es 3/13/17
+def celebrate(personalname = None):
     """Handles the celebrate screen (celebrate.html)."""
-    if 'personalname' in session:                                                        #this pulls name dynamically into template, URL not showing yet as of 3/13/17
+    #personalname = None
+    #error = None
+    if 'personalname' in session:              
        return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])  #this pulls name dynamically as of 3/13/17
     else:
        message= "Celebrate, you live!!!  If you want to look somoone else up, please check out the I'mAlive's Search page."
@@ -151,7 +153,7 @@ def signupSurvivor():
           db.commit()
           session['personalname'] = request.form['personalname']
           session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
-          return redirect(url_for('celebrate'))
+          return redirect(url_for('celebrate', personalname = session['personalname']))
        elif password != password2:
           error = "The passwords do not match.  Please try again.  Thank you."
           return render_template('signupSurvivor.html', error = error)
@@ -291,7 +293,7 @@ def search():
               session['familyname'] = request.form['familyname']
               session['lastDate'] = lastDate
               session['message'] = "Celebrate! On " + str(session['lastDate']) + " " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
-              return redirect(url_for('celebrate'))
+              return redirect(url_for('celebrate', personalname = session['personalname']))
         else:  
             error = "Not enough information to continue; please provide both a family name and a personal name. Thank you."
             return render_template('search.html', error = error)
