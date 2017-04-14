@@ -18,9 +18,9 @@ from datetime import datetime # per flask minitwit example 4/10/17
 from hashlib import md5 # per flask minitwit example 4/10/17
 from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
-#import flask_login  ##attempted 4/13/17 from flask login docs
-#login_manager = flask_login.LoginManager()  ##attempted 4/13/17 from flask login docs
-#login_manager.init_app(app)  ##attempted 4/13/17 from flask login docs
+#import flask_login  ##attempted 4/13/17 from flask login docs    #ARE THESE NECESSARY?
+#login_manager = flask_login.LoginManager()  ##attempted 4/13/17 from flask login docs     #ARE THESE NECESSARY?
+#login_manager.init_app(app)  ##attempted 4/13/17 from flask login docs     #ARE THESE NECESSARY?
 
 
 ### CONFIGURATION CODE ###
@@ -91,6 +91,7 @@ def home():
    """ Handles home screen (home.html). """
    message = None
    error = None
+   session['logged_in'] = False  # JUST to try to cover bases-4/14/17
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
        if 'doWhat' in request.form:
@@ -134,7 +135,7 @@ def signupSurvivor():
     else: # request.method == 'POST':
        error = None
        message = ""
-  #form inputs:
+#form inputs:
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        additionalname = request.form['additionalname']
@@ -178,11 +179,13 @@ def signupSurvivor():
 
 
 @app.route('/loginSurvivor', methods = ['GET', 'POST'])
-def loginSurvivor():
+@app.route('/updateSurvivor/loginSurvivor/<error>', methods = ['GET', 'POST'])
+def loginSurvivor(error=None):
     """Handles survivor login to update information (loginSurvivor.html)."""
     if request.method == 'GET':
        error = None
-       return render_template('loginSurvivor.html', error = None)
+       session['logged_in'] = False
+       return render_template('loginSurvivor.html')
     else: #request.method == 'POST':
        username = request.form['username']
        password = request.form['password']
@@ -192,10 +195,11 @@ def loginSurvivor():
           for row in cur.fetchall():
              if request.form['username'] == row[2] and request.form['password'] == row[3]:
                 session['logged_in'] = True
+                session['username'] = row[2]
                 session['personalname'] = row[1]
-                session['id'] = row[0]
+                session['userID'] = row[0]
                 session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
-                print("Logged in session ID = " + str(session['id']) + " for name " + session['personalname'] + "."  )
+                print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + "."  )
                 return redirect(url_for("updateSurvivor", personalname=session['personalname']))
              else:
                 error = "Invalid username or password."
@@ -207,6 +211,7 @@ def loginSurvivor():
 def logout():
    """Handles logging user out."""
    session.pop('logged_in', None)
+   session['logged_in'] = False
    message = "Logged Out"
    print(message)
    return redirect(url_for('home'))
@@ -217,33 +222,36 @@ def logout():
 def updateSurvivor(personalname=None):
    """Handles survivor update information, only accessible when logged in."""
    if request.method == 'GET':
-      #if session['logged_in'] != True:
-       #  return redirect(url_for("loginSurvivor"))
-      error = None
-      username = None
-      if username in session:
-         username = session['username']
-      message = None
-      if message in session:
-         message = session['message']
-      personalname = None
-      if personalname in session:
-         personalname = session['personalname']
- ####start working here for info to edit on page-ES 4/14/17 ####
-      message2 = None   
-      if session['logged_in'] == True:
-         id = None
-         if id in session:
-            id = session['id']
+      if session['logged_in'] != True:
+         session['error'] = "LoggedOut"
+         return redirect(url_for("loginSurvivor", error=session['error']))
+      else: #session['logged_in'] == True
+         error = None
+         username = None
+         if username in session:
+            username = session['username']
+         message = None
+         if message in session:
+            message = session['message']
+         personalname = None
+         if personalname in session:
+            personalname = session['personalname']
+         message2 = ""
+         userID = None
+         if userID in session:
+            userID = session['userID']
          db = get_db()
-         cur = db.execute("SELECT * FROM survivors WHERE id=id AND username=username")
+         cur = db.execute("SELECT * FROM survivors WHERE username=username")
          for row in cur.fetchall():
-            print(str(row[0]) + " " + row[2])
-            message2 = str(row[2]) + " " + str(row[1]) + ": this is what you should review from the db."
-            if row not in cur.fetchall():
-               message2 = "Nothing pulled from db."
-####end working here for infor to edit, except for message2 added to return below.-ES 4/14/17               
+            if row[0] == session['userID'] and row[17] == session['username']:
+               print(str(row[0]) + " " + row[2])
+               message2 = message2 + str(row[2]) + " " + str(row[3])
+            else:
+               message2 == message2
+         if message2 == "":
+            message2 = "Nothing pulled from db."             
       return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2)
+   
    else: #request.method == 'POST'
       if 'logout' in request.form:
          logout = request.form['logout']
@@ -251,6 +259,7 @@ def updateSurvivor(personalname=None):
             session.pop('username', None)
             session.pop('personalname', None)
             session.pop('message', None)
+            session['logged_in'] = False
             message = "You are logged out."
             print(message)
             return redirect(url_for("logout"))
