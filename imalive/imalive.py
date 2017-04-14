@@ -1,3 +1,16 @@
+
+"""TO DO as of 4/14/17:
+Left to do backend: 1) the update db SQL in updateSurvivor view
+                    2) datetime automatic loading to SQL
+                    3) salt and hash pw
+                    4) work out kinks in db pulling and anything else that turns up.
+                       a) one kink: when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
+                       b) do you want to create separate .py folders for different aspects of your code in imalive.py (i.e. the main python file)?
+
+Other non-backend work: 1) Create good Readme for Git Hub
+                        2) Beautify front-end -- (not focus b/c of backend focus, but needs improving)          
+"""
+
 ### ALL IMPORTS ###
 import os
 import sqlite3
@@ -95,11 +108,14 @@ def home():
 
 
 @app.route('/celebrate', methods = ['GET', 'POST'])    
-@app.route('/celebrate/<personalname>', methods = ['GET', 'POST']) #not pulling dynamic stuff into URL - Es 3/13/17
+@app.route('/celebrate/<personalname>', methods = ['GET', 'POST'])
 def celebrate(personalname = None):
     """Handles the celebrate screen (celebrate.html)."""
-    #personalname = None
-    #error = None
+    personalname = None
+    error = None
+    message = None
+    if message in session:
+       message = session['message']
     if 'personalname' in session:              
        return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])  #this pulls name dynamically as of 3/13/17
     else:
@@ -139,12 +155,11 @@ def signupSurvivor():
        if 'sos' in request.form:
           sos = request.form['sos']
        otherSOS = request.form['otherSOS']
-       username = request.form['username']#### Will need to make this unique somehow, or just leave the password as a unique password???
-       password = request.form['password']   #####  WORK ON HASHING and SALTING AT LATER DATE
-       password2 = request.form['password2']
-       ### if password2 == password:... else: error       
+       username = request.form['username']      #### Will need to make this unique somehow, or just leave the password as a unique password???
+       password = request.form['password']      #### WORK ON HASHING and SALTING AT LATER DATE
+       password2 = request.form['password2']      
  #automatic input:
-       signupDate = 12122012  #hard code for now; later this should automatically update later
+       signupDate = 12122012  #hard code for now; later this should automatically update later via datetime stamp
    
        if familyname and personalname and username and password == password2: #only requiring these
           db = get_db()
@@ -185,7 +200,7 @@ def loginSurvivor():
              else:
                 error = "Invalid username or password."
        else:
-          error = "Please provide both a valid username and password."
+          error = "Please provide both a valid username and the associated password."
     return render_template ('loginSurvivor.html', error=error)
 
 @app.route('/logout')
@@ -205,13 +220,30 @@ def updateSurvivor(personalname=None):
       #if session['logged_in'] != True:
        #  return redirect(url_for("loginSurvivor"))
       error = None
+      username = None
+      if username in session:
+         username = session['username']
       message = None
       if message in session:
          message = session['message']
       personalname = None
       if personalname in session:
          personalname = session['personalname']
-      return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'])
+ ####start working here for info to edit on page-ES 4/14/17 ####
+      message2 = None   
+      if session['logged_in'] == True:
+         id = None
+         if id in session:
+            id = session['id']
+         db = get_db()
+         cur = db.execute("SELECT * FROM survivors WHERE id=id AND username=username")
+         for row in cur.fetchall():
+            print(str(row[0]) + " " + row[2])
+            message2 = str(row[2]) + " " + str(row[1]) + ": this is what you should review from the db."
+            if row not in cur.fetchall():
+               message2 = "Nothing pulled from db."
+####end working here for infor to edit, except for message2 added to return below.-ES 4/14/17               
+      return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2)
    else: #request.method == 'POST'
       if 'logout' in request.form:
          logout = request.form['logout']
@@ -226,7 +258,6 @@ def updateSurvivor(personalname=None):
             session['message'] = session['personalname'] + ", please review and update your information as needed."
       return redirect(url_for("updateSurvivor", personalname = session['personalname']))   
 
-###Left to do backend: the update db in update survivors, the salting and hashing pw; work out kinks in db pulling and anything else that turns up.-ES 4/13/17
 
 #NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
 #always use the WHERE statement with an SQL UPDATE statement

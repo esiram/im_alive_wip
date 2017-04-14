@@ -12,10 +12,14 @@
     {% endif %}
 	 <br>
 	 <br>
-<!--    {% if message2 %}
-        <li>{{ message2}}</li>
+    {% if message2 %}
+<li><b>Your current information:</b>
+         <br>
+     <i>{{ message2 }}</i></li>
     {% endif %}
--->  
+	 <br>
+	 <br>
+ 
 <form action="http://127.0.0.1:5000/updateSurvivor" method="post">
 
     {% if error %}
