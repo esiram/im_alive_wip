@@ -1,9 +1,8 @@
 
 """TO DO as of 4/14/17:
 Left to do backend: 1) the update db SQL in updateSurvivor view
-                    2) datetime automatic loading to SQL
-                    3) salt and hash pw
-                    4) work out kinks in db pulling and anything else that turns up.
+                    2) salt and hash pw
+                    3) work out kinks in db pulling and anything else that turns up.
                        a) one kink: when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
                        b) do you want to create separate .py folders for different aspects of your code in imalive.py (i.e. the main python file)?
 
@@ -20,9 +19,6 @@ import random
 #from hashlib import md5 # per flask minitwit example 4/10/17
 #from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
-#import flask_login  ##attempted 4/13/17 from flask login docs    #ARE THESE NECESSARY?
-#login_manager = flask_login.LoginManager()  ##attempted 4/13/17 from flask login docs     #ARE THESE NECESSARY?
-#login_manager.init_app(app)  ##attempted 4/13/17 from flask login docs     #ARE THESE NECESSARY?
 
 
 ### CONFIGURATION CODE ###
@@ -142,7 +138,7 @@ def signupSurvivor():
        familyname = request.form['familyname']
        personalname = request.form['personalname']
        additionalname = request.form['additionalname']
-       gender = None
+       gender = "" #testing change from (None) to empty string ("") -4/17/17
        if 'gender' in request.form:
           gender = request.form['gender']
        age = request.form['age']
@@ -291,7 +287,7 @@ def search():
         familyname = request.form['familyname']
         personalname = request.form['personalname']
         additionalname = request.form['additionalname']
-        gender = None
+        gender = ""  #changing from (None) to empty string ("") b/c nothing pulling when gender missing. 4/17/17
         if 'gender' in request.form:
            gender = request.form['gender']
         age = request.form['age']
@@ -311,13 +307,13 @@ def search():
            msgDB = ""
            rowCount = 0
            idList = []
-           lastDate = 0
+           lastDate = ""
            for row in cur.fetchall():   #when adding row[] later: note position change(s) from selected db columns
               if familyname in row[1] and personalname in row[2]:#This Works
                  msgDB = msgDB + str(row[2] + " " + row[1]) + " ID# " + str(row[0]) + "... "
                  rowCount = rowCount + 1
                  idList = idList + [row[0]]
-                 lastDate = lastDate + row[15]
+                 lastDate = lastDate + str(row[15])
               else:
                  msgDB = msgDB
                  rowCount = rowCount
