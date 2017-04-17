@@ -4,22 +4,37 @@
 
 {% block content %}
 <h1>I'mAlive: Update Information</h1>
-<!--
-<div action="http://127.0.0.1:5000/updateSurvivor" method="get">
--->
-    {% if message %}
-         <li><strong>{{ message }}</strong></li>
-    {% endif %}
-	 <br>
-	 <br>
-    {% if message2 %}
-<li><b>Your current information:</b>
-         <br>
-	 <i>{{ message2 }}</i></li>
 
+    {% if message %}
+      <li><strong>{{ message }}</strong></li>
     {% endif %}
+	 
+      <br>
+      
+    {% if message2 %}
+        <li><b>Your Current Information:</b></li>
          <br>
-         <br>
+        <li>{{ message2 }}</li>
+    {% endif %}
+	 
+      <br>
+       
+    {% if message3 %}
+        <li><b>Name: </b> {{ message3 }}</li>
+    {% endif %}
+	 
+      <br>
+	
+    {% if message4 %}
+        <li><b>Gender: </b> {{ message4 }}</li>
+    {% endif %}
+	
+        <br>
+
+	{% if message5 %}
+<li><b>Age and Birthday: </b> {{ message5 }}</li>
+{% endif %}
+	 
 	
 <form action="http://127.0.0.1:5000/updateSurvivor" method="post">
 
@@ -29,7 +44,7 @@
     {% endif %} 
   
     Family (Last) Name*: 
-    <input type="text" name="familyname"><br> 
+    <input type="text" name="familyname"> <br> 
     Personal (First) Name*:
     <input type="text" name="personalname"> <br>
     Additional Name(s):

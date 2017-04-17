@@ -252,9 +252,9 @@ def updateSurvivor(personalname=None):
                print("id: " + str(row[0]) + " personalname: " + row[2])
                message2 = message2 + str(row[1]) + " " + str(row[2])
                #message2 = message2 + " Family Name: " +  str(row[1]) + ", Personal Name: " +  str(row[2]) + ", Additional Name: " + str(row[3]) + "; Gender: " + str(row[4]) + "; Age: " + str(row[5]) + ", Birth Year: " + str(row[6]) + ", Birth Month: " + str(row[7]) + ", Birth Day: " + str(row[8]) + "; Origin Country: " + str(row[9]) + ", Origin State : " + str(row[10]) + ", Origin City: " + str(row[11]) + ", Origin County: " + str(row[12]) + ", Origin Village: " + str(row[13]) + ", Other origin information: " + str(row[14])
-             #  message3 = message3 + "Family Name: " + str(row[1]) + " Personal Name: " + str(row[2]) + " Additional Name: " + str(row[3])
-              # message4 = message4 + str(row[4])
-              # message5 = message5 + str(row[5]) + " Birth Year: " + str(row[6]) + " Birth Month: " + str(row[7]) + " Birth Day: " + str(row[8])
+               message3 = message3 + "Family Name: " + str(row[1]) + " Personal Name: " + str(row[2]) + " Additional Name: " + str(row[3])
+               message4 = message4 + str(row[4])
+               message5 = message5 + str(row[5]) + " Birth Year: " + str(row[6]) + " Birth Month: " + str(row[7]) + " Birth Day: " + str(row[8])
               # message6 = message6 + "Origin Country: " + str(row[9]) + " Origin State : " + str(row[10]) + " Origin City: " + str(row[11]) + " Origin County: " + str(row[12]) + " Origin Village: " + str(row[13]) + " Other origin information: " + str(row[14])
             else:
                message2 == message2
