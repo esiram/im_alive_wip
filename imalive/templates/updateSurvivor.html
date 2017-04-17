@@ -15,11 +15,12 @@
     {% if message2 %}
 <li><b>Your current information:</b>
          <br>
-     <i>{{ message2 }}</i></li>
+	 <i>{{ message2 }}</i></li>
+
     {% endif %}
-	 <br>
-	 <br>
- 
+         <br>
+         <br>
+	
 <form action="http://127.0.0.1:5000/updateSurvivor" method="post">
 
     {% if error %}
@@ -27,8 +28,8 @@
          <br>
     {% endif %} 
   
-    Family (Last) Name*:
-    <input type="text" name="familyname"><br> <!-- value="{{ familyname }}"-->
+    Family (Last) Name*: 
+    <input type="text" name="familyname"><br> 
     Personal (First) Name*:
     <input type="text" name="personalname"> <br>
     Additional Name(s):

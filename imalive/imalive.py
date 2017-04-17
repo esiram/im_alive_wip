@@ -14,9 +14,11 @@ Other non-backend work: 1) Create good Readme for Git Hub
 ### ALL IMPORTS ###
 import os
 import sqlite3
-from datetime import datetime # per flask minitwit example 4/10/17
-from hashlib import md5 # per flask minitwit example 4/10/17
-from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
+import time
+import datetime
+import random
+#from hashlib import md5 # per flask minitwit example 4/10/17
+#from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 #import flask_login  ##attempted 4/13/17 from flask login docs    #ARE THESE NECESSARY?
 #login_manager = flask_login.LoginManager()  ##attempted 4/13/17 from flask login docs     #ARE THESE NECESSARY?
@@ -91,6 +93,7 @@ def home():
    """ Handles home screen (home.html). """
    message = None
    error = None
+   print(session['logged_in'] == True)  #to check status 4/17/17
    session['logged_in'] = False  # JUST to try to cover bases-4/14/17
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
@@ -160,7 +163,7 @@ def signupSurvivor():
        password = request.form['password']      #### WORK ON HASHING and SALTING AT LATER DATE
        password2 = request.form['password2']      
  #automatic input:
-       signupDate = 12122012  #hard code for now; later this should automatically update later via datetime stamp
+       signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')) # from pythonprogramming.net on 4/17/17
    
        if familyname and personalname and username and password == password2: #only requiring these
           db = get_db()
@@ -200,6 +203,7 @@ def loginSurvivor(error=None):
                 session['userID'] = row[0]
                 session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
                 print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + "."  )
+                print(session['logged_in'] == True) #to show what's happening -ES 4/17/17
                 return redirect(url_for("updateSurvivor", personalname=session['personalname']))
              else:
                 error = "Invalid username or password."
@@ -212,8 +216,7 @@ def logout():
    """Handles logging user out."""
    session.pop('logged_in', None)
    session['logged_in'] = False
-   message = "Logged Out"
-   print(message)
+   print("Logged_in Status: " + (session['logged_in'] == True)) #to test status - Es 4/17/17
    return redirect(url_for('home'))
 
    
@@ -245,6 +248,8 @@ def updateSurvivor(personalname=None):
          for row in cur.fetchall():
             if row[0] == session['userID'] and row[17] == session['username']:
                print(str(row[0]) + " " + row[2])
+               familyname2 = row[1]
+               personalname2 = row[2]
                message2 = message2 + str(row[2]) + " " + str(row[3])
             else:
                message2 == message2
@@ -260,8 +265,7 @@ def updateSurvivor(personalname=None):
             session.pop('personalname', None)
             session.pop('message', None)
             session['logged_in'] = False
-            message = "You are logged out."
-            print(message)
+            print("Logged_in status: " + session['logged_in'] == True) #-ES 4/17/17 for testing
             return redirect(url_for("logout"))
          else:
             session['message'] = session['personalname'] + ", please review and update your information as needed."
