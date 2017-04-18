@@ -1,8 +1,9 @@
 
 """TO DO as of 4/14/17:
 Left to do backend: 1) the update db SQL in updateSurvivor view
-                    2) salt and hash pw
-                    3) work out kinks in db pulling and anything else that turns up.
+                    2) delete SQL row (i'malive account) in updateSurvivor view (redirect to a delete page)
+                    3) salt and hash pw
+                    4) work out kinks in db pulling and anything else that turns up.
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
                        b) when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
                        c) do you want to create separate .py folders for different aspects of your code in imalive.py (i.e. the main python file)?
@@ -218,10 +219,6 @@ def logout():
    return redirect(url_for('home'))
 
 
-#NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
-#always use the WHERE statement with an SQL UPDATE statement
-#I need to have an update info page so that pulls current info, but also shows all updates once updated.  Only folks a person logged in can access his/her personal page. """
-
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
 @app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
 def updateSurvivor(personalname=None):
@@ -292,18 +289,49 @@ def updateSurvivor(personalname=None):
       return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2, familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
    
    else: #request.method == 'POST'
-      if 'logout' in request.form:
-         logout = request.form['logout']
-         if logout == "yes":
-            session.pop('username', None)
-            session.pop('personalname', None)
-            session.pop('message', None)
-            session['logged_in'] = False
-            print("Update Page logged_in status: " + str(session['logged_in'] == True)) #-ES 4/17/17 for testing
-            return redirect(url_for("logout"))
+      if session['logged_in'] != True:
+         session['error'] = "LoggedOut"
+         return redirect(url_for("loginSurvivor", error=session['error']))
+      else: #session['logged_in'] == True
+         error = "POST VIEW ERROR MESSAGE"
+         username = None
+         if username in session:
+            username = session['username']
+         if 'logout' in request.form:
+            logout = request.form['logout']
+            if logout == "yes" or logout == "Yes":
+               session.pop('username', None)
+               session.pop('personalname', None)
+               session.pop('message', None)
+               session['logged_in'] = False
+               print("Update Page logged_in status: " + str(session['logged_in'] == True)) #-ES 4/17/17 for testing
+               return redirect(url_for("logout"))
+         elif 'delete' in request.form:   #THIS NEEDS WORK
+            delete = request.form['delete']
+            if delete == "Yes":
+               session['message'] = session['personalname'] + ", please confirm you want to delete your information [THIS DOESN'T WORK as of 4/18/17]."
+            return redirect(url_for("updateSurvivor", personalname = session['personalname']))
          else:
-            session['message'] = session['personalname'] + ", POST MESSAGE: please review and update your information as needed."
-      return redirect(url_for("updateSurvivor", personalname = session['personalname']))   
+            db = get_db()
+            cur = db.execute('SELECT * FROM survivors WHERE username=username')
+            for row in cur.fetchall():
+               additionalname = str(row[3])
+               if additionalname in request.form:
+                  additionalname = request.form['additionalname']
+               gender = str(row[4])   
+               if gender in request.form:
+                  gender = request.form['gender']
+               age = str(row[5])
+               if age in request.form:
+                  age = request.form['age']
+               year = str(row[6])
+               if year in request.form:
+                  year = request.form['year']
+               updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))   
+            db.execute("UPDATE survivors SET additionalname=additionalname, gender=gender, age=age, year=year, updateDate=updateDate WHERE username=username")
+            #VALUES (?, ?, ?, ?, ?)", [additionalname, gender, age, year, updateDate])
+            db.commit()
+            return redirect(url_for("updateSurvivor", personalname=session['personalname']))
 
 
 
