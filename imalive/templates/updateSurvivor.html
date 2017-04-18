@@ -8,33 +8,10 @@
     {% if message %}
       <li><strong>{{ message }}</strong></li>
     {% endif %}
-	 
       <br>
-      
     {% if message2 %}
-        <li><b>Your Current Information:</b></li>
-         <br>
-        <li>{{ message2 }}</li>
+      <li><i>{{ message2 }}:</i></li>
     {% endif %}
-	 
-      <br>
-       
-    {% if message3 %}
-        <li><b>Name: </b> {{ message3 }}</li>
-    {% endif %}
-	 
-      <br>
-	
-    {% if message4 %}
-        <li><b>Gender: </b> {{ message4 }}</li>
-    {% endif %}
-	
-        <br>
-
-	{% if message5 %}
-<li><b>Age and Birthday: </b> {{ message5 }}</li>
-{% endif %}
-	 
 	
 <form action="http://127.0.0.1:5000/updateSurvivor" method="post">
 
@@ -43,38 +20,37 @@
          <br>
     {% endif %} 
   
-    Family (Last) Name*: 
-    <input type="text" name="familyname"> <br> 
-    Personal (First) Name*:
-    <input type="text" name="personalname"> <br>
+    Family (Last) Name:
+    <input type="text" name="familyname">{% if familyname2 %}<b>{{ familyname2 }}</b>{% endif %}<br>
+    Personal (First) Name*: {% if personalname2 %}<b>{{ personalname2 }}</b>{% endif %}<br>
     Additional Name(s):
-    <input type="text" name="additionalname"> <br>
+    <input type="text" name="additionalname">{% if additionalname2 %}<b>{{ additionalname2 }}</b>{% endif %}<br>
     <br>
 
-    Gender:<br>
-    <input type="radio" name="gender" id="male" value="male"> Male<br>
-    <input type="radio" name="gender" id="female" value="female"> Female<br>
-    <input type="radio" name="gender" id="other" value="other"> Other<br>
+    Gender: {% if gender2 %}<b>{{ gender2 }}</b>{% endif %}<br>
+    <input type="radio" name="gender" id="male" value="Male"> Male<br>
+    <input type="radio" name="gender" id="female" value="Female"> Female<br>
+    <input type="radio" name="gender" id="other" value="Other"> Other<br>
     <br>
     
     Age:
-    <input type="text" name="age"><br>
+    <input type="text" name="age">{% if age2 %}<b>{{ age2 }}</b>{% endif %}<br>
     Birth Year:
-    <input type="text" name="year"><br>
+    <input type="text" name="year">{% if year2 %}<b>{{ year2 }}</b>{% endif %}<br>
     Birth Month:
-    <input type="text" name="month"><br>
+    <input type="text" name="month">{% if month2 %}<b>{{ month2 }}</b>{% endif %}<br>
     Birthday:
-    <input type="text" name="day"><br>
+    <input type="text" name="day">{% if day2 %}<b>{{ day2 }}</b>{% endif %}<br>
 	   
     <br>	   
     <br>
     
     Origin Country:
-    <input type="text" name="country"><br>
+    <input type="text" name="country">{% if country2 %}<b>{{ country2 }}</b>{% endif %}<br>
     Origin State/Province:
-    <input type="text" name="state"><br>
+    <input type="text" name="state">{% if state2 %}<b>{{ state2 }}</b>{% endif %}<br>
     Origin City:
-    <input type="text" name="city"><br>
+    <input type="text" name="city">{% if city2 %}<b>{{ city2 }}</b>{% endif %}<br>
     Origin County:
     <input type="text" name="county"><br>
     Origin Village/Neighborhood/Borough/Town:

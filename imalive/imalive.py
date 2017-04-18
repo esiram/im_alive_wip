@@ -90,7 +90,8 @@ def home():
    """ Handles home screen (home.html). """
    message = None
    error = None
-   print('logged_in status on home page: ',  session['logged_in'] == True)  #to check status 4/17/17
+   #print(session['logged_in'] == True)
+   print(session['logged_in'] == True)  #to check status 4/17/17
    session['logged_in'] = False  # JUST to try to cover bases-4/14/17
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
@@ -213,10 +214,14 @@ def logout():
    """Handles logging user out."""
    session.pop('logged_in', None)
    session['logged_in'] = False
-   print("Logged_in Status: " + (session['logged_in'] == True)) #to test status - Es 4/17/17
+   print("Logged_in Status: " + str(session['logged_in'] == True)) #to test status - Es 4/17/17
    return redirect(url_for('home'))
 
-   
+
+#NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
+#always use the WHERE statement with an SQL UPDATE statement
+#I need to have an update info page so that pulls current info, but also shows all updates once updated.  Only folks a person logged in can access his/her personal page. """
+
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
 @app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
 def updateSurvivor(personalname=None):
@@ -226,7 +231,7 @@ def updateSurvivor(personalname=None):
          session['error'] = "LoggedOut"
          return redirect(url_for("loginSurvivor", error=session['error']))
       else: #session['logged_in'] == True
-         error = None
+         error = "GET VIEW ERROR MESSAGE"
          username = None
          if username in session:
             username = session['username']
@@ -236,12 +241,24 @@ def updateSurvivor(personalname=None):
          personalname = None
          if personalname in session:
             personalname = session['personalname']
-         message2 = ""
-         message3 = "" #name information
-         message4 = "" #gender information
-         message5 = "" #age information
-         message6 = "" #location information
-        # message7 = "" #sos information
+         message2 = "" #general practice message for development purposes
+         familyname2 = ""
+         personalname2 = ""
+         additionalname2 = ""
+         gender2 = ""
+         age2 = ""
+         year2 = ""
+         month2 = ""
+         day2 = ""
+         country2 = ""
+         state2 = ""
+         city2 = ""
+         county2 = ""
+         village2 = ""
+         other2 = ""
+         sos2 = ""
+         otherSOS2 = ""
+         signupDate = ""
          userID = None
          if userID in session:
             userID = session['userID']
@@ -251,16 +268,28 @@ def updateSurvivor(personalname=None):
             if row[0] == session['userID'] and row[17] == session['username']:
                print("id: " + str(row[0]) + " personalname: " + row[2])
                message2 = message2 + str(row[1]) + " " + str(row[2])
-               #message2 = message2 + " Family Name: " +  str(row[1]) + ", Personal Name: " +  str(row[2]) + ", Additional Name: " + str(row[3]) + "; Gender: " + str(row[4]) + "; Age: " + str(row[5]) + ", Birth Year: " + str(row[6]) + ", Birth Month: " + str(row[7]) + ", Birth Day: " + str(row[8]) + "; Origin Country: " + str(row[9]) + ", Origin State : " + str(row[10]) + ", Origin City: " + str(row[11]) + ", Origin County: " + str(row[12]) + ", Origin Village: " + str(row[13]) + ", Other origin information: " + str(row[14])
-             #  message3 = message3 + "Family Name: " + str(row[1]) + " Personal Name: " + str(row[2]) + " Additional Name: " + str(row[3])
-              # message4 = message4 + str(row[4])
-              # message5 = message5 + str(row[5]) + " Birth Year: " + str(row[6]) + " Birth Month: " + str(row[7]) + " Birth Day: " + str(row[8])
-              # message6 = message6 + "Origin Country: " + str(row[9]) + " Origin State : " + str(row[10]) + " Origin City: " + str(row[11]) + " Origin County: " + str(row[12]) + " Origin Village: " + str(row[13]) + " Other origin information: " + str(row[14])
+               familyname2 = str(row[1])
+               personalname2 = str(row[2])
+               additionalname2 = str(row[3])
+               gender2 = str(row[4])
+               age2 = str(row[5])
+               year2 = str(row[6])
+               month2 = str(row[7])
+               day2 = str(row[8])
+               country2 = str(row[9])
+               state2 = str(row[10])
+               city2 = str(row[11])
+               county2 = str(row[12])
+               village2 = str(row[13])
+               other2 = str(row[14])
+               sos2 = str(row[15])
+               otherSOS2 = str(row[16])
+               signupDate = str(row[17])
             else:
                message2 == message2
          if message2 == "":
             message2 = "Nothing pulled from db."             
-      return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2)
+      return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2, familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
    
    else: #request.method == 'POST'
       if 'logout' in request.form:
@@ -270,17 +299,11 @@ def updateSurvivor(personalname=None):
             session.pop('personalname', None)
             session.pop('message', None)
             session['logged_in'] = False
-            print("Logged_in status: " + session['logged_in'] == True) #-ES 4/17/17 for testing
+            print("Update Page logged_in status: " + str(session['logged_in'] == True)) #-ES 4/17/17 for testing
             return redirect(url_for("logout"))
          else:
-            session['message'] = session['personalname'] + ", please review and update your information as needed."
+            session['message'] = session['personalname'] + ", POST MESSAGE: please review and update your information as needed."
       return redirect(url_for("updateSurvivor", personalname = session['personalname']))   
-
-
-#NOTE: SQL syntax may go something like UPDATE survivors SET column1=value, column2=value WHERE some_column=some_value
-#always use the WHERE statement with an SQL UPDATE statement
-#I need to have an update info page so that pulls current info, but also shows all updates once updated.  Only folks a person logged in can access his/her personal page. """
-
 
 
 

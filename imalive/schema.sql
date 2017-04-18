@@ -20,5 +20,5 @@ create table survivors (
   username text NOT NULL,
   password text NOT NULL,
   signupDate timestamp NOT NULL,
-  updateDate timestamp NULL
+  updateDate timestamp NOT NULL
 );
