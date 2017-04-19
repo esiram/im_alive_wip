@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}DeleteSurvivor{% endblock %}
+
+{% block content %}
+
+<h1>I'mAlive Delete Account Verification</h1>
+
+<form action="http://127.0.0.1:5000/deleteSurvivor" method="post">
+  {% if error %}
+    <p><strong>Error: {{ error }}</strong>
+    <br>
+  {% endif %}
+    Please confirm that you wish to delete this file.  Thank you.
+    <br>
+    <input type="radio" name="delete" value="Yes"> Yes, delete this file.
+    <input type="radio" name="delete" value="No"> No, do not delete this file.
+    
+    Username:
+    <input type="text" name="username"><br>
+    Password:
+    <input type="password" name="password"><br>
+    <br>
+    <input type="submit" value="Submit">
+
+</form>
+
+{% endblock%}

@@ -20,5 +20,6 @@ create table survivors (
   username text NOT NULL,
   password text NOT NULL,
   signupDate timestamp NOT NULL,
-  updateDate timestamp NOT NULL
+  updateDate timestamp NULL,
+  CONSTRAINT name_unique UNIQUE (username)
 );

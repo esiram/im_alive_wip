@@ -1,8 +1,8 @@
 
 """TO DO as of 4/14/17:
-Left to do backend: 1) the update db SQL in updateSurvivor view
+Left to do backend: 1) the update db SQL in updateSurvivor view -- ISSUES AS OF 4/18/17 NOT WORKING
                     2) delete SQL row (i'malive account) in updateSurvivor view (redirect to a delete page)
-                    3) salt and hash pw
+                    3) salt and hash pw #also make username unique required (SQLite has the unique constraint working, but python doesn't yet handle the integrity error)
                     4) work out kinks in db pulling and anything else that turns up.
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
                        b) when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
@@ -91,9 +91,9 @@ def home():
    """ Handles home screen (home.html). """
    message = None
    error = None
-   #print(session['logged_in'] == True)
-   print(session['logged_in'] == True)  #to check status 4/17/17
-   session['logged_in'] = False  # JUST to try to cover bases-4/14/17
+   session['logged_in'] = False  #to make sure session is logged out
+   print("Status of (session['logged_in'] == True):")
+   print(session['logged_in'] == True)
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
        if 'doWhat' in request.form:
@@ -158,7 +158,9 @@ def signupSurvivor():
        if 'sos' in request.form:
           sos = request.form['sos']
        otherSOS = request.form['otherSOS']
-       username = request.form['username']      #### Will need to make this unique somehow, or just leave the password as a unique password???
+       username = request.form['username']  #MUST BE UNIQUE OR ELSE AN ERROR HAPPENS THAT DOESN'T HANDLE CORRECTLY YET-es4/19/17
+      # if username not Unique:
+      #    error = "That username will not work, please enter another one." #### How does the unique error work? 
        password = request.form['password']      #### WORK ON HASHING and SALTING AT LATER DATE
        password2 = request.form['password2']      
  #automatic input:
@@ -201,7 +203,7 @@ def loginSurvivor(error=None):
                 session['personalname'] = row[1]
                 session['userID'] = row[0]
                 session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
-                print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + "."  )
+                print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + ".")
                 print(session['logged_in'] == True) #to show what's happening -ES 4/17/17
                 return redirect(url_for("updateSurvivor", personalname=session['personalname']))
              else:
@@ -218,6 +220,36 @@ def logout():
    print("Logged_in Status: " + str(session['logged_in'] == True)) #to test status - Es 4/17/17
    return redirect(url_for('home'))
 
+@app.route('/deleteSurvivor', methods = ['GET', 'POST'])  ###NEEDS WORK -ES 4/19/17
+def deleteSurvivor():
+   """Handles deleting a user's file."""
+   render_template('deleteSurvivor.html')
+   if request.method == 'GET':
+      error = "GET METHOD"
+      render_template('deleteSurvivor.html', error = error)
+   else: #request.method == 'POST'   
+      delete = ""
+      if delete in request.form:
+         delete = request.form['delete']
+         if delete == 'no':
+            return redirect(url_for("home", error = "Logged out."))
+         else: #delete == 'yes'
+            username = request.form['username']
+            password = request.form['password']
+            db = get_db()
+            cur = db.execute("SELECT * WHERE username=username, password=password")
+            for row in cur.fetchall():
+               if request.form['username'] == row[17] and request.form['password'] == row[18]:
+                  db.execute("DELETE * FROM survivors WHERE username=username AND password=password")
+                  print("Deleted row in db for username" + str(username))
+                  return redirect(url_for("home", error = deleted))
+               else: #if username and password don't match
+                  error = "The username and/or password do not match. Please try again."
+                  return render_template('deleteSurvivor.html', error = error) 
+      else: #delete = ""
+         error = "Nothing chosen; please submit a valid option."
+         return render_template('deleteSurvivor.html', error = error)
+
 
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
 @app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
@@ -229,13 +261,13 @@ def updateSurvivor(personalname=None):
          return redirect(url_for("loginSurvivor", error=session['error']))
       else: #session['logged_in'] == True
          error = "GET VIEW ERROR MESSAGE"
-         username = None
+         username = ""
          if username in session:
             username = session['username']
-         message = None
+         message = ""
          if message in session:
             message = session['message']
-         personalname = None
+         personalname = ""
          if personalname in session:
             personalname = session['personalname']
          message2 = "" #general practice message for development purposes
@@ -285,7 +317,7 @@ def updateSurvivor(personalname=None):
             else:
                message2 == message2
          if message2 == "":
-            message2 = "Nothing pulled from db."             
+            message2 = "Nothing pulled from db."
       return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2, familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
    
    else: #request.method == 'POST'
@@ -294,9 +326,12 @@ def updateSurvivor(personalname=None):
          return redirect(url_for("loginSurvivor", error=session['error']))
       else: #session['logged_in'] == True
          error = "POST VIEW ERROR MESSAGE"
-         username = None
-         if username in session:
-            username = session['username']
+         username = session['username']
+         if username not in session:
+            username = "username not in session :( "
+         print("Username: " + str(username))
+         logout = ""  ####ADDED THIS (logout = "") ON 4/19/17 DUE TO updateSurvivors 'POST' error: no username in session, thus session not carrying forward from 'GET'
+                          #### thus no username able to be used when delving into db for updating
          if 'logout' in request.form:
             logout = request.form['logout']
             if logout == "yes" or logout == "Yes":
@@ -307,10 +342,13 @@ def updateSurvivor(personalname=None):
                print("Update Page logged_in status: " + str(session['logged_in'] == True)) #-ES 4/17/17 for testing
                return redirect(url_for("logout"))
          elif 'delete' in request.form:   #THIS NEEDS WORK
-            delete = request.form['delete']
-            if delete == "Yes":
-               session['message'] = session['personalname'] + ", please confirm you want to delete your information [THIS DOESN'T WORK as of 4/18/17]."
-            return redirect(url_for("updateSurvivor", personalname = session['personalname']))
+            delete = ""
+            if delete in request.form:
+               delete = request.form['delete']
+               if delete == "Yes":
+                  session['message'] = "Please confirm you want to delete your information."
+                  #session['message'] = session['personalname'] + ", please confirm you want to delete your information [THIS DOESN'T WORK as of 4/18/17]."
+            return redirect(url_for("deleteSurvivor"))
          else:
             db = get_db()
             cur = db.execute('SELECT * FROM survivors WHERE username=username')
@@ -327,11 +365,13 @@ def updateSurvivor(personalname=None):
                year = str(row[6])
                if year in request.form:
                   year = request.form['year']
-               updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))   
-            db.execute("UPDATE survivors SET additionalname=additionalname, gender=gender, age=age, year=year, updateDate=updateDate WHERE username=username")
-            #VALUES (?, ?, ?, ?, ?)", [additionalname, gender, age, year, updateDate])
+               updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
+
+               #######ISSUE HERE AS OF 4/18/17##########
+            db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, updateDate=? WHERE username=username", (additionalname, gender, age, year, updateDate))    
+           # db.execute("UPDATE survivors SET additionalName=additionalname, gender=gender, age=age, year=year, updateDate=updateDate WHERE username=username")
             db.commit()
-            return redirect(url_for("updateSurvivor", personalname=session['personalname']))
+            return render_template('updateSurvivor.html', personalname=session['personalname'])
 
 
 
