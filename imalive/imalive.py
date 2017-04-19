@@ -1,7 +1,7 @@
 
 """TO DO as of 4/14/17:
 Left to do backend: 1) the update db SQL in updateSurvivor view -- ISSUES AS OF 4/18/17 NOT WORKING
-                    2) delete SQL row (i'malive account) in updateSurvivor view (redirect to a delete page)
+                    2) delete SQL row (i'malive account) in updateSurvivor view (redirect to a delete page) BIG ISSUES as of 4/19/17
                     3) salt and hash pw #also make username unique required (SQLite has the unique constraint working, but python doesn't yet handle the integrity error)
                     4) work out kinks in db pulling and anything else that turns up.
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
@@ -220,13 +220,13 @@ def logout():
    print("Logged_in Status: " + str(session['logged_in'] == True)) #to test status - Es 4/17/17
    return redirect(url_for('home'))
 
+
 @app.route('/deleteSurvivor', methods = ['GET', 'POST'])  ###NEEDS WORK -ES 4/19/17
 def deleteSurvivor():
    """Handles deleting a user's file."""
-   render_template('deleteSurvivor.html')
    if request.method == 'GET':
       error = "GET METHOD"
-      render_template('deleteSurvivor.html', error = error)
+      return render_template('deleteSurvivor.html', error = error)
    else: #request.method == 'POST'   
       delete = ""
       if delete in request.form:
@@ -342,13 +342,9 @@ def updateSurvivor(personalname=None):
                print("Update Page logged_in status: " + str(session['logged_in'] == True)) #-ES 4/17/17 for testing
                return redirect(url_for("logout"))
          elif 'delete' in request.form:   #THIS NEEDS WORK
-            delete = ""
-            if delete in request.form:
-               delete = request.form['delete']
-               if delete == "Yes":
-                  session['message'] = "Please confirm you want to delete your information."
-                  #session['message'] = session['personalname'] + ", please confirm you want to delete your information [THIS DOESN'T WORK as of 4/18/17]."
-            return redirect(url_for("deleteSurvivor"))
+            delete = request.form['delete']
+            if delete == "Yes":
+               return redirect(url_for("deleteSurvivor", error = ""))
          else:
             db = get_db()
             cur = db.execute('SELECT * FROM survivors WHERE username=username')
