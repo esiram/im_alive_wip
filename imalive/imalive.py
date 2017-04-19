@@ -367,20 +367,32 @@ def deleteSurvivor():
          else:# username and password in request.form
             db = get_db()
             cur = db.execute("SELECT * FROM survivors WHERE username=username AND password=password")
+            userID = None
+            rowCount = 0
             for row in cur.fetchall():
                if request.form['username'] == row[17] and request.form['password'] == row[18]:
-                  print("id = " + str(row[0]))
-                 # db.execute("DELETE FROM survivors WHERE username=request.form['username'] AND password=request.form['password']")
-                 # db.commit()
-                 # print("Deleted row in db for username" + str(username)) #developer check
-                  return redirect(url_for("home"))
-               else: #if username and password don't match
-                  error = "The username and/or password do not match. Please try again."
-                  return render_template('deleteSurvivor.html', error = error)
+                  print("id = " + str(row[0]))  #developer check
+                  userID = row[0]
+                  rowCount = rowCount + 1
+            if rowCount == 1:
+               username = request.form['username']
+               db.execute("DELETE FROM survivors WHERE username=username")
+               db.commit()
+               print("Deleted row in db for username" + str(username)) #developer check
+               return redirect(url_for("home"))
+            elif rowCount >= 2:
+               error = "Multiple rows pulled from db."
+               return render_template('deleteSurvivor.html', error = error)
+            elif rowCount == 0:
+               print("No rows pulled from db.")
+               return render_template('deleteSurvivor.html', error = error)
+            else: #if username and password don't match
+               error = "The username and/or password do not match. Please try again."
+               return render_template('deleteSurvivor.html', error = error)
       elif delete == "no":
          return redirect(url_for("home"))      
       else: #delete = ""
-         error = "Nothing chosen; please submit your selection: yes or no."
+         error = "Nothing chosen; please submit your selection: yes or no. Delete = ''"
          return render_template('deleteSurvivor.html', error = error)
          
 
