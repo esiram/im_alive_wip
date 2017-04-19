@@ -1,9 +1,9 @@
 
 """TO DO as of 4/14/17:
 Left to do backend: 1) the update db SQL in updateSurvivor view -- ISSUES AS OF 4/18/17 NOT WORKING
-                    2) delete SQL row (i'malive account) in updateSurvivor view (redirect to a delete page) BIG ISSUES as of 4/19/17
-                    3) salt and hash pw #also make username unique required (SQLite has the unique constraint working, but python doesn't yet handle the integrity error)
-                    4) work out kinks in db pulling and anything else that turns up.
+                    2) the delete row in db deleting entire db stuff.  :( -- as of 4/19/17
+                    2) salt and hash pw #also make username unique required (SQLite has the unique constraint working, but python doesn't yet handle the integrity error)
+                    3) work out kinks in db pulling and anything else that turns up.
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
                        b) when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
                        c) do you want to create separate .py folders for different aspects of your code in imalive.py (i.e. the main python file)?
@@ -221,36 +221,6 @@ def logout():
    return redirect(url_for('home'))
 
 
-@app.route('/deleteSurvivor', methods = ['GET', 'POST'])  ###NEEDS WORK -ES 4/19/17
-def deleteSurvivor():
-   """Handles deleting a user's file."""
-   if request.method == 'GET':
-      error = "GET METHOD"
-      return render_template('deleteSurvivor.html', error = error)
-   else: #request.method == 'POST'   
-      delete = ""
-      if delete in request.form:
-         delete = request.form['delete']
-         if delete == 'no':
-            return redirect(url_for("home", error = "Logged out."))
-         else: #delete == 'yes'
-            username = request.form['username']
-            password = request.form['password']
-            db = get_db()
-            cur = db.execute("SELECT * WHERE username=username, password=password")
-            for row in cur.fetchall():
-               if request.form['username'] == row[17] and request.form['password'] == row[18]:
-                  db.execute("DELETE * FROM survivors WHERE username=username AND password=password")
-                  print("Deleted row in db for username" + str(username))
-                  return redirect(url_for("home", error = deleted))
-               else: #if username and password don't match
-                  error = "The username and/or password do not match. Please try again."
-                  return render_template('deleteSurvivor.html', error = error) 
-      else: #delete = ""
-         error = "Nothing chosen; please submit a valid option."
-         return render_template('deleteSurvivor.html', error = error)
-
-
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
 @app.route('/updateSurvivor/<personalname>', methods = ['GET', 'POST'])
 def updateSurvivor(personalname=None):
@@ -344,7 +314,7 @@ def updateSurvivor(personalname=None):
          elif 'delete' in request.form:   #THIS NEEDS WORK
             delete = request.form['delete']
             if delete == "Yes":
-               return redirect(url_for("deleteSurvivor", error = ""))
+               return redirect(url_for("deleteSurvivor"))
          else:
             db = get_db()
             cur = db.execute('SELECT * FROM survivors WHERE username=username')
@@ -369,6 +339,50 @@ def updateSurvivor(personalname=None):
             db.commit()
             return render_template('updateSurvivor.html', personalname=session['personalname'])
 
+
+@app.route('/deleteSurvivor', methods = ['GET', 'POST'])  ###NEEDS WORK -ES 4/19/17
+def deleteSurvivor():
+   """Handles deleting a user's file."""
+   if request.method == 'GET':
+      error = "Please confirm that you wish to delete this account.  Thank you."
+      return render_template('deleteSurvivor.html', error = error)
+   else: #request.method == 'POST'
+      error = None
+      delete = request.form['delete']
+     # if delete not in request.form:
+     #    delete = ""
+      username = request.form['username']
+      #if username not in request.form:
+      #   username = ""
+      password = request.form['password']
+      #if password not in request.form:
+      #   password = ""
+      if delete == "yes":
+         if username == "":
+            error = "Username required."
+            return render_template('deleteSurvivor.html', error = error)
+         elif password == "":
+            error = "Password required."
+            return render_template('deleteSurvivor.html', error = error)
+         else:# username and password in request.form
+            db = get_db()
+            cur = db.execute("SELECT * FROM survivors WHERE username=username AND password=password")
+            for row in cur.fetchall():
+               if request.form['username'] == row[17] and request.form['password'] == row[18]:
+                  print("id = " + str(row[0]))
+                 # db.execute("DELETE FROM survivors WHERE username=request.form['username'] AND password=request.form['password']")
+                 # db.commit()
+                 # print("Deleted row in db for username" + str(username)) #developer check
+                  return redirect(url_for("home"))
+               else: #if username and password don't match
+                  error = "The username and/or password do not match. Please try again."
+                  return render_template('deleteSurvivor.html', error = error)
+      elif delete == "no":
+         return redirect(url_for("home"))      
+      else: #delete = ""
+         error = "Nothing chosen; please submit your selection: yes or no."
+         return render_template('deleteSurvivor.html', error = error)
+         
 
 
 #SEARCH VIEW FUNCTIONS

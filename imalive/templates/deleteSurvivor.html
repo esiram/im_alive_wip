@@ -8,17 +8,21 @@
 
 <form action="http://127.0.0.1:5000/deleteSurvivor" method="post">
   {% if error %}
-    <p><strong>Error: {{ error }}</strong>
+    <p><strong>{{ error }}</strong>
     <br>
   {% endif %}
-    Please confirm that you wish to delete this file.  Thank you.
-    <br>
-    <input type="radio" name="delete" value="Yes"> Yes, delete this file.
-    <input type="radio" name="delete" value="No"> No, do not delete this file.
     
-    Username:
+    
+    <br>
+    <input type="radio" name="delete" value="no"> No, do not delete this account.
+    <br>
+    <br>
+    <input type="radio" name="delete" value="yes"> Yes, delete this account.
+    <br>
+    
+    Username (required to delete account):
     <input type="text" name="username"><br>
-    Password:
+    Password (required to delete account):
     <input type="password" name="password"><br>
     <br>
     <input type="submit" value="Submit">
