@@ -81,7 +81,22 @@ def initdb_command():  #in the command line type: flask initdb
     """Initializes the database."""
     init_db()
     print('Initialized the database.')
- 
+
+
+
+### LOGIN MANAGER CODE ### # 4/21/17 initialized with *sudo pip3 install flask-login*
+"""https://flask-login.readthedocs.io/en/latest/#installation"""
+login_manager = LoginManager()
+login_manager.init_app(app)     #configures application object for login
+
+@login_manager.user_loader  
+def load_user(user_id):
+   """This should return None (no exception raised) if invalid ID and ID manually removed from session, processing will continue though."""
+   return User.get(user_id)
+
+#note: for get_id() note that the method returns a unicode, so if ID is an int, it needs to get converted!!!    
+
+
     
 ### VIEW FUNCTIONS ###
 #GENERAL VIEW FUNCTIONS
@@ -288,6 +303,12 @@ def updateSurvivor(personalname=None):
                message2 == message2
          if message2 == "":
             message2 = "Nothing pulled from db."
+      session['username'] = username #test on 4/21/17
+      session['userID'] = userID  #test on 4/21/17
+      if session['logged_in'] == True: #test4/21/17
+         session['logged_in'] = True #test 4/21/17
+      else:                         #test 4/21/17
+         return redirect(url_for("logout")) #test 4/21/17
       return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2, familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
    
    else: #request.method == 'POST'
@@ -314,7 +335,7 @@ def updateSurvivor(personalname=None):
          elif 'delete' in request.form:   #THIS NEEDS WORK
             delete = request.form['delete']
             if delete == "Yes":
-               return redirect(url_for("deleteSurvivor"))
+               return redirect(url_for("deleteSurvivor", personalname=session['personalname']))
          else:
             db = get_db()
             cur = db.execute('SELECT * FROM survivors WHERE username=username')
@@ -340,8 +361,9 @@ def updateSurvivor(personalname=None):
             return render_template('updateSurvivor.html', personalname=session['personalname'])
 
 
-@app.route('/deleteSurvivor', methods = ['GET', 'POST'])  ###NEEDS WORK -ES 4/19/17
-def deleteSurvivor():
+@app.route('/deleteSurvivor', methods = ['GET', 'POST'])###NEEDS WORK -ES 4/19/17
+@app.route('/deleteSurvivor/<personalname>', methods = ['GET', 'POST'])
+def deleteSurvivor(personalname=None):
    """Handles deleting a user's file."""
    if request.method == 'GET':
       error = "Please confirm that you wish to delete this account.  Thank you."
