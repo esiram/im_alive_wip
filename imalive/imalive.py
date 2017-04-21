@@ -21,6 +21,7 @@ import random
 #from hashlib import md5 # per flask minitwit example 4/10/17
 #from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask.ext.login import LoginManager #4/21/17
 
 
 ### CONFIGURATION CODE ###
@@ -84,17 +85,80 @@ def initdb_command():  #in the command line type: flask initdb
 
 
 
+class Survivor(db.Model):
+   """Create user object (named 'Survivor') for logging in and out of sessions."""
+   __tablename__ = "survivors"
+   userID = db.Column('id', db.Integer, primary_key=True)
+   familyname = db.Column('familyName', db.Text)
+   personalname = db.Column('personalName', db.Text)
+   additionalname = db.Column('additionalName', db.Text)
+   gender = db.Column('gender', db.Text)
+   age = db.Column('age', db.Integer)
+   year = db.Column('year', db.Integer)
+   month = db.Column('month', db.Integer)
+   day = db.Column('day', db.Integer)
+   country = db.Column('country', db.Text)
+   state = db.Column('state', db.Text)
+   city = db.Column('city', db.Text)
+   county = db.Column('county', db.Text)
+   village = db.Column('village', db.Text)
+   other = db.Column('other', db.Text)
+   sos = db.Column('sos', db.Text)
+   otherSOS = db.Column('otherSOS', db.Text)
+   username = db.Column('username', unique=True, db.Text)
+   password = db.Column('password', db.Text)
+   signupDate = db.Column('signupDate', db.Timestamp)
+   updateDate = db.Column('updateDate', db.Timestamp)
+   
+   def __init__(self, familyname, personalname, username, password):
+      """To create survivor."""
+      self.familyname = familyname
+      self.personalname = personalname
+      self.additionalname = additionalname
+      self.gender = gender
+      self.age = age
+      self.year = year
+      self.month = month
+      self.day = day
+      self.country = country
+      self.state = state
+      self.city = city
+      self.county = county
+      self.village = village
+      self.other = other
+      self.sos = sos
+      self.otherSOS = otherSOS
+      self.username = username
+      self.password = password
+      self.signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
+      self.updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
+
+   def is_authenticated(self):
+      return True
+
+   def is_active(self):
+      return True
+
+   def is_anonymous(self):
+      return False
+
+   def get_id(self):
+      return unicode(self.userID)
+    
+
 ### LOGIN MANAGER CODE ### # 4/21/17 initialized with *sudo pip3 install flask-login*
-"""https://flask-login.readthedocs.io/en/latest/#installation"""
+"""From: https://flask-login.readthedocs.io/en/latest/#installation"""
 login_manager = LoginManager()
 login_manager.init_app(app)     #configures application object for login
+login_manager.login_view = 'loginSurvivor'
 
-@login_manager.user_loader  
-def load_user(user_id):
-   """This should return None (no exception raised) if invalid ID and ID manually removed from session, processing will continue though."""
-   return User.get(user_id)
+@login_manager.user_loader
+def load_survivor(userID):
+   """To load a user from the database via the user's id."""
+   return Survivor.query.get(int(userID)) #must convert int to/from Unicode strings
 
-#note: for get_id() note that the method returns a unicode, so if ID is an int, it needs to get converted!!!    
+"""Note: load_survivor(userID) should return None (no exception raised) if invalid ID and ID manually removed from session, processing will continue though."""
+    
 
 
     
