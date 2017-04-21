@@ -21,7 +21,7 @@ import random
 #from hashlib import md5 # per flask minitwit example 4/10/17
 #from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
-from flask.ext.login import LoginManager #4/21/17
+#from flask.ext.login import LoginManager #4/21/17
 
 
 ### CONFIGURATION CODE ###
@@ -65,7 +65,7 @@ def create_table():
     """To create table 'survivors' if table doesn't exist."""
     conn = connect_db()       #connection
     cur = conn.cursor()       #cursor (TBD: see init_db 'c' for cursor: determine if a general cursor object for the entire app should get made)
-    cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyname TEXT, personalname TEXT, signupdate TIMESTAMP)')#should I update the columns here????? the db has loaded regardless.-4/10/17
+    cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyName TEXT, personalName TEXT, additionalName TEXT, gender TEXT, age INTEGER, year INTEGER, month INTEGER, day INTEGER, country TEXT, state TEXT, city TEXT, county TEXT, village TEXT, other TEXT, sos TEXT, otherSOS TEXT, username TEXT, password TEXT, signupDate TIMESTAMP, updateDate TIMESTAMP)') #colunns already in sue with schema for weeks updated/added here on 4/21/17
        
 
 #FUNCTIONS TO INITIALIZE DB
@@ -82,84 +82,6 @@ def initdb_command():  #in the command line type: flask initdb
     """Initializes the database."""
     init_db()
     print('Initialized the database.')
-
-
-
-class Survivor(db.Model):
-   """Create user object (named 'Survivor') for logging in and out of sessions."""
-   __tablename__ = "survivors"
-   userID = db.Column('id', db.Integer, primary_key=True)
-   familyname = db.Column('familyName', db.Text)
-   personalname = db.Column('personalName', db.Text)
-   additionalname = db.Column('additionalName', db.Text)
-   gender = db.Column('gender', db.Text)
-   age = db.Column('age', db.Integer)
-   year = db.Column('year', db.Integer)
-   month = db.Column('month', db.Integer)
-   day = db.Column('day', db.Integer)
-   country = db.Column('country', db.Text)
-   state = db.Column('state', db.Text)
-   city = db.Column('city', db.Text)
-   county = db.Column('county', db.Text)
-   village = db.Column('village', db.Text)
-   other = db.Column('other', db.Text)
-   sos = db.Column('sos', db.Text)
-   otherSOS = db.Column('otherSOS', db.Text)
-   username = db.Column('username', unique=True, db.Text)
-   password = db.Column('password', db.Text)
-   signupDate = db.Column('signupDate', db.Timestamp)
-   updateDate = db.Column('updateDate', db.Timestamp)
-   
-   def __init__(self, familyname, personalname, username, password):
-      """To create survivor."""
-      self.familyname = familyname
-      self.personalname = personalname
-      self.additionalname = additionalname
-      self.gender = gender
-      self.age = age
-      self.year = year
-      self.month = month
-      self.day = day
-      self.country = country
-      self.state = state
-      self.city = city
-      self.county = county
-      self.village = village
-      self.other = other
-      self.sos = sos
-      self.otherSOS = otherSOS
-      self.username = username
-      self.password = password
-      self.signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
-      self.updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
-
-   def is_authenticated(self):
-      return True
-
-   def is_active(self):
-      return True
-
-   def is_anonymous(self):
-      return False
-
-   def get_id(self):
-      return unicode(self.userID)
-    
-
-### LOGIN MANAGER CODE ### # 4/21/17 initialized with *sudo pip3 install flask-login*
-"""From: https://flask-login.readthedocs.io/en/latest/#installation"""
-login_manager = LoginManager()
-login_manager.init_app(app)     #configures application object for login
-login_manager.login_view = 'loginSurvivor'
-
-@login_manager.user_loader
-def load_survivor(userID):
-   """To load a user from the database via the user's id."""
-   return Survivor.query.get(int(userID)) #must convert int to/from Unicode strings
-
-"""Note: load_survivor(userID) should return None (no exception raised) if invalid ID and ID manually removed from session, processing will continue though."""
-    
-
 
     
 ### VIEW FUNCTIONS ###
@@ -209,56 +131,56 @@ def celebrate(personalname = None):
 #SURVIVOR VIEW FUNCTIONS
 @app.route('/signupSurvivor', methods = ['POST', 'GET'])
 def signupSurvivor():
-    """Handles survivor signup screen (signupSurvivor.html)."""
-    render_template('signupSurvivor.html', error = None)
-    if request.method == 'GET':
-       return render_template('signupSurvivor.html', error = None)
-    else: # request.method == 'POST':
-       error = None
-       message = ""
-#form inputs:
-       familyname = request.form['familyname']
-       personalname = request.form['personalname']
-       additionalname = request.form['additionalname']
-       gender = "" #testing change from (None) to empty string ("") -4/17/17
-       if 'gender' in request.form:
-          gender = request.form['gender']
-       age = request.form['age']
-       year = request.form['year']
-       month = request.form['month']
-       day = request.form['day']
-       country = request.form['country']
-       state = request.form['state']
-       city = request.form['city']
-       county = request.form['county']
-       village = request.form['village']
-       other = request.form['other']
-       sos = "" #changing from (None) to empty string ("") like gender radio button seemed to require for db entries to pull in search view.-ES 4/17/17
-       if 'sos' in request.form:
-          sos = request.form['sos']
-       otherSOS = request.form['otherSOS']
-       username = request.form['username']  #MUST BE UNIQUE OR ELSE AN ERROR HAPPENS THAT DOESN'T HANDLE CORRECTLY YET-es4/19/17
+   """Handles survivor signup screen (signupSurvivor.html)."""
+   render_template('signupSurvivor.html', error = None)
+   if request.method == 'GET':
+      return render_template('signupSurvivor.html', error = None)
+   else: # request.method == 'POST':
+      error = None
+      message = ""
+     #form inputs:
+      familyname = request.form['familyname']
+      personalname = request.form['personalname']
+      additionalname = request.form['additionalname']
+      gender = "" #testing change from (None) to empty string ("") -4/17/17
+      if 'gender' in request.form:
+         gender = request.form['gender']
+      age = request.form['age']
+      year = request.form['year']
+      month = request.form['month']
+      day = request.form['day']
+      country = request.form['country']
+      state = request.form['state']
+      city = request.form['city']
+      county = request.form['county']
+      village = request.form['village']
+      other = request.form['other']
+      sos = "" #changing from (None) to empty string ("") like gender radio button seemed to require for db entries to pull in search view.-ES 4/17/17
+      if 'sos' in request.form:
+         sos = request.form['sos']
+      otherSOS = request.form['otherSOS']
+      username = request.form['username']  #MUST BE UNIQUE OR ELSE AN ERROR HAPPENS THAT DOESN'T HANDLE CORRECTLY YET-es4/19/17
       # if username not Unique:
       #    error = "That username will not work, please enter another one." #### How does the unique error work? 
-       password = request.form['password']      #### WORK ON HASHING and SALTING AT LATER DATE
-       password2 = request.form['password2']      
+      password = request.form['password']      #### WORK ON HASHING and SALTING AT LATER DATE
+      password2 = request.form['password2']      
  #automatic input:
-       signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')) # from pythonprogramming.net on 4/17/17
-   
-       if familyname and personalname and username and password == password2: #only requiring these
-          db = get_db()
-          db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, password, signupDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-                      [familyname, personalname, additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, password, signupDate])
-          db.commit()
-          session['personalname'] = request.form['personalname']
-          session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
-          return redirect(url_for('celebrate', personalname = session['personalname']))
-       elif password != password2:
-          error = "The passwords do not match.  Please try again.  Thank you."
-          return render_template('signupSurvivor.html', error = error)
-       else:
-           error = "Not enough information to continue, please fill in all asterisked/starred items."
-           return render_template('signupSurvivor.html', error = error)
+      signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')) # from pythonprogramming.net on 4/17/17
+      if familyname and personalname and username and password == password2: #only requiring these
+         db = get_db()
+         db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, password, signupDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                    [familyname, personalname, additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, password, signupDate])
+         db.commit()
+         session['personalname'] = request.form['personalname']
+         session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
+         return redirect(url_for('celebrate', personalname = session['personalname']))
+      elif password != password2:
+         error = "The passwords do not match.  Please try again.  Thank you."
+         return render_template('signupSurvivor.html', error = error)
+      else:
+         error = "Not enough information to continue, please fill in all asterisked/starred items."
+         return render_template('signupSurvivor.html', error = error)
+
 
 
 @app.route('/loginSurvivor', methods = ['GET', 'POST'])
@@ -508,7 +430,6 @@ def search():
         county = request.form['county']       
         village = request.form['village']
         other = request.form['other']
-
         if familyname or personalname: #when "or" used here instead of "and" it lists those with shared last names.-es 4/6/17 ### Q) should I only pull the not null values?-es 4/6/17
            db = get_db()
            cur = db.execute("SELECT id, familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, signupDate FROM survivors WHERE familyName=familyname AND personalName=personalname AND additionalName=additionalname AND gender=gender AND age=age AND year=year AND month=month AND day=day AND country=country AND state=state AND city=city AND county=county AND village=village AND other=other")             
@@ -547,3 +468,106 @@ def search():
             return render_template('search.html', error = error)
     else: #request.method == 'GET'
         return render_template('search.html', error = None)
+
+
+
+
+
+
+
+
+
+
+"""
+Attempt on 4/21/17 to make a User Class (user == survivor), but examples on web seem to use SQAlchemy not SQLite... 
+class Survivor(db.Model):
+   ###Create user object (named 'Survivor') for logging in and out of sessions.###
+   __tablename__ = "survivors"
+   userID = db.Column('id', db.Integer, primary_key=True)
+   familyname = db.Column('familyName', db.Text)
+   personalname = db.Column('personalName', db.Text)
+   additionalname = db.Column('additionalName', db.Text)
+   gender = db.Column('gender', db.Text)
+   age = db.Column('age', db.Integer)
+   year = db.Column('year', db.Integer)
+   month = db.Column('month', db.Integer)
+   day = db.Column('day', db.Integer)
+   country = db.Column('country', db.Text)
+   state = db.Column('state', db.Text)
+   city = db.Column('city', db.Text)
+   county = db.Column('county', db.Text)
+   village = db.Column('village', db.Text)
+   other = db.Column('other', db.Text)
+   sos = db.Column('sos', db.Text)
+   otherSOS = db.Column('otherSOS', db.Text)
+   username = db.Column('username', db.Text)
+   password = db.Column('password', db.Text)
+   signupDate = db.Column('signupDate', db.Timestamp)
+   updateDate = db.Column('updateDate', db.Timestamp)
+   
+   def __init__(self, familyname, personalname, username, password):
+      ###To create survivor.###
+      self.familyname = familyname
+      self.personalname = personalname
+      self.additionalname = additionalname
+      self.gender = gender
+      self.age = age
+      self.year = year
+      self.month = month
+      self.day = day
+      self.country = country
+      self.state = state
+      self.city = city
+      self.county = county
+      self.village = village
+      self.other = other
+      self.sos = sos
+      self.otherSOS = otherSOS
+      self.username = username
+      self.password = password
+      self.signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
+      self.updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
+
+   def is_authenticated(self):
+      return True
+
+   def is_active(self):
+      return True
+
+   def is_anonymous(self):
+      return False
+
+   def get_id(self):
+      return unicode(self.userID)
+    
+
+### LOGIN MANAGER CODE ### # 4/21/17 initialized with *sudo pip3 install flask-login*
+#From: https://flask-login.readthedocs.io/en/latest/#installation
+login_manager = LoginManager()
+login_manager.init_app(app)     #configures application object for login
+login_manager.login_view = 'loginSurvivor'
+
+@login_manager.user_loader
+def load_survivor(userID):
+   ###To load a user from the database via the user's id.###
+   return Survivor.query.get(int(userID)) #must convert int to/from Unicode strings
+
+#Note: load_survivor(userID) should return None (no exception raised) if invalid ID and ID manually removed from session, processing will continue though.
+"""    
+
+     
+
+""" 
+Attempt on 4/21/17 with signup view and LoginManager()
+   else: # request.method == 'POST':
+       if request.form['password'] == request.form['password2']:
+          survivor = Survivor(request.form['familyname'], request.form['personalname'], request.form['additionalname'], request.form['gender'], request.form['age'], request.form['year'], request.form['month'], request.form['day'], request.form['country'], request.form['state'], request.form['city'], request.form['county'], request.form['village'], request.form['other'], request.form['sos'], request.form['otherSOS'], request.form['username'], request.form['password'])
+          db.session.add(survivor)
+          db.session.commit()
+          session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
+          return redirect(url_for('celebrate', personalname = session['personalname']))
+       else:
+          error = "Passwords did not match; please try again."
+          return render_template('signupSurvivor.html', error = error)
+End 4/21/17 Attempt...
+"""     
