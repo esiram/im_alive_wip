@@ -1,4 +1,6 @@
 
+
+"""Question: do the backend to do's listed below need a user/survivor class to create the survivor (row) objects in the db for better session management?  If so: how best should I implement this at this date?-ES 4/24/17"""
 """TO DO as of 4/14/17:
 Left to do backend: 1) the update db SQL in updateSurvivor view -- ISSUES AS OF 4/18/17 NOT WORKING
                     2) the delete row in db deleting entire db stuff.  :( -- as of 4/19/17
@@ -89,12 +91,10 @@ def initdb_command():  #in the command line type: flask initdb
 @app.route('/', methods = ['POST', 'GET'])
 @app.route('/home', methods = ['POST', 'GET'])
 def home():
-   """ Handles home screen (home.html). """
+   """ Handles home screen. """
    message = None
    error = None
    session['logged_in'] = False  #to make sure session is logged out
-   print("Status of (session['logged_in'] == True):")
-   print(session['logged_in'] == True)
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
        if 'doWhat' in request.form:
@@ -123,7 +123,7 @@ def celebrate(personalname = None):
     if 'personalname' in session:              
        return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])  #this pulls name dynamically as of 3/13/17
     else:
-       message= "Celebrate, you live!!!  If you want to look somoone else up, please check out the I'mAlive's Search page."
+       message= "Celebrate, you live!!!  If you want to look somoone else up, please check out the I'mAlive Search page."
        return render_template('celebrate.html', message = message)
 
     
@@ -183,8 +183,9 @@ def signupSurvivor():
 
 
 
+
+# @app.route('/updateSurvivor/loginSurvivor/<error>', methods = ['GET', 'POST'])
 @app.route('/loginSurvivor', methods = ['GET', 'POST'])
-@app.route('/updateSurvivor/loginSurvivor/<error>', methods = ['GET', 'POST'])
 def loginSurvivor(error=None):
     """Handles survivor login to update information (loginSurvivor.html)."""
     if request.method == 'GET':
@@ -196,22 +197,22 @@ def loginSurvivor(error=None):
        password = request.form['password']
        if username and password:
           db = get_db()
-          cur = db.execute("SELECT id, personalName, username, password FROM survivors WHERE username=username AND password=password")
-          for row in cur.fetchall():
-             if request.form['username'] == row[2] and request.form['password'] == row[3]:
-                session['logged_in'] = True
-                session['username'] = row[2]
-                session['personalname'] = row[1]
-                session['userID'] = row[0]
-                session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
-                print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + ".")
-                print(session['logged_in'] == True) #to show what's happening -ES 4/17/17
-                return redirect(url_for("updateSurvivor", personalname=session['personalname']))
-             else:
-                error = "Invalid username or password."
+          cur = db.execute('SELECT id, personalName, username, password FROM survivors WHERE username=? AND password=?', [username, password])
+          dbresult = cur.fetchall()
+          if len(dbresult) == 0 or len(dbresult) > 1:
+             error = "Invalid username or password."
+          else:
+             result = dbresult[0]
+             session['logged_in'] = True
+             session['userID'] = result[0]
+             session['personalname'] = result[1]
+             session['username'] = result[2]
+             session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
+             print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + ".")
+             return redirect(url_for("updateSurvivor", personalname=session['personalname']))
        else:
           error = "Please provide both a valid username and the associated password."
-    return render_template ('loginSurvivor.html', error=error)
+    return render_template('loginSurvivor.html', error=error)
 
 @app.route('/logout')
 def logout():
@@ -230,16 +231,19 @@ def updateSurvivor(personalname=None):
       if session['logged_in'] != True:
          session['error'] = "LoggedOut"
          return redirect(url_for("loginSurvivor", error=session['error']))
-      else: #session['logged_in'] == True
-         error = "GET VIEW ERROR MESSAGE"
+      else: #session['logged_in'] == True     ####NOTE: NOTHING IN SESSION????????
+         error = None
          username = ""
-         if username in session:
+         if 'username' in session:
             username = session['username']
+         #else:
+         #   error = "No username in session; please log in."
+         #   return render_template('updateSurvivor.html', error = error)
          message = ""
-         if message in session:
+         if 'message' in session:
             message = session['message']
          personalname = ""
-         if personalname in session:
+         if 'personalname' in session:
             personalname = session['personalname']
          message2 = "" #general practice message for development purposes
          familyname2 = ""
@@ -260,33 +264,34 @@ def updateSurvivor(personalname=None):
          otherSOS2 = ""
          signupDate = ""
          userID = None
-         if userID in session:
+         if 'userID' in session:
             userID = session['userID']
          db = get_db()
-         cur = db.execute("SELECT * FROM survivors WHERE username=username")
-         for row in cur.fetchall():
-            if row[0] == session['userID'] and row[17] == session['username']:
-               print("id: " + str(row[0]) + " personalname: " + row[2])
-               message2 = message2 + str(row[1]) + " " + str(row[2])
-               familyname2 = str(row[1])
-               personalname2 = str(row[2])
-               additionalname2 = str(row[3])
-               gender2 = str(row[4])
-               age2 = str(row[5])
-               year2 = str(row[6])
-               month2 = str(row[7])
-               day2 = str(row[8])
-               country2 = str(row[9])
-               state2 = str(row[10])
-               city2 = str(row[11])
-               county2 = str(row[12])
-               village2 = str(row[13])
-               other2 = str(row[14])
-               sos2 = str(row[15])
-               otherSOS2 = str(row[16])
-               signupDate = str(row[17])
-            else:
-               message2 == message2
+         cur = db.execute('SELECT * FROM survivors WHERE username=? AND id=?', [username, userID])
+         dbresult = cur.fetchall()
+         if len(dbresult) == 0 or len(dbresult) > 1:
+            error = "Could not find survivor in database."
+         else:
+            result = dbresult[0]
+            print("id: " + str(result[0]) + " personalname: " + result[2])
+            message2 = message2 + str(result[1]) + " " + str(result[2])
+            familyname2 = str(result[1])
+            personalname2 = str(result[2])
+            additionalname2 = str(result[3])
+            gender2 = str(result[4])
+            age2 = str(result[5])
+            year2 = str(result[6])
+            month2 = str(result[7])
+            day2 = str(result[8])
+            country2 = str(result[9])
+            state2 = str(result[10])
+            city2 = str(result[11])
+            county2 = str(result[12])
+            village2 = str(result[13])
+            other2 = str(result[14])
+            sos2 = str(result[15])
+            otherSOS2 = str(result[16])
+            signupDate = str(result[17])
          if message2 == "":
             message2 = "Nothing pulled from db."
       session['username'] = username #test on 4/21/17
@@ -297,45 +302,40 @@ def updateSurvivor(personalname=None):
          return redirect(url_for("logout")) #test 4/21/17
       return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2, familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
    
-   else: #request.method == 'POST'
+   else: #request.method == 'POST'   #CURRENTLY UPDATING EVERY ROW NOT INDIVIDUAL ROW
       if session['logged_in'] != True:
          session['error'] = "LoggedOut"
          return redirect(url_for("loginSurvivor", error=session['error']))
       else: #session['logged_in'] == True
          error = "POST VIEW ERROR MESSAGE"
          username = session['username']
-         if username not in session:
-            username = "username not in session :( "
+         if not username:
+            error = "username not in session :( "
          print("Username: " + str(username))
          logout = ""  ####ADDED THIS (logout = "") ON 4/19/17 DUE TO updateSurvivors 'POST' error: no username in session, thus session not carrying forward from 'GET'
                           #### thus no username able to be used when delving into db for updating
-         if 'logout' in request.form:
-            logout = request.form['logout']
-            if logout == "yes" or logout == "Yes":
-               session.pop('username', None)
-               session.pop('personalname', None)
-               session.pop('message', None)
-               session['logged_in'] = False
-               print("Update Page logged_in status: " + str(session['logged_in'] == True)) #-ES 4/17/17 for testing
-               return redirect(url_for("logout"))
-         elif 'delete' in request.form:   #THIS NEEDS WORK
+         if 'delete' in request.form:   #THIS NEEDS WORK
             delete = request.form['delete']
             if delete == "Yes":
                return redirect(url_for("deleteSurvivor", personalname=session['personalname']))
          else:
             db = get_db()
-            cur = db.execute('SELECT * FROM survivors WHERE username=username')
-            for row in cur.fetchall():
-               additionalname = str(row[3])
+            cur = db.execute('SELECT * FROM survivors WHERE username=? AND id=?', [username, session['userID']])
+            dbresult = cur.fetchall()
+            if len(dbresult) == 0 or len(dbresult) > 1:
+               error = "Not found in I'mAlive's database."
+            else:
+               result = dbresult[0]
+               additionalname = str(result[3])
                if additionalname in request.form:
                   additionalname = request.form['additionalname']
-               gender = str(row[4])   
+               gender = str(result[4])   
                if gender in request.form:
                   gender = request.form['gender']
-               age = str(row[5])
+               age = str(result[5])
                if age in request.form:
                   age = request.form['age']
-               year = str(row[6])
+               year = str(result[6])
                if year in request.form:
                   year = request.form['year']
                updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
@@ -347,7 +347,7 @@ def updateSurvivor(personalname=None):
             return render_template('updateSurvivor.html', personalname=session['personalname'])
 
 
-@app.route('/deleteSurvivor', methods = ['GET', 'POST'])###NEEDS WORK -ES 4/19/17
+@app.route('/deleteSurvivor', methods = ['GET', 'POST'])###NEEDS WORK -ES 4/19/17  CURRENTLY DELETING EVERY ROW
 @app.route('/deleteSurvivor/<personalname>', methods = ['GET', 'POST'])
 def deleteSurvivor(personalname=None):
    """Handles deleting a user's file."""
