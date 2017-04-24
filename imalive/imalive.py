@@ -231,7 +231,8 @@ def updateSurvivor(personalname=None):
       if session['logged_in'] != True:
          session['error'] = "LoggedOut"
          return redirect(url_for("loginSurvivor", error=session['error']))
-      else: #session['logged_in'] == True     ####NOTE: NOTHING IN SESSION????????
+      else: #session['logged_in'] == True
+         print("session['logged_in'] == True: ", session['logged_in'] == True)
          error = None
          username = ""
          if 'username' in session:
@@ -338,8 +339,10 @@ def updateSurvivor(personalname=None):
                updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
                db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, updateDate, username])    
                db.commit()
-            return render_template('updateSurvivor.html', personalname=session['personalname'])
+            #return render_template('updateSurvivor.html', personalname=session['personalname']) #This sends back w/o db results showing and no dynamic URL-es 4/24/17
+            return redirect(url_for("updateSurvivor", personalname=session['personalname']))#This works and shows dynamic URL and db results
 
+            
 
 @app.route('/deleteSurvivor', methods = ['GET', 'POST'])###NEEDS WORK -ES 4/19/17  CURRENTLY DELETING EVERY ROW
 @app.route('/deleteSurvivor/<personalname>', methods = ['GET', 'POST'])
