@@ -336,15 +336,47 @@ def updateSurvivor(personalname=None):
                year = str(result[6])
                if 'year' in request.form:
                   year = request.form['year']
+               month = str(result[7])
+               if 'month' in request.form:
+                  month = request.form['month']
+               day = str(result[8])
+               if 'day' in request.form:
+                  day = request.form['day']
+               country = str(result[9])
+               if 'country' in request.form:
+                  country = request.form['country']
+               state = str(result[10])
+               if 'state' in request.form:
+                  state = request.form['state']
+               city = str(result[11])
+               if 'city' in request.form:
+                  city = request.form['city']
+               county = str(result[12])
+               if 'county' in request.form:
+                  county = request.form['county']
+               village = str(result[13])
+               if 'village' in request.form:
+                  village = request.form['village']
+               other = str(result[14])
+               if 'other' in request.form:
+                  other = request.form['other']
+               sos = str(result[15])
+               if 'sos' in request.form:
+                  sos = request.form['sos']
+               otherSOS = str(result[16])
+               if 'otherSOS' in request.form:
+                  otherSOS = request.form['otherSOS']
+               password = str(result[17])   
+               if 'password' in request.form and 'password2' in request.form and 'password' == 'password2': 
+                  password = request.form['password']      
                updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
-               db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, updateDate, username])    
+               db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, month=?, day=?, country=?, state=?, city=?, county=?, village=?, other=?, sos=?, otherSOS=?, password=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, password, updateDate, username])    
                db.commit()
-            #return render_template('updateSurvivor.html', personalname=session['personalname']) #This sends back w/o db results showing and no dynamic URL-es 4/24/17
-            return redirect(url_for("updateSurvivor", personalname=session['personalname']))#This works and shows dynamic URL and db results
+            return redirect(url_for("updateSurvivor", personalname=session['personalname']))   #This works and shows dynamic URL and db results 4/24/17
 
             
 
-@app.route('/deleteSurvivor', methods = ['GET', 'POST'])###NEEDS WORK -ES 4/19/17  CURRENTLY DELETING EVERY ROW
+@app.route('/deleteSurvivor', methods = ['GET', 'POST'])  ###NEEDS WORK -ES 4/19/17  CURRENTLY DELETING EVERY ROW
 @app.route('/deleteSurvivor/<personalname>', methods = ['GET', 'POST'])
 def deleteSurvivor(personalname=None):
    """Handles deleting a survivor's file."""
