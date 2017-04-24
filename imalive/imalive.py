@@ -219,7 +219,7 @@ def logout():
    """Handles logging user out."""
    session.pop('logged_in', None)
    session['logged_in'] = False
-   print("Logged_in Status: " + str(session['logged_in'] == True)) #to test status - Es 4/17/17
+   print("Logged_in Status: " + str(session['logged_in'] == True))#developer aid
    return redirect(url_for('home'))
 
 
@@ -271,7 +271,7 @@ def updateSurvivor(personalname=None):
          dbresult = cur.fetchall()
          if len(dbresult) == 0 or len(dbresult) > 1:
             error = "Could not find survivor in database."
-         else:
+         else: #if len(dbresult) == 1  (i.e. only one record pulled from survivors table)
             result = dbresult[0]
             print("id: " + str(result[0]) + " personalname: " + result[2])
             message2 = message2 + str(result[1]) + " " + str(result[2])
@@ -292,17 +292,16 @@ def updateSurvivor(personalname=None):
             sos2 = str(result[15])
             otherSOS2 = str(result[16])
             signupDate = str(result[17])
-         if message2 == "":
-            message2 = "Nothing pulled from db."
-      session['username'] = username #test on 4/21/17
-      session['userID'] = userID  #test on 4/21/17
-      if session['logged_in'] == True: #test4/21/17
-         session['logged_in'] = True #test 4/21/17
-      else:                         #test 4/21/17
-         return redirect(url_for("logout")) #test 4/21/17
+            if message2 == "":
+               message2 = "Nothing pulled from db."
+      #session['username'] = username #test on 4/21/17
+      #session['userID'] = userID  #test on 4/21/17
+      #if session['logged_in'] == True: #test4/21/17
+      #   session['logged_in'] = True #test 4/21/17
+      #else:                         #test 4/21/17
+      #   return redirect(url_for("logout")) #test 4/21/17
       return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2, familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
-   
-   else: #request.method == 'POST'   #CURRENTLY UPDATING EVERY ROW NOT INDIVIDUAL ROW
+   else: #request.method == 'POST'
       if session['logged_in'] != True:
          session['error'] = "LoggedOut"
          return redirect(url_for("loginSurvivor", error=session['error']))
@@ -310,11 +309,9 @@ def updateSurvivor(personalname=None):
          error = "POST VIEW ERROR MESSAGE"
          username = session['username']
          if not username:
-            error = "username not in session :( "
-         print("Username: " + str(username))
-         logout = ""  ####ADDED THIS (logout = "") ON 4/19/17 DUE TO updateSurvivors 'POST' error: no username in session, thus session not carrying forward from 'GET'
-                          #### thus no username able to be used when delving into db for updating
-         if 'delete' in request.form:   #THIS NEEDS WORK
+            error = "Username not found in ImAlive's database."
+         print("Username: " + str(username))  #debugging help
+         if 'delete' in request.form:
             delete = request.form['delete']
             if delete == "Yes":
                return redirect(url_for("deleteSurvivor", personalname=session['personalname']))
@@ -327,30 +324,27 @@ def updateSurvivor(personalname=None):
             else:
                result = dbresult[0]
                additionalname = str(result[3])
-               if additionalname in request.form:
+               if 'additionalname' in request.form:
                   additionalname = request.form['additionalname']
                gender = str(result[4])   
-               if gender in request.form:
+               if 'gender' in request.form:
                   gender = request.form['gender']
                age = str(result[5])
-               if age in request.form:
+               if 'age' in request.form:
                   age = request.form['age']
                year = str(result[6])
-               if year in request.form:
+               if 'year' in request.form:
                   year = request.form['year']
                updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
-
-               #######ISSUE HERE AS OF 4/18/17##########
-            db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, updateDate=? WHERE username=username", (additionalname, gender, age, year, updateDate))    
-           # db.execute("UPDATE survivors SET additionalName=additionalname, gender=gender, age=age, year=year, updateDate=updateDate WHERE username=username")
-            db.commit()
+               db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, updateDate, username])    
+               db.commit()
             return render_template('updateSurvivor.html', personalname=session['personalname'])
 
 
 @app.route('/deleteSurvivor', methods = ['GET', 'POST'])###NEEDS WORK -ES 4/19/17  CURRENTLY DELETING EVERY ROW
 @app.route('/deleteSurvivor/<personalname>', methods = ['GET', 'POST'])
 def deleteSurvivor(personalname=None):
-   """Handles deleting a user's file."""
+   """Handles deleting a survivor's file."""
    if request.method == 'GET':
       error = "Please confirm that you wish to delete this account.  Thank you."
       return render_template('deleteSurvivor.html', error = error)
@@ -468,106 +462,3 @@ def search():
             return render_template('search.html', error = error)
     else: #request.method == 'GET'
         return render_template('search.html', error = None)
-
-
-
-
-
-
-
-
-
-
-"""
-Attempt on 4/21/17 to make a User Class (user == survivor), but examples on web seem to use SQAlchemy not SQLite... 
-class Survivor(db.Model):
-   ###Create user object (named 'Survivor') for logging in and out of sessions.###
-   __tablename__ = "survivors"
-   userID = db.Column('id', db.Integer, primary_key=True)
-   familyname = db.Column('familyName', db.Text)
-   personalname = db.Column('personalName', db.Text)
-   additionalname = db.Column('additionalName', db.Text)
-   gender = db.Column('gender', db.Text)
-   age = db.Column('age', db.Integer)
-   year = db.Column('year', db.Integer)
-   month = db.Column('month', db.Integer)
-   day = db.Column('day', db.Integer)
-   country = db.Column('country', db.Text)
-   state = db.Column('state', db.Text)
-   city = db.Column('city', db.Text)
-   county = db.Column('county', db.Text)
-   village = db.Column('village', db.Text)
-   other = db.Column('other', db.Text)
-   sos = db.Column('sos', db.Text)
-   otherSOS = db.Column('otherSOS', db.Text)
-   username = db.Column('username', db.Text)
-   password = db.Column('password', db.Text)
-   signupDate = db.Column('signupDate', db.Timestamp)
-   updateDate = db.Column('updateDate', db.Timestamp)
-   
-   def __init__(self, familyname, personalname, username, password):
-      ###To create survivor.###
-      self.familyname = familyname
-      self.personalname = personalname
-      self.additionalname = additionalname
-      self.gender = gender
-      self.age = age
-      self.year = year
-      self.month = month
-      self.day = day
-      self.country = country
-      self.state = state
-      self.city = city
-      self.county = county
-      self.village = village
-      self.other = other
-      self.sos = sos
-      self.otherSOS = otherSOS
-      self.username = username
-      self.password = password
-      self.signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
-      self.updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
-
-   def is_authenticated(self):
-      return True
-
-   def is_active(self):
-      return True
-
-   def is_anonymous(self):
-      return False
-
-   def get_id(self):
-      return unicode(self.userID)
-    
-
-### LOGIN MANAGER CODE ### # 4/21/17 initialized with *sudo pip3 install flask-login*
-#From: https://flask-login.readthedocs.io/en/latest/#installation
-login_manager = LoginManager()
-login_manager.init_app(app)     #configures application object for login
-login_manager.login_view = 'loginSurvivor'
-
-@login_manager.user_loader
-def load_survivor(userID):
-   ###To load a user from the database via the user's id.###
-   return Survivor.query.get(int(userID)) #must convert int to/from Unicode strings
-
-#Note: load_survivor(userID) should return None (no exception raised) if invalid ID and ID manually removed from session, processing will continue though.
-"""    
-
-     
-
-""" 
-Attempt on 4/21/17 with signup view and LoginManager()
-   else: # request.method == 'POST':
-       if request.form['password'] == request.form['password2']:
-          survivor = Survivor(request.form['familyname'], request.form['personalname'], request.form['additionalname'], request.form['gender'], request.form['age'], request.form['year'], request.form['month'], request.form['day'], request.form['country'], request.form['state'], request.form['city'], request.form['county'], request.form['village'], request.form['other'], request.form['sos'], request.form['otherSOS'], request.form['username'], request.form['password'])
-          db.session.add(survivor)
-          db.session.commit()
-          session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
-          return redirect(url_for('celebrate', personalname = session['personalname']))
-       else:
-          error = "Passwords did not match; please try again."
-          return render_template('signupSurvivor.html', error = error)
-End 4/21/17 Attempt...
-"""     
