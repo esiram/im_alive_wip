@@ -1,11 +1,6 @@
-
-
-"""Question: do the backend to do's listed below need a user/survivor class to create the survivor (row) objects in the db for better session management?  If so: how best should I implement this at this date?-ES 4/24/17"""
-"""TO DO as of 4/14/17:
-Left to do backend: 1) the update db SQL in updateSurvivor view -- ISSUES AS OF 4/18/17 NOT WORKING
-                    2) the delete row in db deleting entire db stuff.  :( -- as of 4/19/17
-                    2) salt and hash pw #also make username unique required (SQLite has the unique constraint working, but python doesn't yet handle the integrity error)
-                    3) work out kinks in db pulling and anything else that turns up.
+"""
+Left to do backend: 1) salt and hash pw #also make username unique required (SQLite has the unique constraint working, but python doesn't yet handle the integrity error)
+                    2) work out kinks in db pulling and anything else that turns up.
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
                        b) when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
                        c) do you want to create separate .py folders for different aspects of your code in imalive.py (i.e. the main python file)?
@@ -23,14 +18,13 @@ import random
 #from hashlib import md5 # per flask minitwit example 4/10/17
 #from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
-#from flask.ext.login import LoginManager #4/21/17
 
 
 ### CONFIGURATION CODE ###
 """Loads default config and overrides config from environment variable."""
 
-app = Flask(__name__)                # create app instance & initialize it
-app.config.from_object(__name__)     # load config from this file, imalive.py
+app = Flask(__name__)                # creates app instance & initializes it
+app.config.from_object(__name__)     # loads config from this file
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'imalive.db'),
@@ -93,7 +87,11 @@ def initdb_command():  #in the command line type: flask initdb
 def home():
    """ Handles home screen. """
    message = None
+   if 'message' in session:
+      message = session['message']
    error = None
+   if 'error' in session:
+      error = session['error']
    session['logged_in'] = False  #to make sure session is logged out
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
@@ -380,15 +378,15 @@ def deleteSurvivor(personalname=None):
       return render_template('deleteSurvivor.html', error = error)
    else: #request.method == 'POST'
       error = None
-      delete = request.form['delete']
-     # if delete not in request.form:
-     #    delete = ""
-      username = request.form['username']
-      #if username not in request.form:
-      #   username = ""
-      password = request.form['password']
-      #if password not in request.form:
-      #   password = ""
+      delete = ""
+      if 'delete' in request.form and request.form['delete']:
+         delete = request.form['delete']
+      username = ""
+      if 'username' in request.form:
+         username = request.form['username']
+      password = ""
+      if 'password' in request.form:
+         password = request.form['password']
       if delete == "yes":
          if username == "":
             error = "Username required."
@@ -398,38 +396,33 @@ def deleteSurvivor(personalname=None):
             return render_template('deleteSurvivor.html', error = error)
          else:# username and password in request.form
             db = get_db()
-            cur = db.execute("SELECT * FROM survivors WHERE username=username AND password=password")
-            userID = None
-            rowCount = 0
-            for row in cur.fetchall():
-               if request.form['username'] == row[17] and request.form['password'] == row[18]:
-                  print("id = " + str(row[0]))  #developer check
-                  userID = row[0]
-                  rowCount = rowCount + 1
-            if rowCount == 1:
-               username = request.form['username']
-               db.execute("DELETE FROM survivors WHERE username=username")
-               db.commit()
-               print("Deleted row in db for username" + str(username)) #developer check
-               return redirect(url_for("home"))
-            elif rowCount >= 2:
-               error = "Multiple rows pulled from db."
+            cur = db.execute("SELECT * FROM survivors WHERE username=? AND password=?", [username, password])
+            dbresult = cur.fetchall()
+            if len(dbresult) == 0 or len(dbresult) > 1:
+               error = "Password and username don't match."
                return render_template('deleteSurvivor.html', error = error)
-            elif rowCount == 0:
-               print("No rows pulled from db.")
-               return render_template('deleteSurvivor.html', error = error)
-            else: #if username and password don't match
-               error = "The username and/or password do not match. Please try again."
-               return render_template('deleteSurvivor.html', error = error)
+            else:
+               result = dbresult[0]
+               if request.form['username'] == result[17] and request.form['password'] == result[18]:
+                  print("id = " + str(result[0]))  #developer check
+                  session['username'] = request.form['username']
+                  db.execute("DELETE FROM survivors WHERE username=?", [username])
+                  db.commit()
+                  print("Deleted row in db for username" + str(username)) #developer check
+                  session['message'] = "Account deleted for: " + session['username'] 
+                  return redirect(url_for("home"))
+               else: #if username and password don't match
+                  error = "The username and/or password do not match."
+                  return render_template('deleteSurvivor.html', error = error)
       elif delete == "no":
          return redirect(url_for("home"))      
       else: #delete = ""
-         error = "Nothing chosen; please submit your selection: yes or no. Delete = ''"
+         error = "Nothing chosen; please submit your selection: yes or no."
          return render_template('deleteSurvivor.html', error = error)
          
 
 
-#SEARCH VIEW FUNCTIONS
+#SEARCH VIEW FUNCTIONS  #correct this (get rid of row count etc. per other view DB examples)-es 4/25/17
 @app.route('/search', methods = ['POST', 'GET'])
 def search():
     """Handles the search index screen (search.html)."""
