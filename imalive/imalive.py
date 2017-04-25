@@ -234,12 +234,11 @@ def updateSurvivor(personalname=None):
       else: #session['logged_in'] == True
          print("session['logged_in'] == True: ", session['logged_in'] == True)
          error = None
+         if 'error' in session:
+            error = session['error']
          username = ""
          if 'username' in session:
             username = session['username']
-         #else:
-         #   error = "No username in session; please log in."
-         #   return render_template('updateSurvivor.html', error = error)
          message = ""
          if 'message' in session:
             message = session['message']
@@ -295,12 +294,6 @@ def updateSurvivor(personalname=None):
             signupDate = str(result[17])
             if message2 == "":
                message2 = "Nothing pulled from db."
-      #session['username'] = username #test on 4/21/17
-      #session['userID'] = userID  #test on 4/21/17
-      #if session['logged_in'] == True: #test4/21/17
-      #   session['logged_in'] = True #test 4/21/17
-      #else:                         #test 4/21/17
-      #   return redirect(url_for("logout")) #test 4/21/17
       return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2, familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
    else: #request.method == 'POST'
       if session['logged_in'] != True:
@@ -325,52 +318,54 @@ def updateSurvivor(personalname=None):
             else:
                result = dbresult[0]
                additionalname = str(result[3])
-               if 'additionalname' in request.form:
+               if 'additionalname' in request.form and request.form['additionalname'] != "":
                   additionalname = request.form['additionalname']
                gender = str(result[4])   
-               if 'gender' in request.form:
+               if 'gender' in request.form and request.form['gender'] != "":
                   gender = request.form['gender']
                age = str(result[5])
-               if 'age' in request.form:
+               if 'age' in request.form and request.form['age'] != "":
                   age = request.form['age']
                year = str(result[6])
-               if 'year' in request.form:
+               if 'year' in request.form and request.form['year'] != "":
                   year = request.form['year']
                month = str(result[7])
-               if 'month' in request.form:
+               if 'month' in request.form and request.form['month'] != "":
                   month = request.form['month']
                day = str(result[8])
-               if 'day' in request.form:
+               if 'day' in request.form and request.form['day'] != "":
                   day = request.form['day']
                country = str(result[9])
-               if 'country' in request.form:
+               if 'country' in request.form and request.form['country'] != "":
                   country = request.form['country']
                state = str(result[10])
-               if 'state' in request.form:
+               if 'state' in request.form and request.form['state'] != "":
                   state = request.form['state']
                city = str(result[11])
-               if 'city' in request.form:
+               if 'city' in request.form and request.form['city'] != "":
                   city = request.form['city']
                county = str(result[12])
-               if 'county' in request.form:
+               if 'county' in request.form and request.form['county'] != "":
                   county = request.form['county']
                village = str(result[13])
-               if 'village' in request.form:
+               if 'village' in request.form and request.form['village'] != "":
                   village = request.form['village']
                other = str(result[14])
-               if 'other' in request.form:
+               if 'other' in request.form and request.form['other'] != "":
                   other = request.form['other']
                sos = str(result[15])
-               if 'sos' in request.form:
+               if 'sos' in request.form and request.form['sos'] != "":
                   sos = request.form['sos']
                otherSOS = str(result[16])
-               if 'otherSOS' in request.form:
+               if 'otherSOS' in request.form and request.form['otherSOS']!= "":
                   otherSOS = request.form['otherSOS']
-               password = str(result[17])   
-               if 'password' in request.form and 'password2' in request.form and 'password' == 'password2': 
-                  password = request.form['password']      
+               if 'password' in session:   
+                  password = session['password']   
+               if 'password' in request.form and request.form['password'] == "Yes":  #THIS NEEDS WORK
+                  error = "Cannot change password at this time."
+                  return redirect(url_for("home", error=error))
                updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
-               db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, month=?, day=?, country=?, state=?, city=?, county=?, village=?, other=?, sos=?, otherSOS=?, password=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, password, updateDate, username])    
+               db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, month=?, day=?, country=?, state=?, city=?, county=?, village=?, other=?, sos=?, otherSOS=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, updateDate, username])
                db.commit()
             return redirect(url_for("updateSurvivor", personalname=session['personalname']))   #This works and shows dynamic URL and db results 4/24/17
 
