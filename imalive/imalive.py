@@ -434,9 +434,8 @@ def search():
         select = "SELECT * FROM survivors WHERE familyName=? AND personalName=?"
         select2 = [familyname, personalname]
         additionalname = ""
-        if 'additionalname' in request.form:
+        if 'additionalname' in request.form and request.form['additionalname'] != "":
            additionalname = request.form['additionalname']
-        if additionalname != "":
            select = select + " AND additionalName=?"
            select2 = select2 + [additionalname]
         gender = ""
@@ -446,13 +445,20 @@ def search():
            select = select + " AND gender=?"
            select2 = select2 + [gender]
         age = ""
-        if 'age' in request.form:
+        if 'age' in request.form and request.form['age'] != "":
            age = request.form['age']
-        if age != "":
            select = select + " AND age=?"
            select2 = select2 + [age]
-        year = request.form['year']
-        month = request.form['month']
+        year = ""
+        if 'year' in request.form and request.form['year'] != "":
+           year = request.form['year']
+           select = select + " AND year=?"
+           select2 = select2 + [year]
+        month = ""
+        if 'month' in request.form and request.form['month'] != "":
+           month = request.form['month']
+           select = select + " AND month=?"
+           select2 = select2 + [month]
         day = request.form['day']
         country = request.form['country']
         state= request.form['state']
