@@ -3,7 +3,7 @@ Left to do backend: 1) salt and hash pw #also make username unique required (SQL
                     2) work out kinks in db pulling and anything else that turns up.
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
                        b) when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
-                       c) do you want to create separate .py folders for different aspects of your code in imalive.py (i.e. the main python file)?
+                       c) do you want to create separate .py folders for different aspects of your code currently in imalive.py to make it easier to read (i.e. the main python file)?
                        
 Other non-backend work: 1) Create good Readme for Git Hub
                         2) Beautify front-end -- (not focus b/c of backend focus, but needs improving)          
@@ -86,7 +86,7 @@ def initdb_command():  #in the command line type: flask initdb
 @app.route('/home', methods = ['POST', 'GET'])
 def home():
    """ Handles home screen. """
-   message = None
+   message = ""
    if 'message' in session:
       message = session['message']
    error = None
@@ -104,8 +104,10 @@ def home():
            else: # doWhat == "login":
               return redirect(url_for("loginSurvivor"))
        else: #if nothing chosen but submit/enter button hit
-           return render_template('home.html', error = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you.", message = message)
+           session['message'] = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you."
+           return render_template('home.html', message = message)
    else:    #request.method == 'GET'
+       session['message'] = "Welcome to I'mAlive!"
        return render_template('home.html', error = error, message = message)
 
 
@@ -116,12 +118,12 @@ def celebrate(personalname = None):
     personalname = None
     error = None
     message = None
-    if message in session:
+    if 'message' in session:
        message = session['message']
     if 'personalname' in session:              
-       return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])  #this pulls name dynamically as of 3/13/17
+       return render_template('celebrate.html', personalname = session['personalname'], message = session['message']) #pulls name dynamically in url
     else:
-       message= "Celebrate, you live!!!  If you want to look somoone else up, please check out the I'mAlive Search page."
+       message= "Celebrate, you live!!!  If you want to look someone else up, please check out the I'mAlive Search page."
        return render_template('celebrate.html', message = message)
 
     
@@ -180,14 +182,14 @@ def signupSurvivor():
          return render_template('signupSurvivor.html', error = error)
 
 
-
-
 # @app.route('/updateSurvivor/loginSurvivor/<error>', methods = ['GET', 'POST'])
 @app.route('/loginSurvivor', methods = ['GET', 'POST'])
 def loginSurvivor(error=None):
     """Handles survivor login to update information (loginSurvivor.html)."""
     if request.method == 'GET':
        error = None
+       if 'error' in session:
+          error = session['error']
        session['logged_in'] = False
        return render_template('loginSurvivor.html')
     else: #request.method == 'POST':
@@ -206,7 +208,7 @@ def loginSurvivor(error=None):
              session['personalname'] = result[1]
              session['username'] = result[2]
              session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
-             print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + ".")
+             print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + ".") #developer aid
              return redirect(url_for("updateSurvivor", personalname=session['personalname']))
        else:
           error = "Please provide both a valid username and the associated password."
@@ -218,6 +220,7 @@ def logout():
    session.pop('logged_in', None)
    session['logged_in'] = False
    print("Logged_in Status: " + str(session['logged_in'] == True))#developer aid
+   session['message'] = "Current status: logged out."
    return redirect(url_for('home'))
 
 
@@ -243,7 +246,6 @@ def updateSurvivor(personalname=None):
          personalname = ""
          if 'personalname' in session:
             personalname = session['personalname']
-         message2 = "" #general practice message for development purposes
          familyname2 = ""
          personalname2 = ""
          additionalname2 = ""
@@ -272,7 +274,6 @@ def updateSurvivor(personalname=None):
          else: #if len(dbresult) == 1  (i.e. only one record pulled from survivors table)
             result = dbresult[0]
             print("id: " + str(result[0]) + " personalname: " + result[2])
-            message2 = message2 + str(result[1]) + " " + str(result[2])
             familyname2 = str(result[1])
             personalname2 = str(result[2])
             additionalname2 = str(result[3])
@@ -290,9 +291,7 @@ def updateSurvivor(personalname=None):
             sos2 = str(result[15])
             otherSOS2 = str(result[16])
             signupDate = str(result[17])
-            if message2 == "":
-               message2 = "Nothing pulled from db."
-      return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], message2 = message2, familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
+      return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
    else: #request.method == 'POST'
       if session['logged_in'] != True:
          session['error'] = "LoggedOut"
@@ -365,11 +364,11 @@ def updateSurvivor(personalname=None):
                updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
                db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, month=?, day=?, country=?, state=?, city=?, county=?, village=?, other=?, sos=?, otherSOS=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, updateDate, username])
                db.commit()
-            return redirect(url_for("updateSurvivor", personalname=session['personalname']))   #This works and shows dynamic URL and db results 4/24/17
+            return redirect(url_for("updateSurvivor", personalname=session['personalname'])) 
 
             
 
-@app.route('/deleteSurvivor', methods = ['GET', 'POST'])  ###NEEDS WORK -ES 4/19/17  CURRENTLY DELETING EVERY ROW
+@app.route('/deleteSurvivor', methods = ['GET', 'POST'])  
 @app.route('/deleteSurvivor/<personalname>', methods = ['GET', 'POST'])
 def deleteSurvivor(personalname=None):
    """Handles deleting a survivor's file."""
@@ -401,7 +400,7 @@ def deleteSurvivor(personalname=None):
             if len(dbresult) == 0 or len(dbresult) > 1:
                error = "Password and username don't match."
                return render_template('deleteSurvivor.html', error = error)
-            else:
+            else: #len(dbresult) == 1
                result = dbresult[0]
                if request.form['username'] == result[17] and request.form['password'] == result[18]:
                   print("id = " + str(result[0]))  #developer check
@@ -422,7 +421,7 @@ def deleteSurvivor(personalname=None):
          
 
 
-#SEARCH VIEW FUNCTIONS  #correct this (get rid of row count etc. per other view DB examples)-es 4/25/17
+#SEARCH VIEW FUNCTIONS  #correct this still: get rid of row count etc. per other view DB examples.--ES4/25/17
 @app.route('/search', methods = ['POST', 'GET'])
 def search():
     """Handles the search index screen (search.html)."""
@@ -447,40 +446,34 @@ def search():
         county = request.form['county']       
         village = request.form['village']
         other = request.form['other']
-        if familyname or personalname: #when "or" used here instead of "and" it lists those with shared last names.-es 4/6/17 ### Q) should I only pull the not null values?-es 4/6/17
+        if familyname and personalname:
            db = get_db()
-           cur = db.execute("SELECT id, familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, signupDate FROM survivors WHERE familyName=familyname AND personalName=personalname AND additionalName=additionalname AND gender=gender AND age=age AND year=year AND month=month AND day=day AND country=country AND state=state AND city=city AND county=county AND village=village AND other=other")             
-           msgDB = ""
-           rowCount = 0
-           idList = []
-           lastDate = ""
-           for row in cur.fetchall():   #when adding row[] later: note position change(s) from selected db columns
-              if familyname in row[1] and personalname in row[2]:#This Works
+           cur = db.execute("SELECT * FROM survivors WHERE familyName=? AND personalName=?", [familyname, personalname])
+           dbresult = cur.fetchall()
+           if len(dbresult) == 0: #no survivor pulls from db
+              error = "I'mAlive does not show anyone with that name actively enrolled in its database."
+              return render_template('search.html', error = error)
+           elif len(dbresult) > 1: #multiple survivors pulled from db with similar information
+              msgDB = ""
+              for row in dbresult:   #when adding row[] later: note position change(s) from selected db columns
                  msgDB = msgDB + str(row[2] + " " + row[1]) + " ID# " + str(row[0]) + "... "
-                 rowCount = rowCount + 1
                  idList = idList + [row[0]]
-                 lastDate = lastDate + str(row[15])
-              else:
-                 msgDB = msgDB
-                 rowCount = rowCount
-                 idList = idList
-                 lastDate = lastDate
-                 
-           if msgDB == "":
-              error = "No such survivor with that name has enrolled with I'mAlive."
+                 error = "I'mAlive has " + str(len(dbresult)) + " people with this information registered in its database: " + msgDB + " Please provide more details."
               return render_template('search.html', error = error)
-           
-           elif rowCount != 1: # multiple survivors with similar info
-              error = "I'mAlive has " + str(rowCount) + " people with this information registered in its database: " + msgDB + " Please provide more details."
-              return render_template('search.html', error = error)
-           
-           else:#msgDB != "" and rowCount == 1
+           else: #one survivor pulls from db (i.e. len(dbresult) == 1)
+              result = dbresult
+              print("Result length: " + str(len(result)))
+              print(result)
+             # lastDate = result[19]
+              #if result[20] and resutlt[20] != None:
+               #  lastDate = result[20]
               session['personalname'] = request.form['personalname']
               session['familyname'] = request.form['familyname']
-              session['lastDate'] = lastDate
-              session['message'] = "Celebrate! On " + str(session['lastDate']) + " " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
+              #session['lastDate'] = lastDate
+              #session['message'] = "Celebrate! On " + str(session['lastDate']) + " " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
+              session['message'] = "Celebrate! " + session['personalname'] + " " + session['familyname'] + " registered with I'm Alive. Hooray!"
               return redirect(url_for('celebrate', personalname = session['personalname']))
-        else:  
+        else:#if missing familyname and/or personalname
             error = "Not enough information to continue; please provide both a family name and a personal name. Thank you."
             return render_template('search.html', error = error)
     else: #request.method == 'GET'
