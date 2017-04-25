@@ -440,12 +440,17 @@ def search():
            select = select + " AND additionalName=?"
            select2 = select2 + [additionalname]
         gender = ""
-        if 'gender' in request.form:
+        if 'gender' in request.form: #ISSUE HERE
            gender = request.form['gender']
-       # if gender != "":
-        #   select = select + " AND gender=?"
-         #  select2 = select2 + [gender]
-        age = request.form['age']
+        if gender != "":
+           select = select + " AND gender=?"
+           select2 = select2 + [gender]
+        age = ""
+        if 'age' in request.form:
+           age = request.form['age']
+        if age != "":
+           select = select + " AND age=?"
+           select2 = select2 + [age]
         year = request.form['year']
         month = request.form['month']
         day = request.form['day']
