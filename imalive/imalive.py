@@ -1,4 +1,4 @@
-"""
+"""STOPPED AT LINE 461 on 4/25/17
 Left to do backend: 1) salt and hash pw #also make username unique required (SQLite has the unique constraint working, but python doesn't yet handle the integrity error)
                     2) work out kinks in db pulling and anything else that turns up.
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
@@ -458,15 +458,43 @@ def search():
         if 'month' in request.form and request.form['month'] != "":
            month = request.form['month']
            select = select + " AND month=?"
-           select2 = select2 + [month]
-        day = request.form['day']
-        country = request.form['country']
-        state= request.form['state']
-        city = request.form['city']
-        county = request.form['county']       
-        village = request.form['village']
-        other = request.form['other']
-        if familyname and personalname:
+           select2 = select2 + [month]#STOP AS OF 4/25/17 - gender issue still happening.
+        day = ""
+        if 'day' in request.form and request.form['day'] != "":
+           day = request.form['day']
+           select = select + " AND day=?"
+           select2 = select2 + [day]
+        country = ""
+        if 'country' in request.form and request.form['country'] != "":
+           country = request.form['country']
+           select = select + " AND country=?"
+           select2 = select2 + [country]
+        state = ""
+        if 'state' in request.form and request.form['state'] != "":
+           state = request.form['state']
+           select = select + " AND state=?"
+           select2 = select2 + [state]
+        city = ""
+        if 'city' in request.form and request.form['city'] != "":
+           city = request.form['city']
+           select = select + " AND city=?"
+           select2 = select2 + [city]
+        county = ""
+        if 'county' in request.form and request.form['county'] != "":
+           county = request.form['county']
+           select = select + " AND county=?"
+           select2 = select2 + [county]
+        village = ""
+        if 'village' in request.form and request.form['village'] != "":
+           village = request.form['village']
+           select = select + " AND village=?"
+           select2 = select2 + [village]
+        other = ""
+        if 'other' in request.form and request.form['other'] != "":   
+           other = request.form['other']
+           select = select + " AND other=?"
+           select2 = select2 + [other]
+        if familyname and  personalname: 
            db = get_db()
            cur = db.execute(select, select2)
            print(select, select2)
@@ -479,7 +507,7 @@ def search():
               msgDB = ""
               for row in dbresult: 
                  msgDB = msgDB + str(row[2] + " " + row[1]) + " ID# " + str(row[0]) + "... "
-                 idList = idList + [row[0]]
+                # idList = idList + [row[0]]
                  error = "I'mAlive has " + str(len(dbresult)) + " people with this information registered in its database: " + msgDB + " Please provide more details."
               return render_template('search.html', error = error)
            else: #one survivor pulls from db (i.e. len(dbresult) == 1)
@@ -494,7 +522,7 @@ def search():
                  session['message'] = "Celebrate! " + session['personalname'] + " " + session['familyname'] + " updated his/her I'mAlive account on " + str(session['lastDate']) + ".  Hooray!!!"
               session['message'] = "Celebrate! On " + str(session['lastDate']) + " " + session['personalname'] + " " + session['familyname'] + " registered with I'mAlive.  Hooray!"
               return redirect(url_for('celebrate', personalname = session['personalname']))
-        else:#if missing familyname and/or personalname
+        else:#if missing familyname and/or personalname  #see how this works on 4/26/17
             error = "Not enough information to continue; please provide both a family name and a personal name. Thank you."
             return render_template('search.html', error = error)
     else: #request.method == 'GET'
