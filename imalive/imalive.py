@@ -4,6 +4,7 @@ Left to do backend: 1) salt and hash pw #also make username unique required (SQL
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
                        b) when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
                        c) do you want to create separate .py folders for different aspects of your code currently in imalive.py to make it easier to read (i.e. the main python file)?
+                       d) upper and lower case values and LIKE phrases
                        
 Other non-backend work: 1) Create good Readme for Git Hub
                         2) Beautify front-end -- (not focus b/c of backend focus, but needs improving)          
@@ -438,10 +439,8 @@ def search():
            additionalname = request.form['additionalname']
            select = select + " AND additionalName=?"
            select2 = select2 + [additionalname]
-        gender = ""
-        if 'gender' in request.form: #ISSUE HERE
+        if 'gender' in request.form and request.form['gender'] != None: #ISSUE HERE
            gender = request.form['gender']
-        if gender != "":
            select = select + " AND gender=?"
            select2 = select2 + [gender]
         age = ""
