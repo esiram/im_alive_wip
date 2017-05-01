@@ -196,7 +196,7 @@ def loginSurvivor(error=None):
           cur = db.execute('SELECT * FROM survivors WHERE username = ?', [username])
           dbresult = cur.fetchall()
           if len(dbresult) != 1:
-             error = "Invalid username or password."
+             error = "Invalid username."
           else:           #only one result pulls from db 
              result = dbresult[0]
              if check_password_hash(result[18], password) != True:
@@ -392,16 +392,18 @@ def deleteSurvivor(personalname=None):
          elif password == "":
             error = "Password required."
             return render_template('deleteSurvivor.html', error = error)
-         else:                #username and password in request.form
+         else:                 #username and password in request.form
             db = get_db()
-            cur = db.execute("SELECT * FROM survivors WHERE username=? AND password=?", [username, password])
+            cur = db.execute("SELECT * FROM survivors WHERE username=?", [username])
             dbresult = cur.fetchall()
-            if len(dbresult) == 0 or len(dbresult) > 1:
-               error = "Password and username don't match."
+            if len(dbresult) != 1:
+               error = "Invalid username."
                return render_template('deleteSurvivor.html', error = error)
-            else:             #len(dbresult) == 1
+            else:              #len(dbresult) == 1
                result = dbresult[0]
-               if request.form['username'] == result[17] and request.form['password'] == result[18]:
+               if check_password_hash(result[18], password) != True:
+                  error = "Invalid password."
+               else:           #only one result pulls from db and password hash returns True
                   print("id = " + str(result[0]))  #developer check
                   session['username'] = request.form['username']
                   db.execute("DELETE FROM survivors WHERE username=?", [username])
@@ -409,9 +411,7 @@ def deleteSurvivor(personalname=None):
                   print("Deleted row in db for username" + str(username)) #developer check
                   session['message'] = "Account deleted for: " + session['username'] 
                   return redirect(url_for("home"))
-               else:          #if username and password don't match
-                  error = "The username and/or password do not match."
-                  return render_template('deleteSurvivor.html', error = error)
+            return render_template('deleteSurvivor.html', error = error)
       elif delete == "no":
          return redirect(url_for("home"))      
       else:                   #delete = ""
