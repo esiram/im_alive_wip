@@ -1,4 +1,4 @@
-"""STOPPED AT LINE 461 on 4/25/17
+"""
 Left to do backend: 1) salt and hash pw #also make username unique required (SQLite has the unique constraint working, but python doesn't yet handle the integrity error)
                     2) work out kinks in db pulling and anything else that turns up.
                        a) how can you pull more detail from db in search field?  Important for app to work when multiple folks share the same data
@@ -16,8 +16,8 @@ import sqlite3
 import time
 import datetime
 import random
-#from hashlib import md5 # per flask minitwit example 4/10/17
-#from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
+from hashlib import md5 # per flask minitwit example 4/10/17
+from werkzeug import check_password_hash, generate_password_hash # this per flask minitwit example 4/10/17
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 
@@ -62,20 +62,20 @@ def create_table():
     """To create table 'survivors' if table doesn't exist."""
     conn = connect_db()       #connection
     cur = conn.cursor()       #cursor (TBD: see init_db 'c' for cursor: determine if a general cursor object for the entire app should get made)
-    cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyName TEXT, personalName TEXT, additionalName TEXT, gender TEXT, age INTEGER, year INTEGER, month INTEGER, day INTEGER, country TEXT, state TEXT, city TEXT, county TEXT, village TEXT, other TEXT, sos TEXT, otherSOS TEXT, username TEXT, password TEXT, signupDate TIMESTAMP, updateDate TIMESTAMP)') #colunns already in sue with schema for weeks updated/added here on 4/21/17
+    cur.execute('CREATE TABLE IF NOT EXISTS survivors(familyName TEXT, personalName TEXT, additionalName TEXT, gender TEXT, age INTEGER, year INTEGER, month INTEGER, day INTEGER, country TEXT, state TEXT, city TEXT, county TEXT, village TEXT, other TEXT, sos TEXT, otherSOS TEXT, username TEXT, password TEXT, signupDate TIMESTAMP, updateDate TIMESTAMP)')
        
 
 #FUNCTIONS TO INITIALIZE DB
 def init_db():
     """Opens file from resource folder."""
     db = get_db()
-    c = db.cursor()                #db.cursor() used in flaskr tutorial rather than c (TBD: does this duplicate the create_table 'cur' variable? Can you simplify?)
+    c = db.cursor()
     with app.open_resource('schema.sql', mode='r') as f:
        c.executescript(f.read())
     db.commit()
     
-@app.cli.command('initdb')  #flask creates an application context bound to correct application
-def initdb_command():  #in the command line type: flask initdb
+@app.cli.command('initdb')  #flask creates application context bound to correct application
+def initdb_command():  #to reset DB: in the command line type *flask initdb*
     """Initializes the database."""
     init_db()
     print('Initialized the database.')
@@ -93,7 +93,7 @@ def home():
    error = None
    if 'error' in session:
       error = session['error']
-   session['logged_in'] = False  #to make sure session is logged out
+   session['logged_in'] = False  #to verify session is logged out
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
        if 'doWhat' in request.form:
@@ -122,7 +122,7 @@ def celebrate(personalname = None):
     if 'message' in session:
        message = session['message']
     if 'personalname' in session:              
-       return render_template('celebrate.html', personalname = session['personalname'], message = session['message']) #pulls name dynamically in url
+       return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])
     else:
        message= "Celebrate, you live!!!  If you want to look someone else up, please check out the I'mAlive Search page."
        return render_template('celebrate.html', message = message)
@@ -143,7 +143,7 @@ def signupSurvivor():
       familyname = request.form['familyname']
       personalname = request.form['personalname']
       additionalname = request.form['additionalname']
-      gender = "" #testing change from (None) to empty string ("") -4/17/17
+      gender = "" 
       if 'gender' in request.form:
          gender = request.form['gender']
       age = request.form['age']
@@ -156,21 +156,21 @@ def signupSurvivor():
       county = request.form['county']
       village = request.form['village']
       other = request.form['other']
-      sos = "" #changing from (None) to empty string ("") like gender radio button seemed to require for db entries to pull in search view.-ES 4/17/17
+      sos = ""
       if 'sos' in request.form:
          sos = request.form['sos']
       otherSOS = request.form['otherSOS']
       username = request.form['username']  #MUST BE UNIQUE OR ELSE AN ERROR HAPPENS THAT DOESN'T HANDLE CORRECTLY YET-es4/19/17
       # if username not Unique:
       #    error = "That username will not work, please enter another one." #### How does the unique error work? 
-      password = request.form['password']      #### WORK ON HASHING and SALTING AT LATER DATE
+      password = request.form['password'] 
       password2 = request.form['password2']      
  #automatic input:
-      signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')) # from pythonprogramming.net on 4/17/17
-      if familyname and personalname and username and password == password2: #only requiring these
+      signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')) # see example on pythonprogramming.net
+      if familyname and personalname and username and password == password2:
          db = get_db()
          db.execute('INSERT INTO survivors (familyName, personalName, additionalName, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, password, signupDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-                    [familyname, personalname, additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, password, signupDate])
+                    [familyname, personalname, additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, username, generate_password_hash(password), signupDate])
          db.commit()
          session['personalname'] = request.form['personalname']
          session['message'] = "Celebrate, " + session['personalname'] + ", you're alive! Hip, hip, hooray!"
@@ -183,7 +183,6 @@ def signupSurvivor():
          return render_template('signupSurvivor.html', error = error)
 
 
-# @app.route('/updateSurvivor/loginSurvivor/<error>', methods = ['GET', 'POST'])
 @app.route('/loginSurvivor', methods = ['GET', 'POST'])
 def loginSurvivor(error=None):
     """Handles survivor login to update information (loginSurvivor.html)."""
@@ -198,22 +197,25 @@ def loginSurvivor(error=None):
        password = request.form['password']
        if username and password:
           db = get_db()
-          cur = db.execute('SELECT id, personalName, username, password FROM survivors WHERE username=? AND password=?', [username, password])
+          cur = db.execute('SELECT * FROM survivors WHERE username = ?', [username])
           dbresult = cur.fetchall()
-          if len(dbresult) == 0 or len(dbresult) > 1:
+          if len(dbresult) != 1:
              error = "Invalid username or password."
           else:
              result = dbresult[0]
-             session['logged_in'] = True
-             session['userID'] = result[0]
-             session['personalname'] = result[1]
-             session['username'] = result[2]
-             session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
-             print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + ".") #developer aid
-             return redirect(url_for("updateSurvivor", personalname=session['personalname']))
-       else:
-          error = "Please provide both a valid username and the associated password."
-    return render_template('loginSurvivor.html', error=error)
+             if check_password_hash(result[18], password) != True:
+                error = "Invalid password."
+             else: #only one result pulled and password hash returns True
+                session['logged_in'] = True
+                session['userID'] = result[0]
+                session['personalname'] = result[2]
+                session['username'] = result[17]
+                session['message'] = session['personalname'] + ", please verify your information in I'mAlive's database and update as needed."
+                print("Logged in session ID = " + str(session['userID']) + " for name " + session['personalname'] + ".") #developer aid
+                return redirect(url_for("updateSurvivor", personalname=session['personalname']))
+       else: #missing username/password
+             error = "Please provide both a valid username and the associated password."
+       return render_template('loginSurvivor.html', error=error)
 
 @app.route('/logout')
 def logout():
