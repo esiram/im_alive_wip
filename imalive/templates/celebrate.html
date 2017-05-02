@@ -7,13 +7,16 @@
 <h1>I'mAlive, Celebrate!!!</h1>
 
 
-<div action="http://127.0.0.1:5000/celebrate" method="get">
-  {% if message %}
-  <li> {{ message }} </li>
-  {% endif %}
-  
-   <div> <img src="static/happydance.gif"></div>
+<div action="http://127.0.0.1:5000/celebrate/<personalname>" method="get">
+   
+       {% if message %}
+          <li> {{ message }} </li>
+	  {% endif %}
+
+	      
+   <li><img src="static/happydance.gif"></li>
    <em>I'm Alive. Celebrate!</em>
+
 </div>   
 {% endblock %}
 
