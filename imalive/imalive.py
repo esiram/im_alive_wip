@@ -1,12 +1,15 @@
 """
 Left to do backend: 1)work out kinks in db pulling and anything else that turns up:
                        a) when dynamic url for celebrate.html: happy dance gif doesn't load... possibly b/c html page has one action div (action = "get" with url listed; I tried a few attempts with this but it didn't work; look at it later.-ES 4/14/17
-                       b) do you want to create separate .py folders for different aspects of your code currently in imalive.py to make it easier to read (i.e. the main python file)?
-                       c) upper and lower case values and LIKE phrases
-                       d) unique username errors
+                       b) upper and lower case values and LIKE phrases and minimum # of characters in password
+                       c) unique username errors
+                       d) do you want to use Flash?  It's imported from flask, but not used in your code.
 Other non-backend work: 1) Create good Readme for Git Hub
                         2) Beautify front-end -- (not focus b/c of backend focus, but needs improving)          
 """
+
+
+"""I'mAlive's primary goal: to give families of refugees and families of human trafficking/domestic violence victims hope and peace through the knowledge that their loved ones still live, having survived whatever obstacles confronted them.  I'mAlive focuses on those lacking access to more common social media platforms and/or those, because of safety issues, unable to risk sharing much identifying information but who still wish to pass information to their families that they live."""
 
 ### ALL IMPORTS ###
 import os
@@ -137,6 +140,17 @@ def signupSurvivor():
    else:                 # request.method == 'POST':
       error = None
       message = ""
+      username = request.form['username']  #MUST BE UNIQUE OR ELSE AN ERROR HAPPENS THAT DOESN'T HANDLE CORRECTLY YET-es4/19/17
+      if len(username) <= 5 or len(username) >= 10:
+         error = "Username must have between 5 and 10 characters."
+         return render_template('signupSurvivor.html', error = error)
+      else: #username >= 5 and username <= 11 characters
+         db = get_db()
+         cur = db.execute("SELECT * FROM survivors WHERE username=?", [username])
+         dbresult = cur.fetchall()
+         if len(dbresult) != 0:
+            error = "Username already taken, please provide a different username."
+            return render_template('signupSurvivor.html', error = error)
       familyname = request.form['familyname']
       personalname = request.form['personalname']
       additionalname = request.form['additionalname']
@@ -157,9 +171,6 @@ def signupSurvivor():
       if 'sos' in request.form:
          sos = request.form['sos']
       otherSOS = request.form['otherSOS']
-      username = request.form['username']  #MUST BE UNIQUE OR ELSE AN ERROR HAPPENS THAT DOESN'T HANDLE CORRECTLY YET-es4/19/17
-      # if username not Unique:
-      #    error = "That username will not work, please enter another one." #### How does the unique error work? 
       password = request.form['password'] 
       password2 = request.form['password2']      
       signupDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')) #see example on pythonprogramming.net
