@@ -5,81 +5,114 @@
 {% block content %}
 <h1>I'mAlive Signup</h1>
    
-<form action="http://127.0.0.1:5000/signupSurvivor" method="post">
+<form action="http://127.0.0.1:5000/signupSurvivor" method="post" class="pure-form pure-form-aligned">
 
     {% if error %}
     <p><strong>Error: {{ error }}</strong>
     <br>
-    {% endif %} 
-  
-    Family (Last) Name*:
-    <input type="text" name="familyname"><br>
-    Personal (First) Name*:
-    <input type="text" name="personalname"> <br>
-    Additional Name(s):
-    <input type="text" name="additionalname"> <br>
-    <br>
-
-    Gender:<br>
-    <input type="radio" name="gender" id="male" value="Male"> Male<br>
-    <input type="radio" name="gender" id="female" value="Female"> Female<br>
-    <input type="radio" name="gender" id="other" value="Other"> Other<br>
-    <br>
+    {% endif %}
     
-    Age:
-    <input type="text" name="age"><br>
-    Birth Year:
-    <input type="text" name="year"><br>
-    Birth Month:
-    <input type="text" name="month"><br>
-    Birthday:
-    <input type="text" name="day"><br>
-	   
-    <br>	   
-    <br>
-    
-    Origin Country:
-    <input type="text" name="country"><br>
-    Origin State/Province:
-    <input type="text" name="state"><br>
-    Origin City:
-    <input type="text" name="city"><br>
-    Origin County:
-    <input type="text" name="county"><br>
-    Origin Village/Neighborhood/Borough/Town:
-    <input type="text" name="village"><br>
-    Other Origin Information:
-    <input type="text" name="other"<br>
+    <div class="pure-control-group">
+      <label for="familyname">Family (Last) Name*:</label>
+      <input type="text" name="familyname">
+    </div>
+    <div class="pure-control-group">
+      <label for="personalname">Personal (First) Name*:</label>
+      <input type="text" name="personalname">
+    </div>
+    <div class="pure-control-group">
+      <label for="additionalname">Additional Name(s):</label>
+      <input type="text" name="additionalname">
+    </div>
+    </br>
 
-    <br>	   
-    <br>
+    <div class="pure-control-group">
+      <label for="genderContainer">Gender:</label>
+      <input type="radio" name="gender" id="male" value="Male"> Male </input>
+      <input type="radio" name="gender" id="female" value="Female"> Female </input>
+      <input type="radio" name="gender" id="other" value="Other"> Other </input>
+    </div>
+    </br>
+    
+    <div class="pure-control-group">
+      <label for="age">Age:</label>
+      <input type="text" name="age">
+    </div>
+    <div class="pure-control-group">
+      <label for="year">Birth Year:</label>
+      <input type="text" name="year">
+    </div>
 
     
-    Are You In Danger?<br>    
-    <input type="radio" name="sos" value="Yes"> Yes, please help.<br>
-    <input type="radio" name="sos" value="No"> No, thank you.<br>
-    <br>
-    If Yes, You May Share Other Information About Your Danger Here:
-    <input type="text" name="otherSOS"<br>
-	   
-    <br>
-    <br>
-    <br>
+    <div class="pure-control-group">
+      <label for="month">Birth Month:</label>
+      <input type="text" name="month">
+    </div>
+    <div class="pure-control-group">
+      <label for="day">Birthday:</label>
+      <input type="text" name="day">
+    </div>
+    </br>
+    
+    <div class="pure-control-group">
+      <label for="country">Origin Country:</label>
+      <input type="text" name="country">
+    </div>
+    
+    <div class="pure-control-group">
+      <label for="state">Origin State/Province:</label>
+      <input type="text" name="state">
+    </div>
+    
+    <div class="pure-control-group">
+      <label for="city">Origin City:</label>
+      <input type="text" name="city">
+    </div>
+    
+    <div class="pure-control-group">
+      <label for="county">Origin County:</label>
+      <input type="text" name="county">
+    </div>
+    
+    <div class="pure-control-group">
+      <label for="village">Origin Village/Neighborhood/Borough/Town:</label>
+      <input type="text" name="village">
+    </div>
+    
+    <div class="pure-control-group">
+      <label for="other">Other Origin Information:</label>
+      <input type="text" name="other">
+    </div>
+    </br>
+    
+    <div class="pure-control-group">
+      <label for="sos">Are You In Danger?</label>
+      <input type="radio" name="sos" value="Yes"> Yes, please help.
+      <input type="radio" name="sos" value="No"> No, thank you.
+    </div>
+    <div class="pure-control-group">
+      <label for="otherSOS">If Yes, You May Share Other Information About Your Danger Here:</label>
+      <input type="text" name="otherSOS">
+    </div>
 
-    Choose a Username*:
-    <input type="username" name="username"<br>
-    <br>	   
-    Create a Password*:
-    <input type="password" name="password"<br>
-    <br>
-    Retype Password for Verification*:
-    <input type="password" name="password2"<br>
+    </br>
+    <div class="pure-control-group">
+      <label for="username">Choose a Username*:</label>
+      <input type="username" name="username">
+    </div>
+    <div class="pure-control-group">
+      <label for="password">Create a Password*:</label>
+      <input type="password" name="password">
+    </div>
 
-    <br>	   
-    <br>
-    <br>
-    <input type="submit" value="Submit">	   
-	   
-	   
-  </form>
+    <div class="pure-control-group">
+      <label for="password2">Retype Password for Verification*:</label>
+      <input type="password" name="password2">
+    </div>
+
+    <div class="pure-controls">
+      <button type="submit" class="pure-button pure-button-primary">Submit</button>
+    </div>
+</form>
+</br>
 {% endblock %}

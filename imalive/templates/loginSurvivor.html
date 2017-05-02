@@ -4,23 +4,24 @@
 
 {% block content %}
 
-<h1>I'mAlive Login</h1>
-
-<form action="http://127.0.0.1:5000/loginSurvivor" method="post">
+<h2>I'mAlive Login</h2>
+<form action="http://127.0.0.1:5000/loginSurvivor" method="post" class="pure-form pure-form-aligned">
   {% if error %}
-    <p><strong>Error: {{ error }}</strong>
+  <p><strong>Error: {{ error }}</strong>
     <br>
-  {% endif %}
-    Please log in to update your information.  Thank you.
-    <br>
-    <br>
-    Username:
-    <input type="text" name="username"><br>
-    Password:
-    <input type="password" name="password"><br>
-    <br>
-    <input type="submit" value="Submit">
-
+    {% endif %}
+    <fieldset>
+      <div class="pure-control-group">
+	<label for="username">Username:</label>
+	<input type="text" name="username" placeholder="Enter username">
+      </div>
+      <div class="pure-control-group">
+	<label for="password">Password:</label>
+	<input type="password" id="password" name="password" placeholder="Enter password">
+      </div>
+      <div class="pure-controls">
+	<button type="submit" class="pure-button pure-button-primary">Submit</button>
+      </div>
+    </fieldset>
 </form>
-
 {% endblock%}

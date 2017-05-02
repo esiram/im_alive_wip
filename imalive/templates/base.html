@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
+  <div class="header">
     {% block head %}
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link href="/static/pure-release-0.6.2/pure-min.css" rel="stylesheet" media="screen">
+    <link href="/static/pure-release-0.6.2/base-min.css" rel="stylesheet" media="screen">
+    <link href="/static/pure-release-0.6.2/forms-min.css" rel="stylesheet" media="screen">
     <title>{% block title %}{% endblock %}</title>
     {% endblock %}
-  </head>
-      <li><a href="http://127.0.0.1:5000/home">Home</a>
-          <a href="http://127.0.0.1:5000/search">Search</a>
-	  <a href="http://127.0.0.1:5000/signupSurvivor">SignUp</a>
-          <a href="http://127.0.0.1:5000/loginSurvivor">Login/Update</a>
-          <a href="http://127.0.0.1:5000/logout">Logout</a></li>
-
-  <body>
-     <div id="content">
-       {% block content %}{% endblock %}
-     </div>
-     <br><br><br><br><br>
-     <div id="footer">
-        {% block footer %}
-         I'mAlive &copy; Copyright 2016-2017 by Esther Siram
-        {% endblock %}
-     </div>
-   </body>
-
+  </div>
+  <div id="header" class="content">
+    <li>
+      <a href="http://127.0.0.1:5000/home">Home</a>
+      <a href="http://127.0.0.1:5000/search">Search</a>
+      <a href="http://127.0.0.1:5000/signupSurvivor">SignUp</a>
+      <a href="http://127.0.0.1:5000/loginSurvivor">Login/Update</a>
+      <a href="http://127.0.0.1:5000/logout">Logout</a>
+    </li>
+  </div>
+  <div id="content" class="content">
+    {% block content %}
+    {% endblock %}
+  </div>
+  <div id="footer" class="footer">
+    {% block footer %}
+    I'mAlive &copy; Copyright 2016-2017 by Esther Siram
+    {% endblock %}
+  </div>
 </html>
