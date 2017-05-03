@@ -5,6 +5,8 @@
 {% block content %}
 <h1>I'mAlive: Update Information</h1>
 
+<form action="http://127.0.0.1:5000/updateSurvivor" method="post" class="pure-form pure-form-aligned">
+
     {% if message %}
       <li><strong>{{ message }}</strong></li>
     {% endif %}
@@ -13,84 +15,127 @@
       <li><i>{{ message2 }}:</i></li>
     {% endif %}
 	
-<form action="http://127.0.0.1:5000/updateSurvivor" method="post">
 
     {% if error %}
-         <p><strong>Error: {{ error }}</strong></p>
-         <br>
+    <p><strong>Error: {{ error }}</strong></p>
+    <br>
     {% endif %} 
-  
-    Family (Last) Name*:{% if familyname2 %}<b>{{ familyname2 }}</b>{% endif %}<br>
-    Personal (First) Name*: {% if personalname2 %}<b>{{ personalname2 }}</b>{% endif %}<br>
-    Additional Name(s):
-    <input type="text" name="additionalname">{% if additionalname2 %}<b>{{ additionalname2 }}</b>{% endif %}<br>
-    <br>
 
-    Gender: {% if gender2 %}<b>{{ gender2 }}</b>{% endif %}<br>
-    <input type="radio" name="gender" id="male" value="Male"> Male<br>
-    <input type="radio" name="gender" id="female" value="Female"> Female<br>
-    <input type="radio" name="gender" id="other" value="Other"> Other<br>
-    <br>
-    
-    Age:
-    <input type="text" name="age">{% if age2 %}<b>{{ age2 }}</b>{% endif %}<br>
-    Birth Year:
-    <input type="text" name="year">{% if year2 %}<b>{{ year2 }}</b>{% endif %}<br>
-    Birth Month:
-    <input type="text" name="month">{% if month2 %}<b>{{ month2 }}</b>{% endif %}<br>
-    Birthday:
-    <input type="text" name="day">{% if day2 %}<b>{{ day2 }}</b>{% endif %}<br>
-	   
-    <br>	   
-    <br>
-    
-    Origin Country:
-    <input type="text" name="country">{% if country2 %}<b>{{ country2 }}</b>{% endif %}<br>
-    Origin State/Province:
-    <input type="text" name="state">{% if state2 %}<b>{{ state2 }}</b>{% endif %}<br>
-    Origin City:
-    <input type="text" name="city">{% if city2 %}<b>{{ city2 }}</b>{% endif %}<br>
-    Origin County:
-    <input type="text" name="county">{% if county2 %}<b>{{ county2 }}</b>{% endif %}<br>
-    Origin Village/Neighborhood/Borough/Town:
-    <input type="text" name="village">{% if village2 %}<b>{{ village2 }}</b>{% endif %}<br>
-    Other Origin Information:
-    <input type="text" name="other">{% if other2 %}<b>{{ other2 }}</b>{% endif %}<br>
+    <div class="pure-control-group">
+      <label for="familyname"> Family (Last) Name*:</label>
+      {% if familyname2 %}<b>{{ familyname2 }}</b>{% endif %}
+    </div>  
+    <div class="pure-control-group">
+      <label for="personalname">Personal (First) Name*:</label>
+      {% if personalname2 %}<b>{{ personalname2 }}</b>{% endif %}
+    </div>   
+    <div class="pure-control-group">
+      <label for="additionalname">Additional Name(s):</label>
+      <input type="text" name="additionalname">
+      {% if additionalname2 %}<b>{{ additionalname2 }}</b>{% endif %}
+    </div>  
+    <br></br>
 
-    <br>	   
-    <br>
+    <div class="pure-control-group">
+      <label for="genderContainer">Gender:</label>
+      <input type="radio" name="gender" id="male" value="Male"> Male </input>
+      <input type="radio" name="gender" id="female" value="Female"> Female </input>
+      <input type="radio" name="gender" id="other" value="Other"> Other </input>
+      {% if gender2 %}<b>{{ gender2 }}</b>{% endif %}
+    </div>
+    <br></br>
+    
+    <div class="pure-control-group">
+      <label for="age">Age:</label>
+      <input type="text" name="age">
+      {% if age2 %}<b>{{ age2 }}</b>{% endif %}
+    </div>
+    
+    <div class="pure-control-group">
+      <label for="year">Birth Year:</label>
+      <input type="text" name="year">
+      {% if year2 %}<b>{{ year2 }}</b>{% endif %}
+    </div>
 
+    <div class="pure-control-group">
+      <label for="month">Birth Month:</label>
+      <input type="text" name="month">
+      {% if month2 %}<b>{{ month2 }}</b>{% endif %}
+    </div>
     
-    Are You In Danger?<br>    
-    <input type="radio" name="sos" value="yes"> Yes, please help.<br>
-    <input type="radio" name="sos" value="no"> No, thank you.<br>
-    If Yes, You May Share Other Information About Your Danger Here:
-    <input type="text" name="otherSOS">{% if otherSOS2 %}<b>{{ otherSOS2 }}</b>{% endif %}<br>
-	   
-    <br>
-    <br>
-    <br>
+    <div class="pure-control-group">
+      <label for="day">Birthday:</label>
+      <input type="text" name="day">
+      {% if day2 %}<b>{{ day2 }}</b>{% endif %}
+    </div>  	   
+    <br></br>	   
     
-    Change Password:<br>
-    <input type="radio" name="password" value="Yes"> Yes, please.<br>
-    <input type="radio" name="password" value="No"> No, thank you.<br>
+    <div class="pure-control-group">
+      <label for="country">Origin Country:</label>
+      <input type="text" name="country">
+      {% if country2 %}<b>{{ country2 }}</b>{% endif %}
+    </div>
     
-    <br>	   
-    <br>
-    <br>
+    <div class="pure-control-group">
+      <label for="state">Origin State/Province:</label>
+      <input type="text" name="state">
+      {% if state2 %}<b>{{ state2 }}</b>{% endif %}
+    </div>
 
-    
-    Delete This I'mAlive Account:<br>
-    <input type="radio" name="delete" value="Yes"> Yes, please.<br>
-    <input type="radio" name="delete" value="No"> No, thank you.<br>
+    <div class="pure-control-group">
+      <label for="city">Origin City:</label>
+      <input type="text" name="city">
+      {% if city2 %}<b>{{ city2 }}</b>{% endif %}
+    </div>
 
-    <br>
-    <br>
-    <br>
-    
-    <input type="submit" value="Submit">
+    <div class="pure-control-group">
+      <label for="county">Origin County:</label>
+      <input type="text" name="county">
+      {% if county2 %}<b>{{ county2 }}</b>{% endif %}
+    </div>
 
-	   
-	   
-  </form>
+    <div class="pure-control-group">
+      <label for="village"> Origin Village/ Neighborhood/ Borough/ Town:</label>
+      <input type="text" name="village">
+      {% if village2 %}<b>{{ village2 }}</b>{% endif %}
+    </div>
+
+    <div class="pure-control-group">
+      <label for="other">Other Origin Information:</label>
+      <input type="text" name="other">
+      {% if other2 %}<b>{{ other2 }}</b>{% endif %}
+   </div>   
+   <br></br> 
+
+   <div class="pure-control-group">
+     <label for"sos">Are You In Danger?</label> 
+     <input type="radio" name="sos" value="Yes"> Yes, please help.
+     <input type="radio" name="sos" value="No"> No, thank you.
+     {% if sos2 %}<b>{{ sos2 }}</b>{% endif %}   
+   </div>
+   <div class="pure-control-group">
+     <label for="otherSOS"><i>If yes, share about your danger here:</i></label>
+     <input type="text" name="otherSOS">
+     {% if otherSOS2 %}<b>{{ otherSOS2 }}</b>{% endif %}
+   </div>   	   
+   <br></br>
+
+   <div class="pure-control-group">
+     <label for="password">Change Password:</label>
+     <input type="radio" name="password" value="Yes"> Yes, please.
+     <input type="radio" name="password" value="No"> No, thank you.
+   </div>
+   <br></br>
+
+   <div class="pure-control-group">
+     <label for="delete">Delete This I'mAlive Account:</label>
+     <input type="radio" name="delete" value="Yes"> Yes, please.
+     <input type="radio" name="delete" value="No"> No, thank you.
+   </div>
+   <br></br>
+
+   <div class="pure-controls">
+     <button type="submit" class="pure-button pure-button-primary">Submit</button>
+   </div>
+</form>
 {% endblock %}

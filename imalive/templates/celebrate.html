@@ -7,7 +7,7 @@
 <h1>I'mAlive, Celebrate!!!</h1>
 
 
-<div action="http://127.0.0.1:5000/celebrate/<personalname>" method="get">
+<div action="http://127.0.0.1:5000/celebrate/{{ personalname }}" method="get">
    
        {% if message %}
           <li> {{ message }} </li>

@@ -1,8 +1,7 @@
 """Left to do backend: 1) Correct issues:
                           a) when dynamic url for celebrate.html: happy dance gif doesn't load
-                          b) upper and lower case values and LIKE phrases
-                          c) work out kinks in db pulling
-                          d) change password section - currently error stating one can't
+                          b) upper and lower case values in search
+                          c) change password section - currently error stating one can't
 Other non-backend work: 1) Create good Readme for Git Hub
                         2) Beautify front-end -- (not focus b/c of backend focus, but needs improving)          
 """
@@ -16,13 +15,13 @@ import sqlite3
 import time
 import datetime
 import random
-from hashlib import md5 #see flask minitwit example
-from werkzeug import check_password_hash, generate_password_hash #see flask minitwit example
+from hashlib import md5 
+from werkzeug import check_password_hash, generate_password_hash
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template
 
 
 ### CONFIGURATION CODE ###
-"""Loads default config and overrides config from environment variable."""
+"""This loads the default configuration and over-rides the environment variable configuration."""
 
 app = Flask(__name__)                #creates & initiates app instance
 app.config.from_object(__name__)     #loads config from this file
@@ -37,6 +36,7 @@ app.config.from_envvar('IMALIVE_SETTINGS', silent=True)
 
 
 ### DATABASE FUNCTIONS ###
+
 #FUNCTIONS TO CONNECT DB
 def connect_db():
    """Connects to specific database."""
@@ -80,8 +80,10 @@ def initdb_command():  #to reset DB: in the command line type *flask initdb*
     init_db()
     print('Initialized the database.')
 
+
     
 ### VIEW FUNCTIONS ###
+
 #GENERAL VIEW FUNCTIONS
 @app.route('/', methods = ['POST', 'GET'])
 @app.route('/home', methods = ['POST', 'GET'])
@@ -91,7 +93,7 @@ def home():
    print(session['logged_in'])     #developer help: should print *False* if logged out
    message = ""
    if 'message' in session:
-      message = session['message'] #consider changing this or renaming session messages
+      message = session['message'] #tbd: consider changing this or renaming session messages
    error = None
    if 'error' in session:
       error = session['error']
@@ -103,9 +105,9 @@ def home():
               return redirect(url_for("search"))
            elif doWhat == "signup":
               return redirect(url_for("signupSurvivor"))
-           else:                    # doWhat == "login"
+           else:                    #doWhat == "login"
               return redirect(url_for("loginSurvivor"))
-       else:                        #if nothing chosen but submit/enter button hit
+       else:                        #if nothing chosen but submit/enter button clicked
            session['message'] = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you."
            return render_template('home.html', message = message)
    else:                            #request.method == 'GET'
@@ -123,13 +125,13 @@ def celebrate(personalname = None):
     if 'message' in session:
        message = session['message']
     if 'personalname' in session:              
-       return render_template('celebrate.html', personalname = session['personalname'], message = session['message'])
-    else:
+       return render_template('celebrate.html', personalname = personalname, message = message)
+    else:                           #personalname not in session
        message= "Celebrate, you live!!!  If you want to look someone else up, please check out the I'mAlive Search page."
        return render_template('celebrate.html', message = message)
 
     
-   
+
 #SURVIVOR VIEW FUNCTIONS
 @app.route('/signupSurvivor', methods = ['POST', 'GET'])
 def signupSurvivor():
@@ -230,7 +232,6 @@ def loginSurvivor(error=None):
              error = "Please provide both a valid username and the associated password."
        return render_template('loginSurvivor.html', error=error)
 
-
     
 @app.route('/logout')
 def logout():
@@ -240,7 +241,6 @@ def logout():
    print("Logged_in Status: " + str(session['logged_in'] == True)) #developer aid
    session['message'] = "Current status: logged out."
    return redirect(url_for('home'))
-
 
 
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
@@ -385,7 +385,6 @@ def updateSurvivor(personalname=None):
                db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, month=?, day=?, country=?, state=?, city=?, county=?, village=?, other=?, sos=?, otherSOS=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, updateDate, username])
                db.commit()
             return redirect(url_for("updateSurvivor", personalname=session['personalname'])) 
-
             
 
 @app.route('/deleteSurvivor', methods = ['GET', 'POST'])  
