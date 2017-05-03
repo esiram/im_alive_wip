@@ -2,28 +2,32 @@
 {% block title %} I'mAlive Home {% endblock %}
 {% block content %}
 
-<li><h1>I'mAlive Home</h2></li>
+<h1>I'mAlive: Home</h1>
 
-<form id="home-form" action="http://127.0.0.1:5000" method="post">
+<form id="home-form" action="http://127.0.0.1:5000" method="post" class="pure-form pure-form-aligned">
 
   {% if message %}
-      <p><strong>{{ message }}</strong>
-  {% endif %}
+  <p><strong>{{ message }}</strong>
+   {% endif %}
+
+   {% if error %} 
+    <p><font color="red">{{ error }}</font>
+   {% endif %}
 
   <div> <img src="static/happystickfigure.jpg"></div>	
-  
-  <input type="radio" name="doWhat" value="search"> Look Up Someone<br>
-  <input type="radio" name="doWhat" value="signup"> Sign Up To Tell Others You Live<br>
-  <input type="radio" name="doWhat" value="login"> Log In To Update Your Information<br>
-   <br>
-  <input type="submit" value="Submit">
-   <br>
-       {% if error %} 
-           <p><strong>{{ error }}</strong>
-       {% endif %}
 
+  <div class="pure-control-group">
+    <label for="doWhatContainer"></label>
+    <li><input type="radio" name="doWhat" value="search"> Look Up Someone</input></li>
+    <li><input type="radio" name="doWhat" value="signup"> Sign Up To Tell Others You Live</input></li>
+    <li><input type="radio" name="doWhat" value="login"> Log In To Update Your Information</input></li>
+  </div>
+
+  <div class="pure-controls">
+    <button type="submit" class="pure-button pure-button-primary">Submit</button>
+  </div>
 </form>  
-  
+<br></br>  
   
 {% endblock %}
 

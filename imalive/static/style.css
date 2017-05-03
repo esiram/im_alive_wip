@@ -1,4 +1,4 @@
-body       { font-family: san-serif; background: #eee; }
+body       { font-family: san-serif; color: #eee; }
 a, h1, h2  { color: #277ba8; }
 .page      { margin: 23m auto; width: 35em; border: 5px solid #ccc; padding: 0.8em; background: white; }
 .metanav   { text-align: right; font-size: 0.8em; padding: 0.3em; margin-bottom: 1em; background: #fafafa; }

@@ -127,7 +127,7 @@ def celebrate(personalname = None):
     if 'personalname' in session:              
        return render_template('celebrate.html', personalname = personalname, message = message)
     else:                           #personalname not in session
-       message= "Celebrate, you live!!!  If you want to look someone else up, please check out the I'mAlive Search page."
+       message= "Rejoice, you live!!!  If you want to look someone else up, please check out the I'mAlive Search page."
        return render_template('celebrate.html', message = message)
 
     
