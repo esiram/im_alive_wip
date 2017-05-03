@@ -8,23 +8,23 @@
 <form action="http://127.0.0.1:5000/search" method="post" class="pure-form pure-form-aligned">
   
   {% if error %}
-  <p><strong>{{ error }}</strong>
+  <p><font color="red">{{ error }}</font>
   <br>
   {% endif %}
 
   <div class="pure-control-group">
     <label for="familyname">Family (Last) Name*:</label>
-    <input type="text" name="familyname">
+    <input type="text" name="familyname" placeholder="Required"></input>
   </div>
 
   <div class="pure-control-group">
     <label for="personalname">Personal (First) Name*:</label>
-    <input type="text" name="personalname">
+    <input type="text" name="personalname" placeholder="Required"></input>
   </div>
 
   <div class="pure-control-group">
     <label for="additionalname">Additional Name(s):</label>
-    <input type="text" name="additionalname">
+    <input type="text" name="additionalname"></input>
   </div>  
   <br></br>
 

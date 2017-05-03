@@ -2,8 +2,7 @@
                           a) when dynamic url for celebrate.html: happy dance gif doesn't load
                           b) upper and lower case values in search
                           c) change password section - currently error stating one can't
-Other non-backend work: 1) Create good Readme for Git Hub
-                        2) Beautify front-end -- (not focus b/c of backend focus, but needs improving)          
+Other non-backend work: 1) Create good Readme for Git Hub        
 """
 
 
@@ -95,8 +94,8 @@ def home():
    if 'message' in session:
       message = session['message'] #tbd: consider changing this or renaming session messages
    error = None
-   if 'error' in session:
-      error = session['error']
+   #if 'error' in session:
+    #  error = session['error']
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
        if 'doWhat' in request.form:

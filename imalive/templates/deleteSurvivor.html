@@ -4,29 +4,35 @@
 
 {% block content %}
 
-<h1>I'mAlive Delete Account Verification</h1>
+<h1>I'mAlive: Delete Account Verification</h1>
 
-<form action="http://127.0.0.1:5000/deleteSurvivor" method="post">
+<form action="http://127.0.0.1:5000/deleteSurvivor" method="post" class="pure-form pure-form-aligned">
+  
   {% if error %}
-    <p><strong>{{ error }}</strong>
-    <br>
+    <p><font color="red">{{ error }}</font>
+    <br></br>
   {% endif %}
     
-    
-    <br>
-    <input type="radio" name="delete" value="no"> No, do not delete this account.
-    <br>
-    <br>
-    <input type="radio" name="delete" value="yes"> Yes, delete this account.
-    <br>
-    
-    Username (required to delete account):
-    <input type="text" name="username"><br>
-    Password (required to delete account):
-    <input type="password" name="password"><br>
-    <br>
-    <input type="submit" value="Submit">
+  <div class="pure-control-group">
+    <label for="deleteContainer">Delete This Account?</label>
+    <input type="radio" name="delete" id="no" value="no"> No, do not delete this account</input>
+    <input type="radio" name="delete" id="yes" value="yes"> Yes, delete this account</input>
+  </div>
+      
+  <div class="pure-control-group">
+    <label for="username"> Username:</label>
+    <input type="text" name="username" placeholder="Required to Delete Account"></input>
+  </div>
 
+  <div class="pure-control-group">
+    <label for="password">Password:</label>
+    <input type="password" name="password" placeholder="Required to Delete Account"></input>
+  </div>  
+  <br></br>
+
+  <div class="pure-controls">
+    <button type="submit" class="pure-button pure-button-primary">Submit</button>
+  </div>  
 </form>
-
+<br></br>
 {% endblock%}
