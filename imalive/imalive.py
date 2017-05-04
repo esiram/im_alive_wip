@@ -1,9 +1,9 @@
 """As time permits, work on: 1) Backend:
-                                 a) when dynamic url for celebrate.html: happy dance gif doesn't load
-                                 b) upper and lower cases in search view (note: you may use html functionality for this; research to see which is better)
-                                 c) change password section needs to get added
+                                 a)upper and lower cases in search view (note: you may use html functionality for this; research to see which is better)
+                                 b) change password section needs to get added
                              2) Frontend:
-                                 a) create good Readme for Git Hub with screen shots """
+                                 a) create good Readme for Git Hub with screen shots
+                                 b) modify/beautify frontend views """
 
 """I'mAlive's primary goal: to give families of refugees and families of human trafficking/domestic violence victims hope and peace through the knowledge that their loved ones still live, having survived whatever obstacles confronted them.  I'mAlive focuses on those lacking access to more common social media platforms and/or those, because of safety issues, unable to risk sharing much identifying information but who still wish to pass information to their families that they live."""
 
@@ -122,10 +122,10 @@ def celebrate(personalname = None):
     if 'message' in session:
        message = session['message']
     if 'personalname' in session:              
-       return render_template('celebrate.html', personalname = personalname, message = message)
+       return render_template('celebrate.html', personalname = personalname, message = message, parent = "..")
     else:                           #personalname not in session
        message= "Rejoice, you live!!!  If you want to look someone else up, please check out the I'mAlive Search page."
-       return render_template('celebrate.html', message = message)
+       return render_template('celebrate.html', message = message, parent = "", personalname = "")
 
     
 
