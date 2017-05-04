@@ -1,10 +1,9 @@
-"""Left to do backend: 1) Correct issues:
-                          a) when dynamic url for celebrate.html: happy dance gif doesn't load
-                          b) upper and lower case values in search
-                          c) change password section - currently error stating one can't
-Other non-backend work: 1) Create good Readme for Git Hub        
-"""
-
+"""As time permits, work on: 1) Backend:
+                                 a) when dynamic url for celebrate.html: happy dance gif doesn't load
+                                 b) upper and lower cases in search view (note: you may use html functionality for this; research to see which is better)
+                                 c) change password section needs to get added
+                             2) Frontend:
+                                 a) create good Readme for Git Hub with screen shots """
 
 """I'mAlive's primary goal: to give families of refugees and families of human trafficking/domestic violence victims hope and peace through the knowledge that their loved ones still live, having survived whatever obstacles confronted them.  I'mAlive focuses on those lacking access to more common social media platforms and/or those, because of safety issues, unable to risk sharing much identifying information but who still wish to pass information to their families that they live."""
 
@@ -90,12 +89,12 @@ def home():
    """ Handles home screen. """
    session['logged_in'] = False    #to verify session is logged out
    print(session['logged_in'])     #developer help: should print *False* if logged out
-   message = ""
-   if 'message' in session:
-      message = session['message'] #tbd: consider changing this or renaming session messages
+   message = "Welcome to I'mAlive!"
+   #if 'message' in session:
+   #   message= session['message']
    error = None
-   #if 'error' in session:
-    #  error = session['error']
+   if 'error' in session:
+     error = session['error']
    render_template('home.html', error = error, message = message)
    if request.method == 'POST':  
        if 'doWhat' in request.form:
@@ -107,11 +106,10 @@ def home():
            else:                    #doWhat == "login"
               return redirect(url_for("loginSurvivor"))
        else:                        #if nothing chosen but submit/enter button clicked
-           session['message'] = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you."
-           return render_template('home.html', message = message)
+           error  = "Nothing selected: please click the circle next to the option you want, then click 'Submit.'  Thank you."
+           return render_template('home.html', error = session['error'], message = message)
    else:                            #request.method == 'GET'
-       session['message'] = "Welcome to I'mAlive!"
-       return render_template('home.html', error = error, message = message)
+      return render_template('home.html', error = error, message = message)
 
 
 @app.route('/celebrate', methods = ['GET', 'POST'])    
@@ -238,8 +236,8 @@ def logout():
    session.pop('logged_in', None)
    session['logged_in'] = False
    print("Logged_in Status: " + str(session['logged_in'] == True)) #developer aid
-   session['message'] = "Current status: logged out."
-   return redirect(url_for('home'))
+   session['error'] = "Current status: logged out."
+   return redirect(url_for('home', error=session['error']))
 
 
 @app.route('/updateSurvivor', methods = ['GET', 'POST'])
@@ -312,8 +310,9 @@ def updateSurvivor(personalname=None):
       return render_template('updateSurvivor.html', message = session['message'], personalname = session['personalname'], familyname2 = familyname2, personalname2 = personalname2, additionalname2 = additionalname2, gender2 = gender2, age2 = age2, year2 = year2, month2 = month2, day2 = day2, country2 = country2, state2 = state2, city2 = city2, county2 = county2, village2 = village2, other2 = other2, sos2 = sos2, otherSOS2 = otherSOS2, signupDate = signupDate)
    else:                           #request.method == 'POST'
       if session['logged_in'] != True:
-         session['error'] = "LoggedOut"
-         return redirect(url_for("loginSurvivor", error=session['error']))
+         error = "Logged out."
+         #session['error'] = "LoggedOut"
+         return redirect(url_for("loginSurvivor", error=error))
       else:                        #session['logged_in'] == True
          error = "POST VIEW ERROR MESSAGE"
          username = session['username']
@@ -374,12 +373,12 @@ def updateSurvivor(personalname=None):
                otherSOS = str(result[16])
                if 'otherSOS' in request.form and request.form['otherSOS']!= "":
                   otherSOS = request.form['otherSOS']
-               if 'password' in session:   
-                  password = session['password']   
-               if 'password' in request.form and request.form['password'] == "Yes":  #THIS NEEDS WORK
-                  error = "Cannot change password at this time."
-                  session['message'] = error
-                  return redirect(url_for("home"))
+              # if 'password' in session:   
+              #    password = session['password']   
+              # if 'password' in request.form and request.form['password'] == "Yes":  #THIS NEEDS WORK
+              #    error = "Cannot change password at this time."
+              #    session['message'] = error
+              #    return redirect(url_for("home"))
                updateDate = str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
                db.execute("UPDATE survivors SET additionalName=?, gender=?, age=?, year=?, month=?, day=?, country=?, state=?, city=?, county=?, village=?, other=?, sos=?, otherSOS=?, updateDate=? WHERE username=?", [additionalname, gender, age, year, month, day, country, state, city, county, village, other, sos, otherSOS, updateDate, username])
                db.commit()

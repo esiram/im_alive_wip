@@ -4,12 +4,13 @@
 
 {% block content %}
 
-<h2>I'mAlive: Login</h2>
+<h1>I'mAlive: Login</h1>
 <form action="http://127.0.0.1:5000/loginSurvivor" method="post" class="pure-form pure-form-aligned">
+  
   {% if error %}
-  <p><font color="red">Error: {{ error }}</font>
-    <br>
-    {% endif %}
+  <p><font color="#880000">Error: {{ error }}</font>
+  <br></br>
+  {% endif %}
     <fieldset>
       <div class="pure-control-group">
 	<label for="username">Username:</label>
@@ -25,3 +26,4 @@
     </fieldset>
 </form>
 {% endblock%}
+

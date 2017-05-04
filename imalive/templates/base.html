@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+ <body style="background-color:gainsboro";>
   <div class="header">
     {% block head %}
     <link href="/static/pure-release-0.6.2/pure-min.css" rel="stylesheet" media="screen">
@@ -8,7 +9,7 @@
     <title>{% block title %}{% endblock %}</title>
     {% endblock %}
   </div>
-  <div id="header" class="content" style="background-color:gainsboro;">
+  <div id="header" class="content">
     <li>
       <a href="http://127.0.0.1:5000/home">Home</a>
       <a href="http://127.0.0.1:5000/search">Search</a>
@@ -17,15 +18,16 @@
       <a href="http://127.0.0.1:5000/logout">Logout</a>
     </li>
   </div>
-  <div id="content" class="content" style="background-color:gainsboro;">
+  <div id="content" class="content">
     {% block content %}
     {% endblock %}
   </div>
   <br></br>
 
-  <div id="footer" class="footer" style="background-color:gainsboro;">
+  <div id="footer" class="footer">
     {% block footer %}
     <small>I'mAlive &copy; Copyright 2016-2017 by Esther Siram</small>
     {% endblock %}
   </div>
+  </body>
 </html>

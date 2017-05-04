@@ -1,20 +1,19 @@
 {% extends "base.html" %}
 {% block title %} I'mAlive Home {% endblock %}
 {% block content %}
-
 <h1>I'mAlive: Home</h1>
 
 <form id="home-form" action="http://127.0.0.1:5000" method="post" class="pure-form pure-form-aligned">
 
-  {% if message %}
-  <p><strong>{{ message }}</strong>
+   {% if message %}
+    <p><strong>{{ message }}</strong></p>
    {% endif %}
 
    {% if error %} 
-    <p><font color="red">{{ error }}</font>
-   {% endif %}
+    <p><font color=#880000; size="3";>{{ error }}</font></p>
+    {% endif %}
 
-  <div> <img src="static/happystickfigure.jpg"></div>	
+  <div> <img src="static/happyperson.jpg"></div>
 
   <div class="pure-control-group">
     <label for="doWhatContainer"></label>
@@ -25,9 +24,9 @@
 
   <div class="pure-controls">
     <button type="submit" class="pure-button pure-button-primary">Submit</button>
-  </div>
+  </div>  
 </form>  
 <br></br>  
   
 {% endblock %}
-
+</body>

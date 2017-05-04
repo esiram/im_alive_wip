@@ -6,15 +6,14 @@
 
 <h1>I'mAlive: Celebrate!!!</h1>
 
-
-<div action="http://127.0.0.1:5000/celebrate/{{ personalname }}" method="get">
-   
+<div action="http://127.0.0.1:5000/celebrate/{{ personalname }}" method="get">  
+  
    {% if message %}
-   <li><b>{{ message }}</b> </li>
+   <li><font color=#88000;><b>{{ message }}</b></font></li>
    {% endif %}
 
 	      
-   <li><img src="static/happydance.gif" class="img-responsive" alt="Responsive image"></li>
+   <li><img src="static/happydance.gif"></li>
    <em>I'm Alive. Celebrate!</em>
 
 </div>   
