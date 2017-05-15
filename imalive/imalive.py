@@ -2,10 +2,9 @@
                                  a)upper and lower cases in search view (note: you may use html functionality for this; research to see which is better)
                                  b) change password section needs to get added
                              2) Frontend:
-                                 a) create good Readme for Git Hub with screen shots
-                                 b) modify/beautify frontend views """
+                                 a) modify/beautify frontend views """
 
-"""I'mAlive's primary goal: to give families of refugees and families of human trafficking/domestic violence victims hope and peace through the knowledge that their loved ones still live, having survived whatever obstacles confronted them.  I'mAlive focuses on those lacking access to more common social media platforms and/or those, because of safety issues, unable to risk sharing much identifying information but who still wish to pass information to their families that they live."""
+"""I'mAlive's primary goal: to give families of refugees and families of human trafficking victims hope and peace through the knowledge that their loved ones still live.  I'mAlive focuses on those lacking access to more common social media platforms and/or those, who because of safety issues, cannot risk sharing much identifying information but who want their families to know that they live."""
 
 ### ALL IMPORTS ###
 import os

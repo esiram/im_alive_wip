@@ -1,0 +1,42 @@
+
+README
+
+Synopsis:
+I'mAlive exists as a prototype Python CRUD web app for refugees and/or human trafficking victims to tell their families that they still live.
+
+Users include *survivors*, *seekers*, and administrators.
+
+Survivors signup submitting at minimum a password, a username, a family (last) name, and a personal (first) name.  To update their information, survivors must log in with their individual passwords and unique usernames.  If survivors currently live in dangerous situations, they may communicate this via I'mAlive. I'mAlive Administrators could then share this so-called *SOS* data with the appropriate government and/or nonprofit agency(ies) who could then try to aid the survivors.  Examples of vulnerable survivors include: starving refugees, human trafficking victims, and victims of domestic violence. 
+
+Seekers may look up survivors by inputting a survivor's family and personal name in the I'mAlive search page.  Seekers may also submit other detailed information in the search screen, but it must match what the survivor provided when signing up and/or updating the survivor's I'mAlive record.
+
+At this time, administrators can update the database only in a backend, development sense.  If launched for "real world" use, I'mAlive administrators would have the ability to take the SOS information and contact the appropriate agencies to help survivors.  Also, I'mAlive administrators could potentially update survivor or help survivors update their I'mAlive profiles.  What type of survivor information administrators could access, depends on how I'mAlive rolls out and would need thoughtful review by the appropriate authorities to ensure the survivors' safety.
+
+
+Code Example:
+
+
+Motivation:
+Many help people lack access to more common social media platforms and/or, who due to safety issues, cannot share much identifying information about themselves online but want to let their families know that they live.  Such folks inspired the creation of I'mAlive.  I chose Flask, Python, and SQLite at the advice of professional programmers encouraging me to learn how to code and to use programming in pursuit of practically helping vulnerable people get out of harmful situations and into good ones.
+
+
+Installation:
+
+
+Contributors:
+At present this functions as a prototype side project.
+If you have questions, comments, or advice, please contact Esther Siram:
+   Twitter: @esturbo -- include #ImAlive
+   email: isusecalea2@gmail.com  -- include "I'mAlive Comment:" in the subject line.
+
+
+License:
+
+
+FLASK (http://flask.pocoo.org/)
+Python (https://www.python.org/)
+SQLite (https://sqlite.org/)
+SQLite Manager (https://github.com/lazierthanthou/sqlite-manager)
+
+ 
+
