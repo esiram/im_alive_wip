@@ -23,36 +23,36 @@ Usage
 -----
 I'mAlive's users include *survivors*, *seekers*, and *administrators*.
 
-On the home page survivors and administrators choose to signup a survivor with I'mAlive or to update information.  Seekers opt to look up individual survivors.
+On the *Home* screen survivors and administrators choose to sign up a survivor with I'mAlive or to update a survivor's information.  Seekers opt to look up individual survivors.
 
 ![home page](imalive/static/imalive-home.png)
 
 
-A survivor registers with I'mAlive by submitting a password, a unique username, a family (last) name, and a personal (first) name; the survivor can share other data too, but I'mAlive doesn't require it.
+To create an I'mAlive profile, a survivor clicks the *Home* screen's "Sign Up To Tell Others You Live" button or clicks the "SignUp" navigation link.  This sends the survivor to the *SignUp* screen.  There the survivor registers with I'mAlive by submitting a password, a unique username, a family (last) name, and a personal (first) name; the survivor can share other data too, but I'mAlive doesn't require it.
 
 ![sign up](imalive/static/imalive-signup.png)
 
 
-If survivors currently live in dangerous situations, they may communicate this via I'mAlive. I'mAlive administrators could then share this so-called *SOS* data with the appropriate government and/or nonprofit agency(ies) which could then try to aid the survivors.
+If survivors currently live in dangerous situations, they may communicate this via I'mAlive by answering the "Are you in danger?" question with "Yes, please help." If possible, the survivor will hopefully give more details about the danger.  I'mAlive administrators could then share this so-called *SOS* data with the appropriate government and/or nonprofit agency(ies) which could then try to aid the survivors.
 
 Examples of vulnerable survivors include: starving refugees, human trafficking victims, and victims of domestic violence.
 
-When registered, I'mAlive celebrates with the survivor.
+Once survivors submit their signup data, I'mAlive sends them to a personalized *Celebrate* screen.
 
 ![celebrate sign up](imalive/static/imalive-celebrate-at-signup.png)
 
 
-To update their information, survivors must log in with their passwords and unique usernames.  The update page shows the survivor's current I'mAlive profile.
+To update their information, survivors click the *Home* screen's "Log In To Update Your Information" button or click on the "Login/Update" navigation link.  Survivors must log in with their passwords and unique usernames.  If successfully logged in, I'mAlive sends the survivor to the *Update* screen which shows the survivor's current I'mAlive profile information next to the fields that the survivor may change.
 
 ![update](imalive/static/imalive-update.png)
 
 
-Seekers input a survivor's family and personal name in the I'mAlive search page to look for a specific individual.  Seekers may submit other details in the search screen, but in order to find the right survivor, the other details must match what the survivor provided at signup and/or when updating the survivor's I'mAlive record.
+Seekers click the *Home* screen's "Look Up Someone" button or click on the "Search" navigation link.  This sends seekers to the *Search* screen where the seeker may input a survivor's family and personal name to look for a specific individual.  Seekers may submit other details in the *Search* screen, but in order to find the right survivor, any other details must match what the survivor provided at registration and/or when updating the survivor's I'mAlive record.
 
 ![search](imalive/static/imalive-search.png)
 
 
-If found, I'mAlive sends the seeker to a celebrate screen which tells when the survivor registered with I'mAlive, but doesn't give any other locating information for the survivor's safety.
+If the seeker's survivor data matches that in I'mAlive's database, I'mAlive sends the seeker to a *Celebrate* screen which tells when the survivor registered with I'mAlive, but doesn't give any other locating information for the survivor's safety.
 
 ![celebrate at search](imalive/static/imalive-celebrate-at-search.png)
 
