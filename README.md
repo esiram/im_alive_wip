@@ -21,37 +21,41 @@ The 'imalive' app should now be running on `http://127.0.0.1:5000`.
 
 Usage
 -----
-Users include *survivors*, *seekers*, and administrators.
-
-![home page](imalive/static/imalive-home.png)
+I'mAlive's users include *survivors*, *seekers*, and *administrators*.
 
 On the home page survivors and administrators choose to signup a survivor with I'mAlive or to update information.  Seekers opt to look up individual survivors.
 
+![home page](imalive/static/imalive-home.png)
 
-![sign up](imalive/static/imalive-signup.png)
 
 A survivor registers with I'mAlive by submitting a password, a unique username, a family (last) name, and a personal (first) name; the survivor can share other data too, but I'mAlive doesn't require it.
 
-If survivors currently live in dangerous situations, they may communicate this via I'mAlive. I'mAlive Administrators could then share this so-called *SOS* data with the appropriate government and/or nonprofit agency(ies) who could then try to aid the survivors.  Examples of vulnerable survivors include: starving refugees, human trafficking victims, and victims of domestic violence.
+![sign up](imalive/static/imalive-signup.png)
 
 
-![celebrate sign up](imalive/static/imalive-celebrate-at-signup.png)
+If survivors currently live in dangerous situations, they may communicate this via I'mAlive. I'mAlive administrators could then share this so-called *SOS* data with the appropriate government and/or nonprofit agency(ies) which could then try to aid the survivors.
+
+Examples of vulnerable survivors include: starving refugees, human trafficking victims, and victims of domestic violence.
 
 When registered, I'mAlive celebrates with the survivor.
 
+![celebrate sign up](imalive/static/imalive-celebrate-at-signup.png)
 
-![update](imalive/static/imalive-update.png)
 
 To update their information, survivors must log in with their passwords and unique usernames.  The update page shows the survivor's I'mAlive profile.
 
+![update](imalive/static/imalive-update.png)
 
-![search](imalive/static/imalive-search.png)
 
 Seekers input a survivor's family and personal name in the I'mAlive search page to look for a specific individual.  Seekers may submit other details in the search screen, but in order to find the right survivor, the other details must match what the survivor provided at signup and/or when updating the survivor's I'mAlive record.
 
-![celebrate at search](imalive/static/imalive-celebrate-at-search.png)
+![search](imalive/static/imalive-search.png)
+
 
 If found, I'mAlive sends the seeker to a celebrate screen which tells when the survivor registered with I'mAlive, but doesn't give any other locating information for the survivor's safety.
+
+![celebrate at search](imalive/static/imalive-celebrate-at-search.png)
+
 
 At this time, administrators can update the database only in a backend, development sense.  If launched for "real world" use, I'mAlive administrators would have the ability to take the SOS information and contact the appropriate agencies to help survivors.  Also, I'mAlive administrators could potentially update survivor or help survivors update their I'mAlive profiles.  What type of survivor information administrators could access depends on how I'mAlive rolls out and would need thoughtful review by the appropriate authorities to ensure each survivors' safety.
 
