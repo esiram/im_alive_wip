@@ -9,7 +9,7 @@ Many people lack access to more common social media platforms and/or, who due to
 
 Installation
 ------------
-First install [Python 3][1], then [SQLite][2] and then [Flask][3], then do:
+First install [Python 3][1], then [SQLite][2], and then [Flask][3], then do:
 
     > git clone https://github.com/esiram/imalive.git
     > cd imalive
@@ -17,7 +17,7 @@ First install [Python 3][1], then [SQLite][2] and then [Flask][3], then do:
     > export FLASK_DEBUG=true
     > flask run
 
-The 'imalive' app should now be running on `http://127.0.0.1:5000`.
+The 'imAlive' app should now be running on `http://127.0.0.1:5000`.
 
 Usage
 -----
@@ -42,7 +42,7 @@ When registered, I'mAlive celebrates with the survivor.
 ![celebrate sign up](imalive/static/imalive-celebrate-at-signup.png)
 
 
-To update their information, survivors must log in with their passwords and unique usernames.  The update page shows the survivor's I'mAlive profile.
+To update their information, survivors must log in with their passwords and unique usernames.  The update page shows the survivor's current I'mAlive profile.
 
 ![update](imalive/static/imalive-update.png)
 
