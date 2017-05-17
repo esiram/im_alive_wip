@@ -22,8 +22,17 @@ The 'imalive' app should now be running on `http://127.0.0.1:5000`.
 Usage
 -----
 
-[!home page](imalive/static/imalive-home.png)
+![home page](imalive/static/imalive-home.png)
 
+![sign up](imalive/static/imalive-signup.png)
+
+![celebrate sign up](imalive/static/imalive-celebrate-at-signup.png)
+
+![update](imalive/static/imalive-update.png)
+
+![search](imalive/static/imalive-search.png)
+
+![celebrate at search](imalive/static/imalive-celebrate-at-search.png)
 
 
    [1]: https://www.python.org/
