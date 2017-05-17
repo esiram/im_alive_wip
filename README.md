@@ -33,7 +33,7 @@ To create an I'mAlive profile, a survivor clicks the *Home* screen's "Sign Up To
 ![sign up](imalive/static/imalive-signup.png)
 
 
-If survivors currently live in dangerous situations, they may communicate this via I'mAlive by answering the "Are you in danger?" question with "Yes, please help." If possible, the survivor will hopefully give more details about the danger.  I'mAlive administrators could then share this so-called *SOS* data with the appropriate government and/or nonprofit agency(ies) which could then try to aid the survivors.
+If survivors currently live in dangerous situations, they may communicate this via I'mAlive by answering the "Are You In Danger?" question with "Yes, please help." If possible, the survivor will hopefully give more details about the danger.  I'mAlive administrators could then share this so-called *SOS* data with the appropriate government and/or nonprofit agency(ies) which could then try to aid the survivors.
 
 Examples of vulnerable survivors include: starving refugees, human trafficking victims, and victims of domestic violence.
 
@@ -47,12 +47,12 @@ To update their information, survivors click the *Home* screen's "Log In To Upda
 ![update](imalive/static/imalive-update.png)
 
 
-Seekers click the *Home* screen's "Look Up Someone" button or click on the "Search" navigation link.  This sends seekers to the *Search* screen where the seeker may input a survivor's family and personal name to look for a specific individual.  Seekers may submit other details in the *Search* screen, but in order to find the right survivor, any other details must match what the survivor provided at registration and/or when updating the survivor's I'mAlive record.
+Seekers click the *Home* screen's "Look Up Someone" button or click on the "Search" navigation link.  This sends seekers to the *Search* screen where seekers may input survivors' family and personal names to look for specific individuals.  Seekers may submit other details in the *Search* screen, but in order to find the right survivor, any other data must match what the survivor provided at registration and/or when updating the survivor's I'mAlive record.
 
 ![search](imalive/static/imalive-search.png)
 
 
-If the seeker's survivor data matches that in I'mAlive's database, I'mAlive sends the seeker to a *Celebrate* screen which tells when the survivor registered with I'mAlive, but doesn't give any other locating information for the survivor's safety.
+If the seeker's survivor data matches a survivor's data in I'mAlive's database, I'mAlive sends the seeker to a *Celebrate* screen which tells when the survivor registered with I'mAlive, but doesn't give any other locating information for the survivor's safety.
 
 ![celebrate at search](imalive/static/imalive-celebrate-at-search.png)
 
