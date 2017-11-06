@@ -1,4 +1,0 @@
-{% extends "base.html" %}
-{% block body %}
-<li><em>I'm Alive.  Celebrate!</em></li>
-{% endblock %}
